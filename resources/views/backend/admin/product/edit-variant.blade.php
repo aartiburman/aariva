@@ -148,11 +148,20 @@
                                                              <select name="package_type[{{ $index }}]" class="form-select form-select-sm">
                                                                   <option value="">Select</option>
                                                                   <option value="box" {{ ($value->package_type ?? '') == 'box' ? 'selected' : '' }}>Box</option>
+                                                                  <option value="cardboard_box" {{ ($value->package_type ?? '') == 'cardboard_box' ? 'selected' : '' }}>Cardboard Box</option>
+                                                                  <option value="corrugated_box" {{ ($value->package_type ?? '') == 'corrugated_box' ? 'selected' : '' }}>Corrugated Box</option>
                                                                   <option value="polybag" {{ ($value->package_type ?? '') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
                                                                   <option value="bubble_wrap" {{ ($value->package_type ?? '') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
-                                                                  <option value="crate" {{ ($value->package_type ?? '') == 'crate' ? 'selected' : '' }}>Crate</option>
-                                                                  <option value="pallet" {{ ($value->package_type ?? '') == 'pallet' ? 'selected' : '' }}>Pallet</option>
-                                                                  <option value="envelope" {{ ($value->package_type ?? '') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                                                                  <option value="padded_envelope" {{ ($value->package_type ?? '') == 'padded_envelope' ? 'selected' : '' }}>Padded Envelope</option>
+                                                                  <option value="paper_envelope" {{ ($value->package_type ?? '') == 'paper_envelope' ? 'selected' : '' }}>Paper Envelope</option>
+                                                                  <option value="plastic_pouch" {{ ($value->package_type ?? '') == 'plastic_pouch' ? 'selected' : '' }}>Plastic Pouch</option>
+                                                                  <option value="zip_lock_bag" {{ ($value->package_type ?? '') == 'zip_lock_bag' ? 'selected' : '' }}>Zip Lock Bag</option>
+                                                                  <option value="foam_packaging" {{ ($value->package_type ?? '') == 'foam_packaging' ? 'selected' : '' }}>Foam Packaging</option>
+                                                                  <option value="thermocol_box" {{ ($value->package_type ?? '') == 'thermocol_box' ? 'selected' : '' }}>Thermocol Box</option>
+                                                                  <option value="wooden_box" {{ ($value->package_type ?? '') == 'wooden_box' ? 'selected' : '' }}>Wooden Box</option>
+                                                                  <option value="carton" {{ ($value->package_type ?? '') == 'carton' ? 'selected' : '' }}>Carton</option>
+                                                                  <option value="gift_box" {{ ($value->package_type ?? '') == 'gift_box' ? 'selected' : '' }}>Gift Box</option>
+                                                                  <option value="tube" {{ ($value->package_type ?? '') == 'tube' ? 'selected' : '' }}>Tube</option>
                                                                   <option value="other" {{ ($value->package_type ?? '') == 'other' ? 'selected' : '' }}>Other</option>
                                                              </select>
                                                         </div>

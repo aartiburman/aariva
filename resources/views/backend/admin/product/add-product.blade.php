@@ -328,11 +328,20 @@
                           <select name="package_type[]" class="form-control">
                             <option value="">Select</option>
                             <option value="box" {{ old('package_type.0') == 'box' ? 'selected' : '' }}>Box</option>
+                            <option value="cardboard_box" {{ old('package_type.0') == 'cardboard_box' ? 'selected' : '' }}>Cardboard Box</option>
+                            <option value="corrugated_box" {{ old('package_type.0') == 'corrugated_box' ? 'selected' : '' }}>Corrugated Box</option>
                             <option value="polybag" {{ old('package_type.0') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
                             <option value="bubble_wrap" {{ old('package_type.0') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
-                            <option value="crate" {{ old('package_type.0') == 'crate' ? 'selected' : '' }}>Crate</option>
-                            <option value="pallet" {{ old('package_type.0') == 'pallet' ? 'selected' : '' }}>Pallet</option>
-                            <option value="envelope" {{ old('package_type.0') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                            <option value="padded_envelope" {{ old('package_type.0') == 'padded_envelope' ? 'selected' : '' }}>Padded Envelope</option>
+                            <option value="paper_envelope" {{ old('package_type.0') == 'paper_envelope' ? 'selected' : '' }}>Paper Envelope</option>
+                            <option value="plastic_pouch" {{ old('package_type.0') == 'plastic_pouch' ? 'selected' : '' }}>Plastic Pouch</option>
+                            <option value="zip_lock_bag" {{ old('package_type.0') == 'zip_lock_bag' ? 'selected' : '' }}>Zip Lock Bag</option>
+                            <option value="foam_packaging" {{ old('package_type.0') == 'foam_packaging' ? 'selected' : '' }}>Foam Packaging</option>
+                            <option value="thermocol_box" {{ old('package_type.0') == 'thermocol_box' ? 'selected' : '' }}>Thermocol Box</option>
+                            <option value="wooden_box" {{ old('package_type.0') == 'wooden_box' ? 'selected' : '' }}>Wooden Box</option>
+                            <option value="carton" {{ old('package_type.0') == 'carton' ? 'selected' : '' }}>Carton</option>
+                            <option value="gift_box" {{ old('package_type.0') == 'gift_box' ? 'selected' : '' }}>Gift Box</option>
+                            <option value="tube" {{ old('package_type.0') == 'tube' ? 'selected' : '' }}>Tube</option>
                             <option value="other" {{ old('package_type.0') == 'other' ? 'selected' : '' }}>Other</option>
                           </select>
                         </div>

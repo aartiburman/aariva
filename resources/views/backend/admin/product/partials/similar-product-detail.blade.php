@@ -270,11 +270,20 @@
                     <select name="package_type[]" class="form-control">
                         <option value="">Select</option>
                         <option value="box" {{ ($v->package_type ?? '') == 'box' ? 'selected' : '' }}>Box</option>
+                        <option value="cardboard_box" {{ ($v->package_type ?? '') == 'cardboard_box' ? 'selected' : '' }}>Cardboard Box</option>
+                        <option value="corrugated_box" {{ ($v->package_type ?? '') == 'corrugated_box' ? 'selected' : '' }}>Corrugated Box</option>
                         <option value="polybag" {{ ($v->package_type ?? '') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
                         <option value="bubble_wrap" {{ ($v->package_type ?? '') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
-                        <option value="crate" {{ ($v->package_type ?? '') == 'crate' ? 'selected' : '' }}>Crate</option>
-                        <option value="pallet" {{ ($v->package_type ?? '') == 'pallet' ? 'selected' : '' }}>Pallet</option>
-                        <option value="envelope" {{ ($v->package_type ?? '') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                        <option value="padded_envelope" {{ ($v->package_type ?? '') == 'padded_envelope' ? 'selected' : '' }}>Padded Envelope</option>
+                        <option value="paper_envelope" {{ ($v->package_type ?? '') == 'paper_envelope' ? 'selected' : '' }}>Paper Envelope</option>
+                        <option value="plastic_pouch" {{ ($v->package_type ?? '') == 'plastic_pouch' ? 'selected' : '' }}>Plastic Pouch</option>
+                        <option value="zip_lock_bag" {{ ($v->package_type ?? '') == 'zip_lock_bag' ? 'selected' : '' }}>Zip Lock Bag</option>
+                        <option value="foam_packaging" {{ ($v->package_type ?? '') == 'foam_packaging' ? 'selected' : '' }}>Foam Packaging</option>
+                        <option value="thermocol_box" {{ ($v->package_type ?? '') == 'thermocol_box' ? 'selected' : '' }}>Thermocol Box</option>
+                        <option value="wooden_box" {{ ($v->package_type ?? '') == 'wooden_box' ? 'selected' : '' }}>Wooden Box</option>
+                        <option value="carton" {{ ($v->package_type ?? '') == 'carton' ? 'selected' : '' }}>Carton</option>
+                        <option value="gift_box" {{ ($v->package_type ?? '') == 'gift_box' ? 'selected' : '' }}>Gift Box</option>
+                        <option value="tube" {{ ($v->package_type ?? '') == 'tube' ? 'selected' : '' }}>Tube</option>
                         <option value="other" {{ ($v->package_type ?? '') == 'other' ? 'selected' : '' }}>Other</option>
                     </select>
                 </div>
