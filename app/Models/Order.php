@@ -72,4 +72,14 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'vendor_id');
     }
+
+    public function notes()
+    {
+        return $this->hasMany(OrderNote::class);
+    }
+
+    public function whatsappMessages()
+    {
+        return $this->hasMany(WhatsAppMessage::class);
+    }
 }

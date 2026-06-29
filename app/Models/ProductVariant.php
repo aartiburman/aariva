@@ -26,11 +26,28 @@ class ProductVariant extends Model
         'material',
         'material_ar',
         'material_ne',
+        'low_stock_threshold',
+        'warehouse_id',
+        'package_weight',
+        'package_length',
+        'package_width',
+        'package_height',
+        'package_type',
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class, 'product_variant_id');
     }
 }
 

@@ -72,7 +72,15 @@ class AppServiceProvider extends ServiceProvider
                     ]);
                 }
             } catch (\Exception $e) {
-                // Silently fail if database is not available during view composition
+                $view->with([
+                    'siteName' => 'Nepoora',
+                    'siteFavicon' => null,
+                    'siteLogoDark' => null,
+                    'siteLogoLight' => null,
+                    'categories' => collect(),
+                    'notificationSetting' => null,
+                    'activeVendorPolicy' => null,
+                ]);
             }
         });
     }

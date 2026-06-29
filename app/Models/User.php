@@ -146,6 +146,26 @@ public function city()
         return $this->hasMany(Product::class, 'vendor_id');
     }
 
+    public function customerGroups()
+    {
+        return $this->belongsToMany(CustomerGroup::class, 'customer_group_customer', 'customer_id', 'customer_group_id');
+    }
+
+    public function customerNotes()
+    {
+        return $this->hasMany(CustomerNote::class, 'customer_id');
+    }
+
+    public function abandonedCarts()
+    {
+        return $this->hasMany(AbandonedCart::class);
+    }
+
+    public function whatsAppMessages()
+    {
+        return $this->hasMany(WhatsAppMessage::class);
+    }
+
     public function hasMinimumKyc(): bool
     {
         if (!$this->isVendor()) {

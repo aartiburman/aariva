@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SubCategory extends Model
 {
     // ✅ Table name must be STRING, not array
-    protected $table = 'sub_categories'; // use exact table name
+    protected $table = 'subcategories';
 
     // ✅ Mass assignable fields
     protected $fillable = [

@@ -126,6 +126,37 @@
                                                              <input type="text" name="material[{{ $index }}]" class="form-control form-control-sm" value="{{ $value->material }}" maxlength="100">
                                                         </div>
 
+                                                        {{-- PACKAGE WEIGHT --}}
+                                                        <div class="col-md-3">
+                                                             <label class="form-label fw-semibold fs-12">Pkg Weight (kg)</label>
+                                                             <input type="number" step="0.01" min="0" name="package_weight[{{ $index }}]" class="form-control form-control-sm" value="{{ $value->package_weight }}" placeholder="0.00">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                             <label class="form-label fw-semibold fs-12">Pkg Length (cm)</label>
+                                                             <input type="number" step="0.1" min="0" name="package_length[{{ $index }}]" class="form-control form-control-sm" value="{{ $value->package_length }}" placeholder="0.0">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                             <label class="form-label fw-semibold fs-12">Pkg Width (cm)</label>
+                                                             <input type="number" step="0.1" min="0" name="package_width[{{ $index }}]" class="form-control form-control-sm" value="{{ $value->package_width }}" placeholder="0.0">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                             <label class="form-label fw-semibold fs-12">Pkg Height (cm)</label>
+                                                             <input type="number" step="0.1" min="0" name="package_height[{{ $index }}]" class="form-control form-control-sm" value="{{ $value->package_height }}" placeholder="0.0">
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                             <label class="form-label fw-semibold fs-12">Package Type</label>
+                                                             <select name="package_type[{{ $index }}]" class="form-select form-select-sm">
+                                                                  <option value="">Select</option>
+                                                                  <option value="box" {{ ($value->package_type ?? '') == 'box' ? 'selected' : '' }}>Box</option>
+                                                                  <option value="polybag" {{ ($value->package_type ?? '') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
+                                                                  <option value="bubble_wrap" {{ ($value->package_type ?? '') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
+                                                                  <option value="crate" {{ ($value->package_type ?? '') == 'crate' ? 'selected' : '' }}>Crate</option>
+                                                                  <option value="pallet" {{ ($value->package_type ?? '') == 'pallet' ? 'selected' : '' }}>Pallet</option>
+                                                                  <option value="envelope" {{ ($value->package_type ?? '') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                                                                  <option value="other" {{ ($value->package_type ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+                                                             </select>
+                                                        </div>
+
                                                         {{-- IMAGES --}}
                                                         <div class="col-md-6">
                                                              <label class="form-label fw-semibold fs-12">Variant Images</label>

@@ -118,6 +118,13 @@ class Product extends Model
             ->withTimestamps();
     }
 
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'product_supplier')
+            ->withPivot(['supplier_sku', 'supply_price', 'lead_time_days', 'is_preferred'])
+            ->withTimestamps();
+    }
+
     public function activeCampaign()
     {
         return $this->belongsToMany(Campaign::class, 'campaign_products', 'product_id', 'campaign_id')

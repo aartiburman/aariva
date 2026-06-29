@@ -41,6 +41,11 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Admin\POSController;
 use App\Http\Controllers\Admin\WebPagesController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\CrmController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\WhatsAppController;
+use App\Http\Controllers\Admin\OrderNoteController;
 use App\Http\Controllers\Api\UserCheckout;
 
 Route::get('/pay/{order_reference_id}', [POSController::class, 'showPaymentPage'])->name('pos.payment');
@@ -375,6 +380,54 @@ Route::middleware(['auth', 'role:1'])->group(function () {
 
     // Handover PDF
     Route::get('download-handover-pdf', [WebPagesController::class, 'downloadHandoverPdf'])->name('download.handover.pdf');
+
+    // ================= INVENTORY MANAGEMENT =================
+    Route::match(['get', 'post'], 'inventory/dashboard', [InventoryController::class, 'dashboard'])->name('inventory.dashboard');
+    Route::match(['get', 'post'], 'inventory/movements', [InventoryController::class, 'movements'])->name('inventory.movements');
+    Route::post('inventory/stock-adjustment', [InventoryController::class, 'stockAdjustment'])->name('inventory.stock.adjustment');
+    Route::post('inventory/update-threshold', [InventoryController::class, 'updateThreshold'])->name('inventory.update.threshold');
+    Route::get('inventory/warehouses', [InventoryController::class, 'warehouses'])->name('inventory.warehouses');
+    Route::post('inventory/warehouses/store', [InventoryController::class, 'storeWarehouse'])->name('inventory.warehouse.store');
+    Route::put('inventory/warehouses/{id}', [InventoryController::class, 'updateWarehouse'])->name('inventory.warehouse.update');
+    Route::delete('inventory/warehouses/{id}', [InventoryController::class, 'deleteWarehouse'])->name('inventory.warehouse.delete');
+
+    // ================= CUSTOMER CRM =================
+    Route::match(['get', 'post'], 'crm/dashboard', [CrmController::class, 'dashboard'])->name('crm.dashboard');
+    Route::match(['get', 'post'], 'crm/customers', [CrmController::class, 'customers'])->name('crm.customers');
+    Route::get('crm/customers/{id}', [CrmController::class, 'customerDetail'])->name('crm.customer.detail');
+    Route::post('crm/notes', [CrmController::class, 'storeNote'])->name('crm.note.store');
+    Route::delete('crm/notes/{id}', [CrmController::class, 'deleteNote'])->name('crm.note.delete');
+    Route::post('crm/customers/assign-group', [CrmController::class, 'assignGroup'])->name('crm.customer.assign.group');
+    Route::get('crm/abandoned-carts', [CrmController::class, 'abandonedCarts'])->name('crm.abandoned.carts');
+    Route::get('crm/groups', [CrmController::class, 'groups'])->name('crm.groups');
+    Route::post('crm/groups', [CrmController::class, 'storeGroup'])->name('crm.group.store');
+    Route::put('crm/groups/{id}', [CrmController::class, 'updateGroup'])->name('crm.group.update');
+    Route::delete('crm/groups/{id}', [CrmController::class, 'deleteGroup'])->name('crm.group.delete');
+
+    // ================= SUPPLIER MANAGEMENT =================
+    Route::match(['get', 'post'], 'suppliers', [SupplierController::class, 'index'])->name('supplier.index');
+    Route::post('suppliers/store', [SupplierController::class, 'store'])->name('supplier.store');
+    Route::put('suppliers/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+    Route::delete('suppliers/{id}', [SupplierController::class, 'destroy'])->name('supplier.destroy');
+    Route::get('suppliers/{id}', [SupplierController::class, 'detail'])->name('supplier.detail');
+    Route::post('suppliers/link-product', [SupplierController::class, 'linkProduct'])->name('supplier.product.link');
+    Route::delete('suppliers/{supplierId}/products/{productId}', [SupplierController::class, 'unlinkProduct'])->name('supplier.product.unlink');
+    Route::match(['get', 'post'], 'purchase-orders', [SupplierController::class, 'purchaseOrders'])->name('supplier.purchase.orders');
+    Route::post('purchase-orders/store', [SupplierController::class, 'storePurchaseOrder'])->name('supplier.purchase.order.store');
+    Route::get('purchase-orders/{id}', [SupplierController::class, 'purchaseOrderDetail'])->name('supplier.purchase.order.detail');
+    Route::put('purchase-orders/{id}/status', [SupplierController::class, 'updatePurchaseOrderStatus'])->name('supplier.purchase.order.status');
+    Route::put('purchase-orders/{id}/receive', [SupplierController::class, 'receivePurchaseOrder'])->name('supplier.purchase.order.receive');
+
+    // ================= WHATSAPP AUTOMATION =================
+    Route::get('whatsapp/settings', [WhatsAppController::class, 'settings'])->name('whatsapp.settings');
+    Route::post('whatsapp/settings', [WhatsAppController::class, 'updateSettings'])->name('whatsapp.settings.update');
+    Route::match(['get', 'post'], 'whatsapp/messages', [WhatsAppController::class, 'messages'])->name('whatsapp.messages');
+    Route::post('whatsapp/test-send', [WhatsAppController::class, 'sendTest'])->name('whatsapp.test.send');
+    Route::post('whatsapp/order-notify/{orderId}', [WhatsAppController::class, 'sendOrderNotification'])->name('whatsapp.order.notify');
+
+    // ================= ORDER NOTES =================
+    Route::post('order-notes', [OrderNoteController::class, 'store'])->name('order.note.store');
+    Route::delete('order-notes/{id}', [OrderNoteController::class, 'destroy'])->name('order.note.delete');
 });
 
 Route::get('firebase-messaging-sw.js', [NotificationController::class, 'firebase_sw']);
@@ -486,6 +539,10 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('export-customers', [HomeController::class, 'export_customers'])->name('export.customers');
     Route::get('customer-detail/{id}', [HomeController::class, 'customer_detail'])->name('customer.detail');
     Route::post('change-customer-status', [HomeController::class, 'change_customer_status'])->name('change.customer.status');
+
+    // CRM - shared (vendors also need customer management)
+    Route::get('crm/customers/{id}', [CrmController::class, 'customerDetail'])->name('crm.customer.detail');
+    Route::post('crm/notes', [CrmController::class, 'storeNote'])->name('crm.note.store');
 
 });
 

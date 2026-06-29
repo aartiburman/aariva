@@ -141,6 +141,78 @@
                </li>
 
 
+               {{-- ================= INVENTORY MANAGEMENT ================= --}}
+               <li class="nav-item">
+                    <a class="nav-link menu-arrow {{ request()->routeIs(['inventory.*']) ? 'active' : '' }}" href="#sidebarInventory" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['inventory.*']) ? 'true' : 'false' }}" aria-controls="sidebarInventory">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:box-linear"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> Inventory </span>
+                         <iconify-icon icon="solar:alt-arrow-right-linear" class="nav-arrow"></iconify-icon>
+                    </a>
+                    <div class="collapse {{ request()->routeIs(['inventory.*']) ? 'show' : '' }}" id="sidebarInventory">
+                         <ul class="nav sub-navbar-nav">
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('inventory.dashboard') ? 'active' : '' }}" href="{{ route('inventory.dashboard') }}">Dashboard</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('inventory.movements') ? 'active' : '' }}" href="{{ route('inventory.movements') }}">Stock Movements</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('inventory.warehouses') ? 'active' : '' }}" href="{{ route('inventory.warehouses') }}">Warehouses</a>
+                              </li>
+                         </ul>
+                    </div>
+               </li>
+
+               {{-- ================= CRM ================= --}}
+               <li class="nav-item">
+                    <a class="nav-link menu-arrow {{ request()->routeIs(['crm.*']) ? 'active' : '' }}" href="#sidebarCrm" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['crm.*']) ? 'true' : 'false' }}" aria-controls="sidebarCrm">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> CRM </span>
+                         <iconify-icon icon="solar:alt-arrow-right-linear" class="nav-arrow"></iconify-icon>
+                    </a>
+                    <div class="collapse {{ request()->routeIs(['crm.*']) ? 'show' : '' }}" id="sidebarCrm">
+                         <ul class="nav sub-navbar-nav">
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('crm.dashboard') ? 'active' : '' }}" href="{{ route('crm.dashboard') }}">Dashboard</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('crm.customers') ? 'active' : '' }}" href="{{ route('crm.customers') }}">All Customers</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('crm.groups') ? 'active' : '' }}" href="{{ route('crm.groups') }}">Groups</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('crm.abandoned.carts') ? 'active' : '' }}" href="{{ route('crm.abandoned.carts') }}">Abandoned Carts</a>
+                              </li>
+                         </ul>
+                    </div>
+               </li>
+
+               {{-- ================= SUPPLIER MANAGEMENT ================= --}}
+               <li class="nav-item">
+                    <a class="nav-link menu-arrow {{ request()->routeIs(['supplier.*']) ? 'active' : '' }}" href="#sidebarSuppliers" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['supplier.*']) ? 'true' : 'false' }}" aria-controls="sidebarSuppliers">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:delivery-linear"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> Suppliers </span>
+                         <iconify-icon icon="solar:alt-arrow-right-linear" class="nav-arrow"></iconify-icon>
+                    </a>
+                    <div class="collapse {{ request()->routeIs(['supplier.*']) ? 'show' : '' }}" id="sidebarSuppliers">
+                         <ul class="nav sub-navbar-nav">
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('supplier.index') ? 'active' : '' }}" href="{{ route('supplier.index') }}">All Suppliers</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('supplier.purchase.orders') ? 'active' : '' }}" href="{{ route('supplier.purchase.orders') }}">Purchase Orders</a>
+                              </li>
+                         </ul>
+                    </div>
+               </li>
+
                <li class="nav-item">
                     <a class="nav-link menu-arrow {{ request()->routeIs(['new.orders', 'admin.refund.list', 'orders.*']) ? 'active' : '' }}" href="#sidebarOrders" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['new.orders', 'admin.refund.list', 'orders.*']) ? 'true' : 'false' }}" aria-controls="sidebarOrders">
                          <span class="nav-icon">
@@ -415,6 +487,26 @@
                          </span>
                          <span class="nav-text"> {{ __('messages.notifications') }} </span>
                     </a>
+               </li>
+
+               <li class="nav-item">
+                    <a class="nav-link menu-arrow {{ request()->routeIs(['whatsapp.*']) ? 'active' : '' }}" href="#sidebarWhatsApp" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['whatsapp.*']) ? 'true' : 'false' }}" aria-controls="sidebarWhatsApp">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:chat-round-call-linear"></iconify-icon>
+                         </span>
+                         <span class="nav-text"> WhatsApp </span>
+                         <iconify-icon icon="solar:alt-arrow-right-linear" class="nav-arrow"></iconify-icon>
+                    </a>
+                    <div class="collapse {{ request()->routeIs(['whatsapp.*']) ? 'show' : '' }}" id="sidebarWhatsApp">
+                         <ul class="nav sub-navbar-nav">
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('whatsapp.settings') ? 'active' : '' }}" href="{{ route('whatsapp.settings') }}">Settings</a>
+                              </li>
+                              <li class="sub-nav-item">
+                                   <a class="sub-nav-link {{ request()->routeIs('whatsapp.messages') ? 'active' : '' }}" href="{{ route('whatsapp.messages') }}">Message Log</a>
+                              </li>
+                         </ul>
+                    </div>
                </li>
 
                <li class="nav-item">

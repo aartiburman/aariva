@@ -81,11 +81,21 @@
                     <div class="row g-3">
                       <div class="col-md-6">
                         <label class="form-label fw-semibold fs-13 required">Product Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Product Name" value="{{ old('name', $product_data->name) }}" maxlength="255" required>
+                        <div class="input-group">
+                          <input type="text" name="name" class="form-control product-name" placeholder="Enter Product Name" value="{{ old('name', $product_data->name) }}" maxlength="255" required>
+                          <button type="button" class="btn btn-outline-secondary" id="generateTitleBtn" title="Auto-generate title from Brand + Category + Main Feature + Size">
+                            <iconify-icon icon="solar:magic-stick-3-linear" class="fs-16"></iconify-icon>
+                          </button>
+                        </div>
+                        <small class="text-muted">Format: Brand + Product Type + Main Feature + Size/Variant</small>
                       </div>
                       <div class="col-md-6">
                         <label class="form-label fw-semibold fs-13 required">Slug</label>
                         <input type="text" name="slug" class="form-control" value="{{ old('slug', $product_data->slug) }}" maxlength="255" readonly>
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label fw-semibold fs-13">Main Feature</label>
+                        <input type="text" name="main_feature" id="main_feature" class="form-control" maxlength="255" placeholder="e.g. Wireless, Waterproof, Organic" value="{{ old('main_feature') }}">
                       </div>
                       <div class="col-12">
                         <label class="form-label fw-semibold fs-13 required">Short Description</label>
@@ -93,6 +103,11 @@
                       </div>
                       <div class="col-12">
                         <label class="form-label fw-semibold fs-13 required">Description</label>
+                        <div class="d-flex justify-content-end mb-1">
+                          <button type="button" class="btn btn-sm btn-outline-secondary" id="generateDescBtn">
+                            <iconify-icon icon="solar:magic-stick-3-linear" class="fs-14"></iconify-icon> Generate Description Template
+                          </button>
+                        </div>
                         <textarea name="description" class="form-control" rows="4" placeholder="Detailed description..." maxlength="5000" required>{{ old('description', $product_data->description) }}</textarea>
                       </div>
                     </div>
@@ -228,15 +243,78 @@
 
 @push('scripts')
 <script>
+  function generateTitle() {
+    let brand = $('.brandSelect option:selected').text();
+    if (brand === 'Create or select Brand' || brand === 'Select Brand' || !brand) brand = '';
+
+    let category = $('.category_id option:selected').text();
+    if (category === 'Create or select Category' || category === 'Select Category' || !category) category = '';
+
+    let subcategory = $('.subcategory_id option:selected').text();
+    if (subcategory === 'Create or select Subcategory' || subcategory === 'Select Category First' || !subcategory) subcategory = '';
+
+    let childcategory = $('.child_category_id option:selected').text();
+    if (childcategory === 'Create or select Child category' || childcategory === 'Select Sub Category First' || !childcategory) childcategory = '';
+
+    let mainFeature = $('#main_feature').val() || '';
+
+    let sizeVariant = '';
+    let variantSelect = $('select[name="product_variant"]');
+    if (variantSelect.length) {
+      sizeVariant = variantSelect.find('option:selected').text();
+      if (sizeVariant === 'Select product Variant' || !sizeVariant) sizeVariant = '';
+    }
+
+    let productType = childcategory || subcategory || category;
+
+    let parts = [brand, productType, mainFeature, sizeVariant].filter(p => p.trim() !== '');
+
+    let title = parts.join(' - ');
+
+    $('input[name="name"]').val(title);
+
+    let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+    $('input[name="slug"]').val(slug);
+  }
+
+  function generateDescription() {
+    let color = $('input[name="color[]"]').val() || '';
+    let material = $('input[name="material[]"]').val() || '';
+    let sizeText = '';
+    let sizeSelect = $('select[name="size[]"]');
+    if (sizeSelect.length) {
+      let selectedSizes = sizeSelect.val();
+      if (selectedSizes && selectedSizes.length > 0) {
+        sizeText = selectedSizes.join(', ');
+      }
+    }
+
+    let desc = 'Description\n\nInclude:\n';
+    desc += '☐ Material' + (material ? ': ' + material : '') + '\n';
+    desc += '☐ Color' + (color ? ': ' + color : '') + '\n';
+    desc += '☐ Size' + (sizeText ? ': ' + sizeText : '') + '\n';
+    desc += '☐ Features\n';
+    desc += '☐ Package details\n';
+    desc += '☐ Care instructions';
+
+    $('textarea[name="description"]').val(desc);
+  }
+
   $(document).ready(function() {
-    // 1. Slug Generator
+    // 1. Generate Title
+    $('#generateTitleBtn').on('click', generateTitle);
+
+    // 2. Generate Description
+    $('#generateDescBtn').on('click', generateDescription);
+
+    // 3. Slug Generator
     $('.product-name').on('input', function() {
       let name = $(this).val();
-      let slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+      let slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
       $('input[name="slug"]').val(slug);
     });
 
-    // 2. Form Validation
+    // 4. Form Validation
     if (jQuery().validate) {
       $("form").validate({
         rules: {

@@ -40,8 +40,14 @@
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <label class="required">Product Name</label>
-                      <input type="text" name="name" class="form-control product-name @error('name') is-invalid @enderror" maxlength="255" value="{{ old('name') }}" required>
+                      <div class="input-group">
+                        <input type="text" name="name" class="form-control product-name @error('name') is-invalid @enderror" maxlength="255" value="{{ old('name') }}" required>
+                        <button type="button" class="btn btn-outline-secondary" id="generateTitleBtn" title="Auto-generate title from Brand + Category + Main Feature + Size">
+                          <iconify-icon icon="solar:magic-stick-3-linear" class="fs-16"></iconify-icon> Generate
+                        </button>
+                      </div>
                       @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                      <small class="text-muted">Format: Brand + Product Type + Main Feature + Size/Variant</small>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -89,6 +95,12 @@
                   </div>
 
                   <div class="mb-3">
+                    <label>Main Feature</label>
+                    <input type="text" name="main_feature" id="main_feature" class="form-control @error('main_feature') is-invalid @enderror" maxlength="255" placeholder="e.g. Wireless, Waterproof, Organic" value="{{ old('main_feature') }}">
+                    @error('main_feature') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                  </div>
+
+                  <div class="mb-3">
                     <label class="required">Short Description</label>
                     <textarea name="short_description" class="form-control @error('short_description') is-invalid @enderror" maxlength="1000" required>{{ old('short_description') }}</textarea>
                     @error('short_description') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -96,6 +108,11 @@
 
                   <div class="mb-3">
                     <label class="required">Description</label>
+                    <div class="d-flex justify-content-end mb-1">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="generateDescBtn">
+                        <iconify-icon icon="solar:magic-stick-3-linear" class="fs-14"></iconify-icon> Generate Description Template
+                      </button>
+                    </div>
                     <textarea name="description" rows="4" class="form-control @error('description') is-invalid @enderror" maxlength="5000" required>{{ old('description') }}</textarea>
                     @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
                   </div>
@@ -284,10 +301,40 @@
                           @error('size.0') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-12  mb-3">
+                        <div class="col-md-12 mb-3">
                           <label>Material</label>
                           <input type="text" name="material[]" class="form-control @error('material.*') is-invalid @enderror" maxlength="100" placeholder="e.g. Cotton" value="{{ old('material.0') }}">
                           @error('material.*')<div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                          <label>Pkg Weight (kg)</label>
+                          <input type="number" step="0.01" min="0" name="package_weight[]" class="form-control" placeholder="0.00" value="{{ old('package_weight.0') }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                          <label>Pkg Length (cm)</label>
+                          <input type="number" step="0.1" min="0" name="package_length[]" class="form-control" placeholder="0.0" value="{{ old('package_length.0') }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                          <label>Pkg Width (cm)</label>
+                          <input type="number" step="0.1" min="0" name="package_width[]" class="form-control" placeholder="0.0" value="{{ old('package_width.0') }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                          <label>Pkg Height (cm)</label>
+                          <input type="number" step="0.1" min="0" name="package_height[]" class="form-control" placeholder="0.0" value="{{ old('package_height.0') }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label>Package Type</label>
+                          <select name="package_type[]" class="form-control">
+                            <option value="">Select</option>
+                            <option value="box" {{ old('package_type.0') == 'box' ? 'selected' : '' }}>Box</option>
+                            <option value="polybag" {{ old('package_type.0') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
+                            <option value="bubble_wrap" {{ old('package_type.0') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
+                            <option value="crate" {{ old('package_type.0') == 'crate' ? 'selected' : '' }}>Crate</option>
+                            <option value="pallet" {{ old('package_type.0') == 'pallet' ? 'selected' : '' }}>Pallet</option>
+                            <option value="envelope" {{ old('package_type.0') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                            <option value="other" {{ old('package_type.0') == 'other' ? 'selected' : '' }}>Other</option>
+                          </select>
                         </div>
 
                         <div class="col-md-12">
@@ -323,7 +370,73 @@
 
   @push('scripts')
   <script>
+    function generateTitle() {
+      let brand = $('.brandSelect option:selected').text();
+      if (brand === 'Select Brand' || !brand) brand = '';
+
+      let category = $('.category_id option:selected').text();
+      if (category === 'Select Category' || category === 'Create or select Category' || !category) category = '';
+
+      let subcategory = $('.subcategory_id option:selected').text();
+      if (subcategory === 'Select Category First' || subcategory === 'Create or select Subcategory' || !subcategory) subcategory = '';
+
+      let childcategory = $('.child_category_id option:selected').text();
+      if (childcategory === 'Select Sub Category First' || childcategory === 'Create or select Child category' || !childcategory) childcategory = '';
+
+      let mainFeature = $('#main_feature').val() || '';
+
+      let sizeVariant = '';
+      let selectedSizes = $('.js-size-select').first().select2('data');
+      if (selectedSizes && selectedSizes.length > 0) {
+        sizeVariant = selectedSizes.map(s => s.text).join(', ');
+      }
+      if (!sizeVariant) {
+        sizeVariant = $('select[name="product_variant"] option:selected').text();
+        if (sizeVariant === 'Select product Variant' || sizeVariant === 'Select product Variant' || !sizeVariant) sizeVariant = '';
+      }
+
+      let productType = childcategory || subcategory || category;
+
+      let parts = [brand, productType, mainFeature, sizeVariant].filter(p => p.trim() !== '');
+
+      let title = parts.join(' - ');
+
+      $('input[name="name"]').val(title);
+
+      let slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+      $('input[name="slug"]').val(slug);
+    }
+
+    function generateDescription() {
+      let color = $('input[name="color[]"]').val() || '';
+      let material = $('input[name="material[]"]').val() || '';
+      let sizeText = '';
+      let selectedSizes = $('.js-size-select').first().select2('data');
+      if (selectedSizes && selectedSizes.length > 0) {
+        sizeText = selectedSizes.map(s => s.text).join(', ');
+      }
+
+      let desc = 'Description\n\nInclude:\n';
+      desc += '☐ Material' + (material ? ': ' + material : '') + '\n';
+      desc += '☐ Color' + (color ? ': ' + color : '') + '\n';
+      desc += '☐ Size' + (sizeText ? ': ' + sizeText : '') + '\n';
+      desc += '☐ Features\n';
+      desc += '☐ Package details\n';
+      desc += '☐ Care instructions';
+
+      $('textarea[name="description"]').val(desc);
+    }
+
     $(document).ready(function() {
+      $('#generateTitleBtn').on('click', generateTitle);
+      $('#generateDescBtn').on('click', generateDescription);
+
+      // Regenerate slug when product name changes
+      $('.product-name').on('input', function() {
+        let name = $(this).val();
+        let slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        $('input[name="slug"]').val(slug);
+      });
       // Custom validation for percentage discount
       $.validator.addMethod("maxPercentage", function(value, element) {
         let type = $(element).closest('.row').find('.ve-discount-type').val();

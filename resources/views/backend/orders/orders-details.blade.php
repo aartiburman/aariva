@@ -420,12 +420,98 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- ================= ORDER NOTES ================= --}}
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title text-body mb-0">Order Notes</h4>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOrderNoteModal">+ Add Note</button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @forelse($order->notes()->latest()->get() as $note)
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong class="fs-12">{{ $note->user->name ?? 'Staff' }}</strong>
+                                        @if($note->is_staff_only)<span class="badge bg-soft-warning text-warning ms-1 fs-10">Staff Only</span>@endif
+                                        <br>
+                                        <small class="text-muted">{{ $note->created_at->diffForHumans() }}</small>
+                                    </div>
+                                    <form action="{{ route('order.note.delete', $note->id) }}" method="POST" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0" onclick="return confirm('Delete note?')">
+                                            <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
+                                        </button>
+                                    </form>
+                                </div>
+                                <p class="mb-0 mt-1">{{ $note->note }}</p>
+                            </div>
+                            @empty
+                            <div class="list-group-item text-center text-muted py-3">No notes yet</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- WhatsApp Notification Button -->
+        @if($order->user && $order->user->phone)
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header"><h5 class="card-title mb-0">WhatsApp Notifications</h5></div>
+                    <div class="card-body">
+                        <div class="d-flex gap-2">
+                            <form action="{{ route('whatsapp.order.notify', $order->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="template" value="confirmation">
+                                <button type="submit" class="btn btn-sm btn-outline-success">Send Confirmation</button>
+                            </form>
+                            <form action="{{ route('whatsapp.order.notify', $order->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="template" value="shipped">
+                                <button type="submit" class="btn btn-sm btn-outline-info">Send Shipped</button>
+                            </form>
+                            <form action="{{ route('whatsapp.order.notify', $order->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="template" value="delivered">
+                                <button type="submit" class="btn btn-sm btn-outline-success">Send Delivered</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
     <!-- End Container Fluid -->
 
+</div>
+
+<!-- Add Order Note Modal -->
+<div class="modal fade" id="addOrderNoteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('order.note.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                <div class="modal-header"><h5 class="modal-title">Add Note</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <textarea name="note" class="form-control" rows="4" placeholder="Enter note..." maxlength="2000" required></textarea>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="is_staff_only" value="1" id="staff_only">
+                        <label class="form-check-label" for="staff_only">Visible to staff only</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
 

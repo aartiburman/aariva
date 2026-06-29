@@ -249,6 +249,36 @@
                     <input type="text" name="material[]" class="form-control" value="{{ $v->material }}">
                 </div>
 
+                <div class="col-md-3 mb-3">
+                    <label>Pkg Weight (kg)</label>
+                    <input type="number" step="0.01" min="0" name="package_weight[]" class="form-control" value="{{ $v->package_weight }}" placeholder="0.00">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Pkg Length (cm)</label>
+                    <input type="number" step="0.1" min="0" name="package_length[]" class="form-control" value="{{ $v->package_length }}" placeholder="0.0">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Pkg Width (cm)</label>
+                    <input type="number" step="0.1" min="0" name="package_width[]" class="form-control" value="{{ $v->package_width }}" placeholder="0.0">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Pkg Height (cm)</label>
+                    <input type="number" step="0.1" min="0" name="package_height[]" class="form-control" value="{{ $v->package_height }}" placeholder="0.0">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label>Package Type</label>
+                    <select name="package_type[]" class="form-control">
+                        <option value="">Select</option>
+                        <option value="box" {{ ($v->package_type ?? '') == 'box' ? 'selected' : '' }}>Box</option>
+                        <option value="polybag" {{ ($v->package_type ?? '') == 'polybag' ? 'selected' : '' }}>Poly Bag</option>
+                        <option value="bubble_wrap" {{ ($v->package_type ?? '') == 'bubble_wrap' ? 'selected' : '' }}>Bubble Wrap</option>
+                        <option value="crate" {{ ($v->package_type ?? '') == 'crate' ? 'selected' : '' }}>Crate</option>
+                        <option value="pallet" {{ ($v->package_type ?? '') == 'pallet' ? 'selected' : '' }}>Pallet</option>
+                        <option value="envelope" {{ ($v->package_type ?? '') == 'envelope' ? 'selected' : '' }}>Envelope</option>
+                        <option value="other" {{ ($v->package_type ?? '') == 'other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                </div>
+
                 <div class="mt-3">
                     <label>Variant Images</label>
                     <input type="file" name="product_image[{{ $index }}][]" class="form-control" multiple>

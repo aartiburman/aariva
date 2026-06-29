@@ -154,6 +154,7 @@
                                         <th>Discount</th>
                                         <th>Final Price</th>
                                         <th>SKU</th>
+                                        <th>Packaging</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -201,10 +202,23 @@
                                         </td>
                                         <td class="fw-bold">{{ $variant->final_price ?? $variant->price }}</td>
                                         <td>{{ $variant->sku }}</td>
+                                        <td>
+                                            @php
+                                                $pkgParts = [];
+                                                if ($variant->package_weight) $pkgParts[] = $variant->package_weight . 'kg';
+                                                if ($variant->package_length && $variant->package_width && $variant->package_height) $pkgParts[] = $variant->package_length . 'x' . $variant->package_width . 'x' . $variant->package_height . 'cm';
+                                                if ($variant->package_type) $pkgParts[] = ucfirst(str_replace('_', ' ', $variant->package_type));
+                                            @endphp
+                                            @if(count($pkgParts))
+                                                <small class="text-muted">{{ implode(', ', $pkgParts) }}</small>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">No variants found for this product.</td>
+                                        <td colspan="9" class="text-center text-muted">No variants found for this product.</td>
                                     </tr>
                                     @endforelse
                                 </tbody>

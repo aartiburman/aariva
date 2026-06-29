@@ -597,6 +597,11 @@ class ProductController extends Controller
                     'color_ne'         => $translate($request->color[$index], 'ne'),
                     'product_variant'  => $request->product_variant[$index] ?? null,
                     'material'         => $request->material[$index] ?? null,
+                    'package_weight'   => $request->package_weight[$index] ?? null,
+                    'package_length'   => $request->package_length[$index] ?? null,
+                    'package_width'    => $request->package_width[$index] ?? null,
+                    'package_height'   => $request->package_height[$index] ?? null,
+                    'package_type'     => $request->package_type[$index] ?? null,
                     'size_cat_id'      => $request->size_category_id[$index] ?? null,
                     'size'             => json_encode($sizes),
                     'size_ar'          => json_encode($sizes),
@@ -1105,10 +1110,15 @@ class ProductController extends Controller
             $material = $request->material[$index] ?? null;
             $color    = $request->color[$index] ?? null;
 
-            $variant->sku      = $sku;
-            $variant->color    = $color;
-            $variant->stock    = (int) ($request->stock[$index] ?? 0);
-            $variant->material = $material;
+            $variant->sku            = $sku;
+            $variant->color          = $color;
+            $variant->stock          = (int) ($request->stock[$index] ?? 0);
+            $variant->material       = $material;
+            $variant->package_weight = $request->package_weight[$index] ?? null;
+            $variant->package_length = $request->package_length[$index] ?? null;
+            $variant->package_width  = $request->package_width[$index] ?? null;
+            $variant->package_height = $request->package_height[$index] ?? null;
+            $variant->package_type   = $request->package_type[$index] ?? null;
 
             /* ================= TRANSLATIONS ================= */
             try {
@@ -1264,10 +1274,15 @@ class ProductController extends Controller
             $material = $request->material[$index] ?? null;
             $color    = $request->color[$index] ?? null;
 
-            $variant->sku      = $sku;
-            $variant->color    = $color;
-            $variant->stock    = (int) ($request->stock[$index] ?? 0);
-            $variant->material = $material;
+            $variant->sku            = $sku;
+            $variant->color          = $color;
+            $variant->stock          = (int) ($request->stock[$index] ?? 0);
+            $variant->material       = $material;
+            $variant->package_weight = $request->package_weight[$index] ?? null;
+            $variant->package_length = $request->package_length[$index] ?? null;
+            $variant->package_width  = $request->package_width[$index] ?? null;
+            $variant->package_height = $request->package_height[$index] ?? null;
+            $variant->package_type   = $request->package_type[$index] ?? null;
 
             try {
                 $variant->material_ar = $material ? $trAr->translate($material) : null;
