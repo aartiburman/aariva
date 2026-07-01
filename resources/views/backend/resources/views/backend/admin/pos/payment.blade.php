@@ -20,13 +20,12 @@
             <div class="order-summary">
                 <h4>Order Summary</h4>
                 <p><strong>Order ID:</strong> {{ $order->order_reference_id }}</p>
-                <p><strong>Total Amount:</strong> {{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($order->total_cost, 2) }}</p>
+                <p><strong>Total Amount:</strong> {{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($order->total_cost, 2) }}</p>
             </div>
 
             <div class="payment-methods">
                 <h4>Select Payment Method</h4>
-                <button class="btn btn-primary">Pay with Khalti</button>
-                <button class="btn btn-success">Pay with eSewa</button>
+                <button class="btn btn-success">Pay with PhonePe</button>
                 <button class="btn btn-dark">Pay with Stripe</button>
             </div>
         </div>

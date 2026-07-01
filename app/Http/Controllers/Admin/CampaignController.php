@@ -145,7 +145,7 @@ class CampaignController extends Controller
 
             return DB::transaction(function () use ($request, $validated) {
                 $trAr = new GoogleTranslate('ar');
-                $trNe = new GoogleTranslate('ne');
+                $trNe = new GoogleTranslate('hi');
 
                 $campaign = Campaign::create([
                     'name' => $validated['name'],
@@ -355,7 +355,7 @@ class CampaignController extends Controller
             return DB::transaction(function () use ($request, $campaign, $validated) {
                 if ($request->has('name')) {
                     $trAr = new GoogleTranslate('ar');
-                    $trNe = new GoogleTranslate('ne');
+                    $trNe = new GoogleTranslate('hi');
                     $campaign->name_ar = $trAr->translate($request->name);
                     $campaign->name_ne = $trNe->translate($request->name);
                 }

@@ -11,8 +11,8 @@
     }
 
     .btn-login:hover {
-        background-color: #4b0082 !important;
-        border-color: #4b0082 !important;
+        background-color: #C6A75E !important;
+        border-color: #C6A75E !important;
         color: #fff !important;
     }
 </style>

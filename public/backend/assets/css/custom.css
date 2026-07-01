@@ -254,12 +254,12 @@ input.error, select.error, textarea.error {
 
 /* --- Light Mode Overrides --- */
 [data-bs-theme="light"] {
-    --theme-primary-color: #4b0082;
-    --bs-primary: #4b0082;
-    --bs-primary-rgb: 75, 0, 130;
-    --bs-secondary-color: #4b0082;
-    --bs-link-color: #4b0082;
-    --bs-link-hover-color: #3a0063;
+    --theme-primary-color: #1a1a1a;
+    --bs-primary: #ffffff;
+    --bs-primary-rgb: 255, 255, 255;
+    --bs-secondary-color: #ffffff;
+    --bs-link-color: #1a1a1a;
+    --bs-link-hover-color: #C6A75E;
     --bs-table-border-color: #e9ecef;
     --bs-card-border-color: transparent;
     --bs-border-color: #e9ecef;
@@ -269,7 +269,7 @@ input.error, select.error, textarea.error {
 }
 
 [data-bs-theme="light"] .text-purple {
-    color: #4b0082 !important;
+    color: #1a1a1a !important;
 }
 
 [data-bs-theme="light"] body {
@@ -282,6 +282,11 @@ input.error, select.error, textarea.error {
     box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06) !important;
 }
 
+[data-bs-theme="light"] .form-check-input:checked {
+    background-color: #C6A75E !important;
+    border-color: #C6A75E !important;
+}
+
 [data-bs-theme="light"] .form-switch-gold:focus {
     border-color: #000;
     box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25);
@@ -289,22 +294,23 @@ input.error, select.error, textarea.error {
 
 /* Nav Pills Soft Primary - Light Mode */
 [data-bs-theme="light"] .nav-pills.nav-soft-primary .nav-link.active {
-    background-color: #4b0082 !important;
-    color: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+    border: 1px solid #e9ecef !important;
 }
 
 [data-bs-theme="light"] .nav-pills.nav-soft-primary .nav-link {
-    color: #4b0082 !important;
+    color: #1a1a1a !important;
     background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
 }
 
 [data-bs-theme="light"] .bg-soft-purple {
-    background-color: rgba(75, 0, 130, 0.1) !important;
-    color: #4b0082 !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: #1a1a1a !important;
 }
 
 [data-bs-theme="light"] .hover-text-purple:hover {
-    color: #4b0082 !important;
+    color: #C6A75E !important;
 }
 
 [data-bs-theme="dark"] .form-check-input:checked {
@@ -314,7 +320,8 @@ input.error, select.error, textarea.error {
 
 /* Light Mode Sidebar & Topbar */
 [data-bs-theme="light"] .main-nav {
-    background-color: #4b0082 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e9ecef !important;
 }
 
 /* --- Attractive Sidebar Scrollbar (SimpleBar Support) --- */
@@ -387,14 +394,14 @@ input.error, select.error, textarea.error {
 [data-bs-theme="light"] .main-nav .nav-icon,
 [data-bs-theme="light"] .main-nav .logo-box a,
 [data-bs-theme="light"] .main-nav .logo-box img {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 [data-bs-theme="light"] .main-nav .nav-link.active,
 [data-bs-theme="light"] .main-nav .nav-link:hover,
 [data-bs-theme="light"] .main-nav .nav-link:focus {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #C6A75E !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-bs-theme="light"] .topbar {
@@ -411,14 +418,16 @@ input.error, select.error, textarea.error {
 
 /* Light Mode Button Color */
 [data-bs-theme="light"] .btn-primary {
-    background-color: #4b0082 !important;
-    border-color: #4b0082 !important;
-    color: #fff !important;
+    background-color: #ffffff !important;
+    border-color: #e9ecef !important;
+    color: #1a1a1a !important;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
 [data-bs-theme="light"] .btn-primary:hover {
-    background-color: #3a0063 !important;
-    border-color: #3a0063 !important;
+    background-color: #C6A75E !important;
+    border-color: #C6A75E !important;
+    color: #ffffff !important;
 }
 
 /* Light Mode Placeholder Color */
@@ -508,9 +517,9 @@ input.error, select.error, textarea.error {
 }
 
 [data-bs-theme="light"] .daterangepicker .ranges li.active {
-    background-color: #4b0082 !important;
+    background-color: #ffffff !important;
     border-color: #e9ecef !important;
-    color: #e9ecef !important;
+    color: #1a1a1a !important;
 
 }
 
@@ -562,8 +571,8 @@ input.error, select.error, textarea.error {
 
 .daterangepicker td.active,
 [data-bs-theme="light"] .daterangepicker td.active:hover {
-    background-color: #4b0082 !important;
-    color: #e9ecef !important;
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 
@@ -1071,11 +1080,11 @@ body.popup-open {
     background-color: rgba(93, 26, 143, 0.1) !important;
 }
 .btn-purple {
-    background-color: #5d1a8f !important;
+    background-color: #C6A75E !important;
     color: white !important;
 }
 .btn-purple:hover {
-    background-color: #4a1572 !important;
+    background-color: #b09350 !important;
     color: white !important;
 }
 .hover-shadow:hover {

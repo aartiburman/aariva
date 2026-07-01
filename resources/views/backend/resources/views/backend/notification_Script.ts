@@ -9,9 +9,9 @@
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
     apiKey: "AIzaSyAV1Cl6pHg-66yCTePjUPeMQLByfYt9UsE",
-    authDomain: "nepoora-notification.firebaseapp.com",
-    projectId: "nepoora-notification",
-    storageBucket: "nepoora-notification.firebasestorage.app",
+    authDomain: "aariva-notification.firebaseapp.com",
+    projectId: "aariva-notification",
+    storageBucket: "aariva-notification.firebasestorage.app",
     messagingSenderId: "150894054344",
     appId: "1:150894054344:web:133e55ecce431363d58efd",
     measurementId: "G-8D0ZDBJLM4"

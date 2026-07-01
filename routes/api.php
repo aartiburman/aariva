@@ -18,7 +18,6 @@ use App\Http\Controllers\Api\VendorCampaignController;
 use App\Http\Controllers\Api\VendorMetricsController;
 
 use App\Http\Controllers\Api\PayPalApiController;
-use App\Http\Controllers\Api\KhaltiApiController;
 use App\Http\Controllers\Admin\OrderController ;
 use App\Helpers\EmailHelper;
 
@@ -85,21 +84,10 @@ Route::post('place-order', [UserCheckout::class, 'place_order']);
 Route::post('checkout', [UserCheckout::class, 'checkout']);
 Route::post('checkout-amount', [UserCheckout::class, 'checkout_amount']);
 Route::post('buy-now', [UserCheckout::class, 'buy_now']);
-Route::post('orders/sync-ncm/{reference_id}', [OrderController::class, 'sync_ncm_status']);
 Route::post('add-shipping-address', [UserCheckout::class, 'add_shipping_address']);
 Route::post('update-shipping-address', [UserCheckout::class, 'update_shipping_address']);
 Route::get('edit-shipping-address', [UserCheckout::class, 'edit_shipping_address']);
 Route::get('get-shipping-address', [UserCheckout::class, 'get_shipping_address']);
-Route::post('sync-ncm-status', [UserCheckout::class, 'sync_ncm_status']);
-
-// Khalti Payment
-Route::get('khalti/verify', [KhaltiApiController::class, 'verifyPayment'])->name('api.khalti.verify');
-Route::post('khalti/verify', [KhaltiApiController::class, 'verifyPayment']); // Supporting both GET/POST if needed by client
-
-// Payment Verification with admin prefix (for return URL compatibility)
-Route::get('admin/api/khalti/verify', [KhaltiApiController::class, 'verifyPayment']);
-Route::post('admin/api/khalti/verify', [KhaltiApiController::class, 'verifyPayment']);
-
 // PhonePe Payment
 Route::post('phonepe/initiate', [\App\Http\Controllers\Api\PhonePeApiController::class, 'initiatePayment']);
 Route::post('phonepe/verify', [\App\Http\Controllers\Api\PhonePeApiController::class, 'verifyPayment']);
@@ -242,82 +230,5 @@ Route::get('paypal/cancel', [PayPalApiController::class, 'cancel'])->name('api.p
 //     }
 // });
 
-Route::get('/test-ncm', function () {
-    $ncm = new \App\Services\Logistics\NCMService();
-    
-    // 1. Check Configuration
-    $config = [
-        'mode' => $ncm->mode,
-        'base_url' => $ncm->baseUrl,
-        'api_key_set' => !empty($ncm->apiKey)
-    ];
 
-    // 2. Test Branch List
-    $branches = $ncm->getBranches();
-    
-    // 3. Test Order Creation Endpoint with dummy data
-    $dummyData = [
-        'name' => 'Test Customer',
-        'phone' => '9800000000',
-        'phone2' => '',
-        'cod_charge' => 0,
-        'address' => 'Pokhara, Nepal',
-        'fbranch' => 'POKHARA',
-        'branch' => 'POKHARA',
-        'package' => 'Test Package',
-        'vref_id' => 'ITEM-TEST',
-        'instruction' => 'Handle with care',
-        'delivery_type' => 'Door2Door',
-        'weight' => '1',
-    ];
-    $orderResult = $ncm->createOrder($dummyData);
-    
-    return [
-        'debug_config' => $config,
-        'branch_list_sample' => is_array($branches) ? array_slice($branches, 0, 5) : [],
-        'order_test_result' => $orderResult,
-        'raw_branch_response' => $branches
-    ];
-});
-
-Route::get('/test-ncm-full', function () {
-    // Try to find a real order item to test with
-    $orderItem = \App\Models\OrderItem::first();
-    
-    if (!$orderItem) {
-        return response()->json(['error' => 'No order items found for testing'], 404);
-    }
-    
-    $orderItem->load(['order', 'order.user', 'order.shippingAddress', 'order.shippingAddress.city', 'vendor', 'vendor.city', 'product']);
-    
-    $ncm = new \App\Services\Logistics\NCMService();
-    $result = $ncm->createShipment($orderItem);
-    
-    return response()->json([
-        'order_item' => $orderItem,
-        'ncm_result' => $result
-    ]);
-});
-
-Route::get('/test-khalti', function () {
-    // Create a dummy order and user for testing Khalti
-    $dummyUser = \App\Models\User::first();
-    if (!$dummyUser) {
-        return response()->json(['error' => 'No users found for testing'], 404);
-    }
-    
-    $dummyOrder = (object)[
-        'total_cost' => 100,
-        'order_reference_id' => 'ORD-TEST' . strtoupper(\Illuminate\Support\Str::random(10)),
-        'id' => 999
-    ];
-    
-    $result = \App\Services\Payment\KhaltiService::initiatePayment($dummyOrder, $dummyUser);
-    
-    return response()->json([
-        'dummy_order' => $dummyOrder,
-        'dummy_user' => $dummyUser,
-        'khalti_result' => $result
-    ]);
-});
 

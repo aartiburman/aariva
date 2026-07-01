@@ -16,7 +16,6 @@ use App\Helpers\EmailHelper;
 use App\Helpers\ImageHelper;
 use App\Helpers\PriceHelper;
 use App\Helpers\CampaignBudgetHelper;
-use App\Services\Logistics\NCMService;
 use App\Services\Payment\PhonePeService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -127,7 +126,6 @@ class PhonePeApiController extends Controller
                         'delivery_date' => $orderData['delivery_date'],
                     ]);
 
-                    $ncmService = new NCMService();
                     foreach ($orderData['summary_items'] as $item) {
                         OrderItem::create([
                             'order_id' => $order->id,

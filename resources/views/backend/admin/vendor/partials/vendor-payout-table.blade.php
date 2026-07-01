@@ -10,10 +10,10 @@
     <td class="fs-13 text-muted">{{ $payout->vendor->store_name ?? 'N/A' }}</td>
     <td class="fs-13 fw-bold text-primary">{{ number_format($payout->vendor->wallet_balance ?? 0, 2) }}</td>
     <td class="fs-13">{{ (int) ($payout->items_qty ?? 0) }}</td>
-    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->order_amount, 2) }}</td>
-    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->commission_amount, 2) }}</td>
-    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
-    <td class="fs-13 fw-bold text-dark">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->payout_amount, 2) }}</td>
+    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->order_amount, 2) }}</td>
+    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->commission_amount, 2) }}</td>
+    <td class="fs-13">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
+    <td class="fs-13 fw-bold text-dark">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->payout_amount, 2) }}</td>
     <td>
         <span class="badge bg-primary-subtle text-primary px-2 py-1 payment-mode-label">
             {{ ucfirst($payout->payment_method ?? 'Wallet') }}

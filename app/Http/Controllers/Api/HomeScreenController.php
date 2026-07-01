@@ -42,7 +42,7 @@ class HomeScreenController extends Controller
         /* =========================
      * LANGUAGE HANDLING
      * ========================= */
-        $lang = $request->get('lang', 'en'); // en | ar | np
+        $lang = $request->get('lang', 'en'); // en | ar | hi
         $userId = $request->user_id;
         $ipAddress = $request->ip_address;
 

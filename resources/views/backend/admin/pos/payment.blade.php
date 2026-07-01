@@ -25,7 +25,6 @@
 
             <div class="payment-methods">
                 <h4>Select Payment Method</h4>
-                <button class="btn btn-primary">Pay with Khalti</button>
                 <button class="btn btn-success">Pay with PhonePe</button>
                 <button class="btn btn-dark">Pay with Stripe</button>
             </div>

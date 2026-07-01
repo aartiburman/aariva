@@ -1,5 +1,19 @@
 @extends('frontend.layouts.app')
 
+@section('title', ($product->name ?? 'Product') . ' - ' . config('app.name'))
+
+@section('meta_description', \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 160))
+
+@section('meta_keywords', ($product->name ?? 'product') . ', buy ' . ($product->name ?? '') . ', ' . config('app.name') . ', online shopping, best price')
+
+@section('og_type', 'product')
+@section('og_title', ($product->name ?? 'Product') . ' - ' . config('app.name'))
+@section('og_description', \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 160))
+@php
+    $productOgImage = isset($variant) && $variant ? App\Helpers\ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
+@endphp
+@section('og_image', $productOgImage)
+
 @section('content')
 <section class="py-5">
     <div class="container">

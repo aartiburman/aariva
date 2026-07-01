@@ -23,7 +23,7 @@ class POSController extends Controller
     public function index()
     {
         $categories = Category::where('is_active', 1)->get();
-        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'NPR';
+        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'INR';
         return view('backend.admin.pos.index', compact('categories', 'currencySymbol'));
     }
 
@@ -36,7 +36,7 @@ class POSController extends Controller
         }
 
         $orders = $query->latest()->paginate(15)->withQueryString();
-        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'NPR';
+        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'INR';
         return view('backend.admin.pos.history', compact('orders', 'currencySymbol'));
     }
 
@@ -238,7 +238,7 @@ class POSController extends Controller
             $favicon = GeneralSetting::where('key', 'vendor_favicon')->first();
         }
 
-        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'NPR';
+        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'INR';
 
         return view('backend.admin.pos.invoice', compact('order', 'websiteName', 'contactEmail', 'contactPhone', 'defaultCurrency', 'timezone', 'address', 'websiteLogo', 'favicon', 'currencySymbol'));
     }
@@ -246,7 +246,7 @@ class POSController extends Controller
     public function showPaymentPage($order_reference_id)
     {
         $order = Order::where('order_reference_id', $order_reference_id)->firstOrFail();
-        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'NPR';
+        $currencySymbol = GeneralSetting::where('key', 'currency_symbol')->value('value') ?? 'INR';
         return view('backend.admin.pos.payment', compact('order', 'currencySymbol'));
     }
 }

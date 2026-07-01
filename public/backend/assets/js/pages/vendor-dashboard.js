@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Helper to get chart color based on theme
     function getChartColor(theme) {
-        return theme === 'dark' ? '#C6A75E' : '#4b0082';
+        return theme === 'dark' ? '#C6A75E' : '#C6A75E';
     }
 
     // Chart instances

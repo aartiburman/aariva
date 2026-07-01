@@ -58,7 +58,7 @@ class BrandController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         
         Brand::create([
@@ -228,7 +228,7 @@ class BrandController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
         // echo '<pre>';print_r($trAr->translate($request->name));die;
 
       
@@ -358,7 +358,7 @@ public function createBrand(Request $request)
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $brand = Brand::create([
             'name' => $name,

@@ -78,7 +78,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Test Message</label>
-                                <textarea name="message" class="form-control" rows="3" required>Test message from Nepoora admin</textarea>
+                                <textarea name="message" class="form-control" rows="3" required>Test message from Aariva admin</textarea>
                             </div>
                             <button type="submit" class="btn btn-outline-primary w-100">Send Test Message</button>
                         </form>

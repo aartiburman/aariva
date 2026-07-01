@@ -34,25 +34,25 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <h5 class="mb-3 text-primary">Dynamic Shipping Rates (NPR)</h5>
+                                        <h5 class="mb-3 text-primary">Dynamic Shipping Rates (INR)</h5>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Inside Butwal City</label>
-                                        <input type="number" step="0.01" name="shipping_inside_butwal" class="form-control" placeholder="100" value="{{ $shippingButwal->value ?? '100' }}">
-                                        <p class="text-muted small">Shipping for orders within Butwal.</p>
+                                        <label class="form-label fw-bold">Local (Same City)</label>
+                                        <input type="number" step="0.01" name="shipping_local" class="form-control" placeholder="50" value="{{ $shippingLocal->value ?? '50' }}">
+                                        <p class="text-muted small">Shipping within the same city.</p>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Major Cities (KTM/Pokhara)</label>
-                                        <input type="number" step="0.01" name="shipping_major_cities" class="form-control" placeholder="150" value="{{ $shippingMajor->value ?? '150' }}">
-                                        <p class="text-muted small">Kathmandu, Pokhara, etc.</p>
+                                        <label class="form-label fw-bold">Within State</label>
+                                        <input type="number" step="0.01" name="shipping_within_state" class="form-control" placeholder="100" value="{{ $shippingWithinState->value ?? '100' }}">
+                                        <p class="text-muted small">Shipping within the same state.</p>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Remote Areas</label>
-                                        <input type="number" step="0.01" name="shipping_remote_areas" class="form-control" placeholder="200" value="{{ $shippingRemote->value ?? '200' }}">
-                                        <p class="text-muted small">All other regions in Nepal.</p>
+                                        <label class="form-label fw-bold">Inter-State / Remote</label>
+                                        <input type="number" step="0.01" name="shipping_interstate" class="form-control" placeholder="200" value="{{ $shippingInterstate->value ?? '200' }}">
+                                        <p class="text-muted small">Shipping to other states or remote areas.</p>
                                     </div>
 
                                     <div class="col-md-12">
@@ -60,15 +60,15 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Inside Kathmandu Valley (NPR)</label>
-                                        <input type="number" step="0.01" name="free_delivery_min_inside_valley" class="form-control" placeholder="2000" value="{{ $freeDeliveryInsideValley->value ?? '2000' }}">
-                                        <p class="text-muted small">Free shipping for orders above this amount in KTM Valley.</p>
+                                        <label class="form-label fw-bold">Free Delivery Min Amount (INR)</label>
+                                        <input type="number" step="0.01" name="free_delivery_min" class="form-control" placeholder="500" value="{{ $freeDeliveryMin->value ?? '500' }}">
+                                        <p class="text-muted small">Free shipping for orders above this amount.</p>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Major Cities / Outside Valley (NPR)</label>
-                                        <input type="number" step="0.01" name="free_delivery_min_major_cities" class="form-control" placeholder="5000" value="{{ $freeDeliveryMajorCities->value ?? '5000' }}">
-                                        <p class="text-muted small">Free shipping for orders above this amount in major cities.</p>
+                                        <label class="form-label fw-bold">Free Delivery for Metro Cities (INR)</label>
+                                        <input type="number" step="0.01" name="free_delivery_min_metro" class="form-control" placeholder="300" value="{{ $freeDeliveryMetro->value ?? '300' }}">
+                                        <p class="text-muted small">Free shipping for orders above this amount in metro cities.</p>
                                     </div>
 
                                     <div class="col-md-12 mt-4">

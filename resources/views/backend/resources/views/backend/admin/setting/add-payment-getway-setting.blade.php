@@ -196,7 +196,7 @@
                             <div class="mt-4 pt-3 border-top border-purple border-opacity-10">
                                 <small class="text-muted d-block mb-2 text-uppercase fw-bold fs-11">Documentation Links</small>
                                 <div class="d-flex flex-column gap-2">
-                                    @if($gateway->slug == 'khalti')
+                                    @if($gateway->slug == 'khalti' && false)
                                     <a href="https://docs.khalti.com/" target="_blank" class="text-purple fs-13 d-flex align-items-center gap-2">
                                         <iconify-icon icon="solar:link-linear"></iconify-icon> Khalti API Docs
                                     </a>

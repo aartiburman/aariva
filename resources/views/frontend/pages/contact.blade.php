@@ -1,5 +1,14 @@
 @extends('frontend.layouts.app')
 
+@section('title', 'Contact Us - ' . config('app.name'))
+
+@section('meta_description', 'Get in touch with ' . config('app.name') . ' - We\'re here to help! Contact our friendly customer support team for any questions, orders, or assistance.')
+
+@section('meta_keywords', 'contact ' . config('app.name') . ', customer support, help, inquiries')
+
+@section('og_title', 'Contact Us - ' . config('app.name'))
+@section('og_description', 'Get in touch with ' . config('app.name') . ' - We\'re here to help! Contact our friendly customer support team for any questions, orders, or assistance.')
+
 @section('content')
 <section class="py-3 border-bottom border-top d-none d-md-flex bg-light">
     <div class="container">

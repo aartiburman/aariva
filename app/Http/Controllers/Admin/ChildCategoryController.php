@@ -74,7 +74,7 @@ class ChildCategoryController extends Controller
             : Str::slug($request->name);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         // ✅ Create Child Category
         $data = [
@@ -135,7 +135,7 @@ class ChildCategoryController extends Controller
             }
 
             $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('ne');
+            $trNe = new GoogleTranslate('hi');
 
             $child = ChildCategory::create([
                 'category_id' => $request->category_id,
@@ -303,7 +303,7 @@ class ChildCategoryController extends Controller
         $childCategory = ChildCategory::findOrFail($request->child_category_id);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $childCategory->update([
             'category_id'       => $request->category_id,

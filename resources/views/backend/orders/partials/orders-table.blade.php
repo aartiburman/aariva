@@ -45,7 +45,7 @@
 
     <td>{{ $item->product->name ?? 'Product' }} (Qty: {{ $item->quantity }})</td>
     <td class="fw-bold text-dark">
-        {{ optional(optional($item->vendor)->country)->currency_code ?? 'NPR' }} 
+        {{ optional(optional($item->vendor)->country)->currency_code ?? 'INR' }} 
         {{ number_format($item->total_actual_price, 2) }}
     </td>
     <td>

@@ -213,7 +213,7 @@ public function add_to_wishlist(Request $request)
 
         // Currency
         $item->currency_symbol = ($lang === 'en')
-            ? ($item->currency_code ?? 'NPR')
+            ? ($item->currency_code ?? 'INR')
             : ($item->currency ?? '$');
 
         $item->currency_code = $item->currency_code ?? 'USD';

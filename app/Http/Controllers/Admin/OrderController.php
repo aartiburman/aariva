@@ -16,7 +16,6 @@ use App\Helpers\NotificationHelper;
 use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Models\Campaign;
-use App\Services\Logistics\NCMService;
 use App\Helpers\EmailHelper;
 use App\Helpers\ImageHelper;
 use App\Helpers\PriceHelper;
@@ -114,34 +113,6 @@ class OrderController extends Controller
         }
 
         return $query;
-    }
-
-    public function sync_ncm_status(Request $request, $reference_id = null)
-    {
-        $reference_id = $reference_id ?? $request->reference_id;
-        if (!$reference_id) {
-            return response()->json(['status' => false, 'message' => 'Reference ID is required'], 400);
-        }
-        $order = Order::where('order_reference_id', $reference_id)->firstOrFail();
-        $ncmService = new NCMService();
-        $items = $order->items()->where('logistics_provider', 'NCM')->get();
-
-        $updatedCount = 0;
-        foreach ($items as $item) {
-            $trackingData = $ncmService->trackShipment($item->tracking_id);
-            if ($trackingData && isset($trackingData['status'])) {
-                $newStatus = $ncmService->mapStatus($trackingData['status']);
-                if ($newStatus && $newStatus !== $item->logistics_status) {
-                    $item->update(['logistics_status' => $newStatus]);
-                    $updatedCount++;
-                }
-            }
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => $updatedCount > 0 ? "Synced successfully. {$updatedCount} item(s) updated." : "All statuses are up to date."
-        ]);
     }
 
     public function new_orders(Request $request)
@@ -788,16 +759,6 @@ class OrderController extends Controller
             // Update Order-level payment_status so referral reward logic can run
             $order->payment_status = '1';
             $order->save();
-
-            // Create NCM shipment for COD success
-            $ncmService = new NCMService();
-            $orderItems = $order->items()->get();
-            foreach ($orderItems as $item) {
-                // Only create if not already created
-                if (empty($item->tracking_id)) {
-                    $ncmService->createShipment($item);
-                }
-            }
 
             // Trigger referral reward when order is fully delivered + now paid
             if ($order->items()->where('status', '!=', '3')->doesntExist() && $order->items()->exists()) {

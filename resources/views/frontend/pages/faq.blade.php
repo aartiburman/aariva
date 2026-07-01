@@ -1,5 +1,14 @@
 @extends('frontend.layouts.app')
 
+@section('title', 'FAQ - ' . config('app.name'))
+
+@section('meta_description', 'Find answers to frequently asked questions about ' . config('app.name') . ' - shipping, returns, payments, orders and more. Quick help for a smooth shopping experience.')
+
+@section('meta_keywords', 'FAQ, frequently asked questions, ' . config('app.name') . ', help, shipping, returns, payments')
+
+@section('og_title', 'FAQ - ' . config('app.name'))
+@section('og_description', 'Find answers to frequently asked questions about ' . config('app.name') . ' - shipping, returns, payments, orders and more. Quick help for a smooth shopping experience.')
+
 @section('content')
 <section class="py-3 border-bottom border-top d-none d-md-flex bg-light">
     <div class="container">

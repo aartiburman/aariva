@@ -209,7 +209,7 @@ class RefundController extends Controller
         }
 
         $user = User::with('country')->find($request->user_id);
-        $currencyCode = 'NPR';
+        $currencyCode = 'INR';
         if ($user && $user->country && !empty($user->country->currency_code)) {
             $currencyCode = $user->country->currency_code;
         }

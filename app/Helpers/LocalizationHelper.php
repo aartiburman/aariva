@@ -9,7 +9,6 @@ class LocalizationHelper
         $locale = app()->getLocale();
         $map = [
             'ar' => '_ar',
-            'ne' => '_ne',
             'zh' => '_zh',
             'ja' => '_ja',
             'hi' => '_hi',

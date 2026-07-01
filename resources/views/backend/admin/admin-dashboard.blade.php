@@ -146,8 +146,8 @@
                <div class="col-lg-12">
                     <div class="card">
                          <div class="card-body">
-                              <h5 class="card-title">Performance by Country (Nepal)</h5>
-                              <div id="dash-performance-chart" class="apex-charts" data-series='@json($nepalChartData)' data-currency="NPR"></div>
+                               <h5 class="card-title">Performance by Country (India)</h5>
+                               <div id="dash-performance-chart" class="apex-charts" data-series='@json($indiaChartData)' data-currency="INR"></div>
                          </div>
                     </div>
                </div>
@@ -256,8 +256,7 @@
                                                  @php
                                                                  $currency = $item->currency ?? '$';
                                                                  if ($item->vendor && $item->vendor->country && $item->vendor->country->currency_code) {
-                                                                     $currency = $item->vendor->country->currency_code;
-                                                                     if($currency == 'रु') $currency = 'NPR';
+                                                                    $currency = $item->vendor->country->currency_code;
                                                                  }
                                                             @endphp
                                                  {{ $currency }} {{ number_format($item->total_actual_price, 2) }}

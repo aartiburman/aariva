@@ -334,7 +334,7 @@ class UserCommonController extends Controller
         return response()->json([
             'status' => true,
             'data' => [
-                'company_name' => $company_name->value ?? 'Nepoora Store Pvt. Ltd.',
+                'company_name' => $company_name->value ?? 'Aariva Store Pvt. Ltd.',
                 'registration_number' => $registration_number->value ?? '',
                 'registered_at' => $registered_at->value ?? '',
                 'registered_office' => $registered_office->value ?? '',

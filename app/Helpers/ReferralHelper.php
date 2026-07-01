@@ -147,7 +147,7 @@ class ReferralHelper
         if ($referrerAmount > 0) {
             NotificationHelper::notifyCustomer($referrer->id, [
                 'title' => 'Referral Reward Credited',
-                'message' => 'NPR ' . number_format($referrerAmount, 2) . ' has been credited to your reward balance for referring a friend.',
+                'message' => 'INR ' . number_format($referrerAmount, 2) . ' has been credited to your reward balance for referring a friend.',
                 'type' => 'promotions',
                 'url' => '#',
                 'icon' => 'solar:gift-linear',
@@ -157,7 +157,7 @@ class ReferralHelper
         if ($referredAmount > 0) {
             NotificationHelper::notifyCustomer($user->id, [
                 'title' => 'Referral Reward Credited',
-                'message' => 'NPR ' . number_format($referredAmount, 2) . ' has been credited to your reward balance as a referred user.',
+                'message' => 'INR ' . number_format($referredAmount, 2) . ' has been credited to your reward balance as a referred user.',
                 'type' => 'promotions',
                 'url' => '#',
                 'icon' => 'solar:gift-linear',

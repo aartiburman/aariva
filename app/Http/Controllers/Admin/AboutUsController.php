@@ -42,7 +42,7 @@ class AboutUsController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         if ($request->id) {
             $about = AboutUs::findOrFail($request->id);

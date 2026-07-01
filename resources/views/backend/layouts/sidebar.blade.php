@@ -4,8 +4,8 @@
      <!-- Sidebar Logo -->
      <div class="logo-box">
           <a href="{{route('admin.dashboard')}}" class="logo-dark">
-               <img src="{{ $siteLogoLight ? asset('uploads/settings/'.$siteLogoLight) : asset('backend/assets/images/small-logo.png') }}" class="logo-sm small_logo_size" alt="logo sm">
-               <img src="{{ $siteLogoLight ? asset('uploads/settings/'.$siteLogoLight) : asset('backend/assets/images/logo.png') }}" class="logo-lg " alt="logo dark">
+               <img src="{{ $siteLogoDark ? asset('uploads/settings/'.$siteLogoDark) : asset('backend/assets/images/small-logo.png') }}" class="logo-sm small_logo_size" alt="logo sm">
+               <img src="{{ $siteLogoDark ? asset('uploads/settings/'.$siteLogoDark) : asset('backend/assets/images/logo.png') }}" class="logo-lg " alt="logo dark">
           </a>
 
           <a href="{{route('admin.dashboard')}}" class="logo-light">
@@ -460,11 +460,8 @@
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link {{ request()->routeIs('global.fees') ? 'active' : '' }}" href="{{route('global.fees')}}">{{ __('messages.global_fees') }}</a>
                               </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link {{ request()->routeIs('ncm.setting') ? 'active' : '' }}" href="{{route('ncm.setting')}}">NCM Settings</a>
-                              </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link {{ request()->routeIs('payment.getway.setting') ? 'active' : '' }}" href="{{route('payment.getway.setting')}}">{{ __('messages.payment_gateway_setting') }}</a>
+                               <li class="sub-nav-item">
+                                    <a class="sub-nav-link {{ request()->routeIs('payment.getway.setting') ? 'active' : '' }}" href="{{route('payment.getway.setting')}}">{{ __('messages.payment_gateway_setting') }}</a>
                               </li>
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link {{ request()->routeIs('email.setting') ? 'active' : '' }}" href="{{route('email.setting')}}">{{ __('messages.email_setting') }}</a>
@@ -528,13 +525,13 @@
      <!-- Sidebar Logo -->
      <div class="logo-box">
           <a href="{{route('vendor.dashboard')}}" class="logo-dark">
-               <img src="{{ asset('backend/assets/images/logo.png') }}" class="logo-sm" alt="logo sm">
-               <img src="{{ asset('backend/assets/images/logo.png') }}" class="logo-lg" alt="logo dark">
+               <img src="{{ $siteLogoDark ? asset('uploads/settings/'.$siteLogoDark) : asset('backend/assets/images/small-logo.png') }}" class="logo-sm small_logo_size" alt="logo sm">
+               <img src="{{ $siteLogoDark ? asset('uploads/settings/'.$siteLogoDark) : asset('backend/assets/images/logo.png') }}" class="logo-lg" alt="logo dark">
           </a>
 
           <a href="{{route('vendor.dashboard')}}" class="logo-light">
-               <img src="{{ asset('backend/assets/images/logo.png') }}" class="logo-sm" alt="logo sm">
-               <img src="{{ asset('backend/assets/images/logo.png') }}" class="logo-lg" alt="logo light">
+               <img src="{{ $siteLogoLight ? asset('uploads/settings/'.$siteLogoLight) : asset('backend/assets/images/small-logo.png') }}" class="logo-sm small_logo_size" alt="logo sm">
+               <img src="{{ $siteLogoLight ? asset('uploads/settings/'.$siteLogoLight) : asset('backend/assets/images/logo.png') }}" class="logo-lg" alt="logo light">
           </a>
      </div>
 

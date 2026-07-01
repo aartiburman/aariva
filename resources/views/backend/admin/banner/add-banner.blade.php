@@ -50,6 +50,7 @@
                                                 <option value="deal" {{ old('position') == 'deal' ? 'selected' : '' }}>Deal</option>
                                                 <option value="middle" {{ old('position') == 'middle' ? 'selected' : '' }}>Middle</option>
                                                 <option value="bottom" {{ old('position') == 'bottom' ? 'selected' : '' }}>Bottom</option>
+                                                <option value="promo" {{ old('position') == 'promo' ? 'selected' : '' }}>Promo</option>
                                                 <option value="wishlist" {{ old('position') == 'wishlist' ? 'selected' : '' }}>wishlist</option>
                                                 <option value="cart" {{ old('position') == 'cart' ? 'selected' : '' }}>cart</option>
                                                 <!-- <option value="contact" {{ old('position') == 'contact' ? 'selected' : '' }}>contact</option>\ -->

@@ -23,7 +23,7 @@
                         <p class="text-muted mb-4">Our support team is available 24/7 to assist you with any issues or questions regarding your store.</p>
                         
                         <div class="d-grid gap-2">
-                            <a href="mailto:support@nepooras.com" class="btn btn-purple py-2 rounded-3" style="background-color: #5d1a8f; color: white;">
+                            <a href="mailto:support@aariva.com" class="btn btn-purple py-2 rounded-3" style="background-color: #5d1a8f; color: white;">
                                 <iconify-icon icon="solar:letter-linear" class="align-middle me-2"></iconify-icon> Email Support
                             </a>
                             <a href="https://wa.me/yourwhatsappnumber" class="btn btn-success py-2 rounded-3">

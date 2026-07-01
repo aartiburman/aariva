@@ -11,7 +11,7 @@ class LanguageController extends Controller
     public function changeLanguage(Request $request, string $lang)
     {
         $supported = [
-            'en', 'ne', 'ar', 'zh', 'ja', 'hi', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi',
+            'en', 'ar', 'zh', 'ja', 'hi', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi',
         ];
 
         if (! in_array($lang, $supported, true)) {
@@ -20,7 +20,6 @@ class LanguageController extends Controller
 
         $languageCountryMap = [
             'en' => 'US',
-            'ne' => 'NP',
             'ar' => 'SA',
             'zh' => 'CN',
             'ja' => 'JP',
@@ -63,7 +62,6 @@ class LanguageController extends Controller
 
         $countryLanguageMap = [
             'US' => 'en', 'GB' => 'en', 'AU' => 'en', 'NZ' => 'en', 'CA' => 'en',
-            'NP' => 'ne',
             'SA' => 'ar', 'AE' => 'ar', 'EG' => 'ar', 'QA' => 'ar', 'KW' => 'ar', 'OM' => 'ar',
             'CN' => 'zh', 'TW' => 'zh', 'HK' => 'zh',
             'JP' => 'ja',

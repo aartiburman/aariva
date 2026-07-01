@@ -31,7 +31,7 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-header border-bottom-0">
                         <div class="d-flex align-items-center justify-content-between">
-                            <h4 class="card-title mb-0">Nepoora Store Company Details</h4>
+                            <h4 class="card-title mb-0">Aariva Store Company Details</h4>
                         </div>
                     </div>
                     <div class="card-body">
@@ -42,7 +42,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="company_name" class="form-label">Company Name</label>
-                                        <input type="text" class="form-control" id="company_name" name="company_name" value="{{ $company_name->value ?? 'Nepoora Store Pvt. Ltd.' }}">
+                                        <input type="text" class="form-control" id="company_name" name="company_name" value="{{ $company_name->value ?? 'Aariva Store Pvt. Ltd.' }}">
                                     </div>
                                 </div>
                                 <div class="col-md-6">

@@ -30,10 +30,8 @@ class GeneralHelper
     {
         if ($lang === 'ar') {
             return 'AED';
-        } elseif ($lang === 'ne') {
-            return 'रु';
         } else {
-            return 'NPR';
+            return 'INR';
         }
     }
 

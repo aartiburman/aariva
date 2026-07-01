@@ -169,23 +169,23 @@
                                             <input class="form-check-input" type="checkbox" name="referral_enabled" id="referral_enabled" value="1" {{ (optional($referralEnabled)->value ?? '1') == '1' ? 'checked' : '' }}>
                                             <label class="form-check-label fw-bold ms-2" for="referral_enabled">Enable Referral Rewards</label>
                                         </div>
-                                        <p class="text-muted small">When enabled, referrers and referred users get fixed rewards on first successful order (min cart NPR 1000).</p>
+                                        <p class="text-muted small">When enabled, referrers and referred users get fixed rewards on first successful order (min cart INR 1000).</p>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Referrer Reward (NPR)</label>
+                                        <label class="form-label fw-bold">Referrer Reward (INR)</label>
                                         <input type="number" step="0.01" min="0" name="referral_referrer_reward" class="form-control" placeholder="200" value="{{ optional($referralReferrerReward)->value ?? '200' }}">
                                         <p class="text-muted small">Amount credited to referrer on referred user's first order.</p>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Referred User Reward (NPR)</label>
+                                        <label class="form-label fw-bold">Referred User Reward (INR)</label>
                                         <input type="number" step="0.01" min="0" name="referral_referred_reward" class="form-control" placeholder="100" value="{{ optional($referralReferredReward)->value ?? '100' }}">
                                         <p class="text-muted small">Amount credited to referred user on their first order.</p>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-bold">Minimum Cart Value (NPR)</label>
+                                        <label class="form-label fw-bold">Minimum Cart Value (INR)</label>
                                         <input type="number" step="1" min="0" name="referral_min_cart_value" class="form-control" placeholder="1000" value="{{ optional($referralMinCart)->value ?? '1000' }}">
                                         <p class="text-muted small">Order must meet this value to trigger referral reward.</p>
                                     </div>

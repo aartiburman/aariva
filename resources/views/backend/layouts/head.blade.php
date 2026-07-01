@@ -164,10 +164,6 @@
                                              <iconify-icon icon="twemoji:flag-united-kingdom" class="align-middle me-2"></iconify-icon>
                                              <span class="align-middle">English</span>
                                         </a>
-                                        <a href="{{ url('change-language/ne') }}" class="dropdown-item">
-                                             <iconify-icon icon="twemoji:flag-nepal" class="align-middle me-2"></iconify-icon>
-                                             <span class="align-middle">Nepali</span>
-                                        </a>
                                         <a href="{{ url('change-language/ar') }}" class="dropdown-item">
                                              <iconify-icon icon="twemoji:flag-saudi-arabia" class="align-middle me-2"></iconify-icon>
                                              <span class="align-middle">Arabic</span>

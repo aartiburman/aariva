@@ -41,7 +41,7 @@
                                     <li>Select your app</li>
                                     <li>Go to Facebook Login → Settings</li>
                                     <li>Add the redirect URI: <code>https://{{ request()->getHost() }}/__/auth/handler</code></li>
-                                    <li>Also add: <code>https://nepoora-auth.firebaseapp.com/__/auth/handler</code></li>
+                                    <li>Also add: <code>https://aariva-auth.firebaseapp.com/__/auth/handler</code></li>
                                 </ul>
                             </li>
                             <li><strong>Test the Login:</strong>

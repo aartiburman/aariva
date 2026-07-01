@@ -190,11 +190,11 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Selling Price (NPR)</label>
+                    <label class="form-label fw-bold">Selling Price (INR)</label>
                     <input type="number" step="0.01" min="0" id="calcSellingPrice" class="form-control" placeholder="e.g. 1000">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Vendor Cost (NPR)</label>
+                    <label class="form-label fw-bold">Vendor Cost (INR)</label>
                     <input type="number" step="0.01" min="0" id="calcVendorCost" class="form-control" placeholder="e.g. 600">
                 </div>
                 <div class="mb-3">
@@ -270,8 +270,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const campPgFee = (discountedPrice * pgPct) / 100;
         const campaignNet = discountedPrice - campCommission - campPgFee - cost;
         
-        document.getElementById('calcStandardResult').textContent = selling.toFixed(2) + ' − ' + commission.toFixed(2) + ' − ' + pgFee.toFixed(2) + ' − ' + cost.toFixed(2) + ' = NPR ' + standardNet.toFixed(2);
-        document.getElementById('calcCampaignResult').textContent = discountedPrice.toFixed(2) + ' − ' + campCommission.toFixed(2) + ' − ' + campPgFee.toFixed(2) + ' − ' + cost.toFixed(2) + ' = NPR ' + campaignNet.toFixed(2);
+        document.getElementById('calcStandardResult').textContent = selling.toFixed(2) + ' − ' + commission.toFixed(2) + ' − ' + pgFee.toFixed(2) + ' − ' + cost.toFixed(2) + ' = INR ' + standardNet.toFixed(2);
+        document.getElementById('calcCampaignResult').textContent = discountedPrice.toFixed(2) + ' − ' + campCommission.toFixed(2) + ' − ' + campPgFee.toFixed(2) + ' − ' + cost.toFixed(2) + ' = INR ' + campaignNet.toFixed(2);
         
         const warn = document.getElementById('calcWarning');
         if (campaignNet < 0) {

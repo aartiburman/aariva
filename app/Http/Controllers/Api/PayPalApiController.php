@@ -17,8 +17,6 @@ use App\Models\Campaign;
 use Carbon\Carbon;
 use App\Models\WalletTransaction;
 
-use App\Services\Logistics\NCMService;
-
 class PayPalApiController extends Controller
 {
     public function createPayment(Request $request)
@@ -242,7 +240,7 @@ class PayPalApiController extends Controller
                         ]);
                         NotificationHelper::notifyCustomer($user->id, [
                             'title' => 'Reward Used Successfully',
-                            'message' => 'NPR ' . number_format($rewardUsed, 2) . ' reward was used for Order #' . ($order->order_reference_id ?? $order->id) . '.',
+                            'message' => 'INR ' . number_format($rewardUsed, 2) . ' reward was used for Order #' . ($order->order_reference_id ?? $order->id) . '.',
                             'type' => 'orders',
                             'url' => '#',
                             'icon' => 'solar:wallet-linear',
@@ -312,16 +310,12 @@ class PayPalApiController extends Controller
 
                 // Update Order Items Status
                 $orderItems = OrderItem::where('order_id', $order->id)->get();
-                $ncmService = new NCMService();
 
                 foreach ($orderItems as $item) {
                     $item->update([
                         'payment_status' => '1',
                         'status' => '1'
                     ]);
-
-                    // Create NCM Shipment for online payment after verification
-                    $ncmService->createShipment($item);
                 }
 
                 // Notify Vendors
@@ -357,7 +351,7 @@ class PayPalApiController extends Controller
                         ]);
                         NotificationHelper::notifyCustomer($user->id, [
                             'title' => 'Reward Used Successfully',
-                            'message' => 'NPR ' . number_format($rewardUsed, 2) . ' reward was used for Order #' . ($order->order_reference_id ?? $order->id) . '.',
+                            'message' => 'INR ' . number_format($rewardUsed, 2) . ' reward was used for Order #' . ($order->order_reference_id ?? $order->id) . '.',
                             'type' => 'orders',
                             'url' => '#',
                             'icon' => 'solar:wallet-linear',

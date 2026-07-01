@@ -62,6 +62,7 @@ class BannerController extends Controller
             'deal'           => 2,
             'middle'         => 1,
             'bottom'         => 1,
+            'promo'          => 10,
             'wishlist'       => 1,
             'cart'           => 1,
             'product_detail' => 1,
@@ -90,7 +91,7 @@ class BannerController extends Controller
      * STORE BANNER
      * ========================= */
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $baseSlug = Str::slug($request->title);
         $slug = $baseSlug;
@@ -163,6 +164,7 @@ class BannerController extends Controller
             'deal'           => 2,
             'middle'         => 1,
             'bottom'         => 1,
+            'promo'          => 10,
             'wishlist'       => 1,
             'cart'           => 1,
             'product_detail' => 1,
@@ -199,7 +201,7 @@ class BannerController extends Controller
  * UPDATE BANNER
  * ========================= */
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $baseSlug = Str::slug($request->title);
         $slug = $baseSlug;

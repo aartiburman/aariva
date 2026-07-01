@@ -67,28 +67,7 @@
                                         <h5 class="mb-3 text-purple">API Credentials</h5>
                                     </div>
 
-                                    @if($gateway->slug == 'khalti')
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Live Public Key</label>
-                                            <input type="text" name="live_public_key" class="form-control" value="{{ $gateway->live_public_key }}" placeholder="Live Public Key">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Live Secret Key</label>
-                                            <input type="password" name="live_secret_key" class="form-control" value="{{ $gateway->live_secret_key }}" placeholder="Live Secret Key">
-                                        </div>
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Test Public Key</label>
-                                            <input type="text" name="test_public_key" class="form-control" value="{{ $gateway->test_public_key }}" placeholder="Test Public Key">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Test Secret Key</label>
-                                            <input type="password" name="test_secret_key" class="form-control" value="{{ $gateway->test_secret_key }}" placeholder="Test Secret Key">
-                                        </div>
-                                    </div>
-                                    @elseif($gateway->slug == 'phonepe')
+                                    @if($gateway->slug == 'phonepe')
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold">Live Merchant ID</label>
@@ -187,13 +166,7 @@
                                         <hr class="my-2 opacity-10">
                                         <h5 class="mb-3 text-purple">Callback URLs</h5>
                                     </div>
-                                    @if($gateway->slug == 'khalti')
-                                    <div class="col-md-12">
-                                        <label class="form-label fw-bold">Return / Verify URL</label>
-                                        <input type="text" name="success_url" class="form-control" value="{{ $gateway->success_url }}" placeholder="https://your-domain.com/api/khalti/verify">
-                                        <small class="text-muted">Khalti will redirect to this URL after payment (both success & failure)</small>
-                                    </div>
-                                    @else
+                                    @if(true)
                                     <div class="col-md-12">
                                         <label class="form-label fw-bold">Success URL</label>
                                         <input type="text" name="success_url" class="form-control" value="{{ $gateway->success_url }}" placeholder="Success Callback URL">
@@ -233,11 +206,7 @@
                             <div class="mt-4 pt-3 border-top border-purple border-opacity-10">
                                 <small class="text-muted d-block mb-2 text-uppercase fw-bold fs-11">Documentation Links</small>
                                 <div class="d-flex flex-column gap-2">
-                                    @if($gateway->slug == 'khalti')
-                                    <a href="https://docs.khalti.com/" target="_blank" class="text-purple fs-13 d-flex align-items-center gap-2">
-                                        <iconify-icon icon="solar:link-linear"></iconify-icon> Khalti API Docs
-                                    </a>
-                                    @elseif($gateway->slug == 'phonepe')
+                                    @if($gateway->slug == 'phonepe')
                                     <a href="https://developer.phonepe.com/v1/docs/" target="_blank" class="text-purple fs-13 d-flex align-items-center gap-2">
                                         <iconify-icon icon="solar:link-linear"></iconify-icon> PhonePe Developer Docs
                                     </a>

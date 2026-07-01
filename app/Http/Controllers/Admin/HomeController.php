@@ -75,41 +75,21 @@ class HomeController extends Controller
         $vendorStats->growth_prefix = $vendorGrowth >= 0 ? '+' : '';
 
         // Fetch country IDs dynamically
-        $nepalId = Country::where('name', 'Nepal')->value('id') ;
-        // $uaeId = Country::where('name', 'United Arab Emirates')->value('id');
-        // $indiaId = Country::where('name', 'India')->value('id');
+        $indiaId = Country::where('name', 'India')->value('id');
 
-        // Revenue for Nepal and UAE (Based on Vendor Performance)
-        $nepalRevenue = $queryBuilder(
+        // Revenue for India (Based on Vendor Performance)
+        $indiaRevenue = $queryBuilder(
             OrderItem::where('order_items.payment_status', '1')
                 ->join('users', 'order_items.vendor_id', '=', 'users.id')
-                ->where('users.country_id', $nepalId)
+                ->where('users.country_id', $indiaId)
                 ->where('users.role', '2'),
             'order_items.created_at'
         )->sum('order_items.total_actual_price');
 
-        // $uaeRevenue = $queryBuilder(
-        //     OrderItem::where('order_items.payment_status', '1')
-        //         ->join('users', 'order_items.vendor_id', '=', 'users.id')
-        //         ->where('users.country_id', $uaeId)
-        //         ->where('users.role', '2'),
-        //     'order_items.created_at'
-        // )->sum('order_items.total_actual_price');
-
-        // $indiaRevenue = $queryBuilder(
-        //     OrderItem::where('order_items.payment_status', '1')
-        //         ->join('users', 'order_items.vendor_id', '=', 'users.id')
-        //         ->where('users.country_id', $indiaId)
-        //         ->where('users.role', '2'),
-        //     'order_items.created_at'
-        // )->sum('order_items.total_actual_price');
-
         // Performance Chart Data by Country
         $countryPerformanceData = [];
         $countries = [
-            'Nepal' => $nepalId,
-            // 'India' => $indiaId,
-            // 'UAE' => $uaeId
+            'India' => $indiaId,
         ];
 
         foreach ($countries as $name => $id) {
@@ -134,22 +114,12 @@ class HomeController extends Controller
 
         // Prepare chart data for all months
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        $nepalChartData = array_fill(0, 12, 0);
-        // $indiaChartData = array_fill(0, 12, 0);
-        // $uaeChartData = array_fill(0, 12, 0);
+        $indiaChartData = array_fill(0, 12, 0);
 
-        foreach ($countryPerformanceData['Nepal'] as $item) {
+        foreach ($countryPerformanceData['India'] as $item) {
             $index = array_search($item->month, $months);
-            if ($index !== false) $nepalChartData[$index] = (float)$item->revenue;
+            if ($index !== false) $indiaChartData[$index] = (float)$item->revenue;
         }
-        // foreach ($countryPerformanceData['India'] as $item) {
-        //     $index = array_search($item->month, $months);
-        //     if ($index !== false) $indiaChartData[$index] = (float)$item->revenue;
-        // }
-        // foreach ($countryPerformanceData['UAE'] as $item) {
-        //     $index = array_search($item->month, $months);
-        //     if ($index !== false) $uaeChartData[$index] = (float)$item->revenue;
-        // }
 
         // Calculate percentage changes
         $lastMonthOrders = $queryBuilder(OrderItem::query(), 'order_items.created_at')
@@ -221,7 +191,6 @@ class HomeController extends Controller
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('shipping_addresses', 'orders.shipping_id', '=', 'shipping_addresses.id')
             ->join('countries', 'shipping_addresses.country_id', '=', 'countries.id')
-            ->where('countries.id', $nepalId)
             ->where('order_items.payment_status', '1');
              
         $revenueByCountryData = $queryBuilder($revenueByCountryQuery, 'order_items.created_at')
@@ -230,13 +199,12 @@ class HomeController extends Controller
             ->get();
 
         // Required countries to always show
-        // $requiredCountries = ['Nepal', 'United Arab Emirates', 'India'];
-        $requiredCountries = ['Nepal'];
+        $requiredCountries = ['India'];
         $existingCountries = $revenueByCountryData->pluck('country')->toArray();
 
         foreach ($requiredCountries as $country) {
             if (!in_array($country, $existingCountries)) {
-                $currency = Country::where('name', $country)->value('currency') ?? '$';
+                $currency = Country::where('name', $country)->value('currency') ?? '₹';
                 $revenueByCountryData->push((object)[
                     'country' => $country,
                     'revenue' => 0,
@@ -248,10 +216,8 @@ class HomeController extends Controller
 
         $totalRevenueAll = $revenueByCountryData->sum('revenue');
 
-        // Ensure Nepal and UAE are always represented if they have data
         $sessionsByCountry = $revenueByCountryData->map(function($item) use ($totalRevenueAll) {
-            $currency = $item->currency ?? '$';
-            if($currency == 'रु') $currency = 'NPR';
+            $currency = $item->currency ?? '₹';
             return [
                 'country' => $item->country,
                 'revenue' => number_format($item->revenue, 2),
@@ -260,10 +226,6 @@ class HomeController extends Controller
                 'orders' => $item->orders_count
             ];
         })->toArray();
-
-        // If Nepal or UAE are missing from the top list, we could add them, 
-        // but the query already groups by country, so they will appear if they have orders.
-        // To specifically highlight them as requested, we can sort them to the top or just leave as is if they are the main countries.
         
         return view('backend/admin/admin-dashboard', compact(
             'totalOrders', 
@@ -272,12 +234,8 @@ class HomeController extends Controller
             'vendorStats',
             'totalProducts', 
             'totalRevenue',
-            'nepalRevenue',
-            // 'uaeRevenue',
-            // 'indiaRevenue',
-            'nepalChartData',
-            // 'indiaChartData',
-            // 'uaeChartData',
+            'indiaRevenue',
+            'indiaChartData',
             'orderChange',
             'chartMonths',
             'chartRevenue',

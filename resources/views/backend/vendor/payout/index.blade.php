@@ -118,9 +118,9 @@
                                 </td>
                                 <td>#VP-{{ str_pad($payout->id, 4, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ (int) ($payout->items_qty ?? 0) }}</td>
-                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->order_amount, 2) }}</td>
-                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
-                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->commission_amount, 2) }}</td>
+                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->order_amount, 2) }}</td>
+                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
+                                <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->commission_amount, 2) }}</td>
                                 <td class="fw-bold">{{ number_format($payout->payout_amount, 2) }}</td>
                                 <td>
                             @php

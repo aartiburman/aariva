@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
                     $siteLogoDark = $siteSettings['website_logo_dark'] ?? null;
                     $siteLogoLight = $siteSettings['website_logo_light'] ?? null;
                     $siteFavicon = $siteSettings['favicon'] ?? null;
-                    $siteName = $siteSettings['website_name'] ?? 'Nepoora';
+                    $siteName = $siteSettings['website_name'] ?? 'Aariva';
 
                     $activeVendorPolicy = null;
                     if (Auth::check() && Auth::user()->role == '2' && Auth::user()->agreement == 0) {
@@ -73,7 +73,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             } catch (\Exception $e) {
                 $view->with([
-                    'siteName' => 'Nepoora',
+                    'siteName' => 'Aariva',
                     'siteFavicon' => null,
                     'siteLogoDark' => null,
                     'siteLogoLight' => null,

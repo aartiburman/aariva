@@ -39,6 +39,7 @@
                     <option value="middle" {{ $pos == 'middle' ? 'selected' : '' }}>Middle</option>
                     <option value="bottom" {{ $pos == 'bottom' ? 'selected' : '' }}>Bottom</option>
                     <option value="popup" {{ $pos == 'popup' ? 'selected' : '' }}>Popup</option>
+                    <option value="promo" {{ $pos == 'promo' ? 'selected' : '' }}>Promo</option>
                     <option value="wishlist" {{ $pos == 'wishlist' ? 'selected' : '' }}>wishlist</option>
                     <option value="cart" {{ $pos == 'cart' ? 'selected' : '' }}>cart</option>
                     <!-- <option value="contact" {{ $pos == 'contact' ? 'selected' : '' }}>contact</option>\ -->

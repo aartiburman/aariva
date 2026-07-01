@@ -323,7 +323,7 @@
                                                 <td>
                                                     <div class="d-flex flex-column">
                                                         <h6 class="fs-13 mb-0 fw-bold">{{ $product->vendor->name ?? 'N/A' }}</h6>
-                                                        <small class="text-muted">{{ $product->vendor->store_name ?? 'Nepoora' }}</small>
+                                                        <small class="text-muted">{{ $product->vendor->store_name ?? 'Aariva' }}</small>
                                                     </div>
                                                 </td>
                                                 <td>

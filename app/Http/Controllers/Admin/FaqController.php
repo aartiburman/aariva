@@ -40,7 +40,7 @@ class FaqController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $data = [
             'question' => $request->question,

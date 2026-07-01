@@ -34,7 +34,7 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <h5 class="mb-3 text-primary">Dynamic Shipping Rates (NPR)</h5>
+                                        <h5 class="mb-3 text-primary">Dynamic Shipping Rates (INR)</h5>
                                     </div>
 
                                     <div class="col-md-4">
@@ -79,22 +79,6 @@
                                         <hr>
                                     </div>
 
-                                    <div class="col-md-12">
-                                        <h5 class="mb-3 text-primary">NCM Logistics Settings</h5>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">NCM API Key</label>
-                                        <input type="text" name="ncm_api_key" class="form-control" placeholder="e.g. your_api_key" value="{{ $ncmApiKey->value ?? '' }}">
-                                        <p class="text-muted small">Your unique API key from NCM.</p>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">NCM API URL</label>
-                                        <input type="text" name="ncm_api_url" class="form-control" placeholder="e.g. https://api.nepalcanmove.com" value="{{ $ncmApiUrl->value ?? 'https://api.nepalcanmove.com' }}">
-                                        <p class="text-muted small">NCM API endpoint base URL.</p>
-                                    </div>
-
                                     <div class="col-md-12 mt-4 text-end">
                                         <button type="submit" class="btn btn-primary px-4">
                                             Update Global Fees
@@ -115,7 +99,7 @@
                         </div>
                         
                         <p class="text-muted fs-14">
-                            These settings define the default fees and commissions across the Nepoora platform.
+                            These settings define the default fees and commissions across the Aariva platform.
                         </p>
                         <ul class="text-muted fs-13 ps-3">
                             <li class="mb-2"><strong>VAT:</strong> Applied during checkout based on the subtotal.</li>

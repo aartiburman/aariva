@@ -131,7 +131,7 @@
                             </small>
                         @endif
                         <br>
-                        <small>{{ $item->quantity }} x {{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($item->actual_price ?? $item->price, 2) }}</small>
+                        <small>{{ $item->quantity }} x {{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($item->actual_price ?? $item->price, 2) }}</small>
                     </td>
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">{{ number_format(($item->total_actual_price ?: ($item->actual_price ?: $item->price) * $item->quantity), 2) }}</td>
@@ -145,17 +145,17 @@
         <div class="total-section">
             <div class="total-row">
                 <span>Subtotal:</span>
-                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($order->sub_total, 2) }}</span>
+                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($order->sub_total, 2) }}</span>
             </div>
             @if($order->total_discount > 0)
             <div class="total-row savings">
                 <span>You Saved:</span>
-                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($order->total_discount, 2) }}</span>
+                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($order->total_discount, 2) }}</span>
             </div>
             @endif
             <div class="total-row grand-total">
                 <span>TOTAL:</span>
-                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($order->total_cost, 2) }}</span>
+                <span>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($order->total_cost, 2) }}</span>
             </div>
         </div>
 

@@ -138,7 +138,7 @@
 $(document).ready(function() {
     let cart = [];
     let currentProduct = null;
-    let currencySymbol = '{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}';
+    let currencySymbol = '{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}';
 
     // Load Products
     window.loadProducts = function(page = 1) {

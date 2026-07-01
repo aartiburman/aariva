@@ -46,7 +46,7 @@ class ContactDetailController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $data = $request->all();
         $data['title_ar'] = $request->title ? $trAr->translate($request->title) : null;
@@ -100,7 +100,7 @@ class ContactDetailController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $data = $request->all();
         $data['title_ar'] = $request->title ? $trAr->translate($request->title) : null;

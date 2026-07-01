@@ -28,12 +28,12 @@ class TestApiController extends Controller
             ], 400);
         }
 
-        $to = $request->email ?? 'support@nepoora.com';
+        $to = $request->email ?? 'support@aariva.com';
         $subject = 'Brevo API Test Mail';
         $message = '<h1>Brevo Integration Test</h1>
                     <p>This is a test email to verify that the Brevo SMTP configuration is working correctly on your website.</p>
                     <p><strong>Status:</strong> Configuration Applied Successfully.</p>
-                    <p><strong>Sender:</strong> support@nepoora.com</p>';
+                    <p><strong>Sender:</strong> support@aariva.com</p>';
         
         $result = EmailHelper::sendWithReason($to, $subject, $message);
         
@@ -41,7 +41,7 @@ class TestApiController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Test email sent successfully to ' . $to,
-                'sender' => 'support@nepoora.com'
+                'sender' => 'support@aariva.com'
             ]);
         } else {
             return response()->json([

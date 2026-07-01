@@ -102,7 +102,7 @@
     <td>{{ $value->{"child_category_name_$lang"} ?? $value->child_category_name ?? 'N/A' }}</td>
     <td>{{ $value->brand_name ?? 'N/A' }}</td>
     <td>{{ $value->vendor_name }} @if(!empty($value->store_name))
-        <br>({{ $value->store_name }}) @else <br> (Nepoora) @endif
+        <br>({{ $value->store_name }}) @else <br> (Aariva) @endif
     </td>
 
     <td>

@@ -32,7 +32,7 @@
                                             <span class="fw-medium">{{ $order->order_reference_id }}</span>
                                         </td>
                                         <td>{{ $order->created_at->format('d M Y, h:i A') }}</td>
-                                        <td>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'NPR' }}{{ number_format($order->total_cost, 2) }}</td>
+                                        <td>{{ \App\Helpers\GeneralHelper::get_setting('currency_symbol') ?? 'INR' }}{{ number_format($order->total_cost, 2) }}</td>
                                         <td>
                                             <span class="badge bg-info-subtle text-info">{{ ucfirst($order->payment_mode) }}</span>
                                             @if($order->payment_mode == 'online')

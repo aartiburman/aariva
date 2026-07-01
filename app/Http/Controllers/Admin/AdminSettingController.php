@@ -47,7 +47,7 @@ class AdminSettingController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         if ($request->id) {
             $policy = PrivacyPolicy::findOrFail($request->id);
@@ -135,7 +135,7 @@ class AdminSettingController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         if ($request->id) {
             $term = TermsAndCondition::findOrFail($request->id);
@@ -222,7 +222,7 @@ class AdminSettingController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         if ($request->id) {
             $policy = VendorPolicy::findOrFail($request->id);
@@ -466,19 +466,19 @@ class AdminSettingController extends Controller
         $commission = GeneralSetting::where('key', 'vendor_commission')->first();
         $pgFeePercent = GeneralSetting::where('key', 'pg_fee_percent')->first();
 
-        // Dynamic Shipping Rates
-        $shippingButwal = GeneralSetting::where('key', 'shipping_inside_butwal')->first();
-        $shippingMajor = GeneralSetting::where('key', 'shipping_major_cities')->first();
-        $shippingRemote = GeneralSetting::where('key', 'shipping_remote_areas')->first();
+        // Dynamic Shipping Rates (India)
+        $shippingLocal = GeneralSetting::where('key', 'shipping_local')->first();
+        $shippingWithinState = GeneralSetting::where('key', 'shipping_within_state')->first();
+        $shippingInterstate = GeneralSetting::where('key', 'shipping_interstate')->first();
 
         // Free Delivery Minimum Amounts
-        $freeDeliveryInsideValley = GeneralSetting::where('key', 'free_delivery_min_inside_valley')->first();
-        $freeDeliveryMajorCities = GeneralSetting::where('key', 'free_delivery_min_major_cities')->first();
+        $freeDeliveryMin = GeneralSetting::where('key', 'free_delivery_min')->first();
+        $freeDeliveryMetro = GeneralSetting::where('key', 'free_delivery_min_metro')->first();
 
         return view('backend/admin/setting/global-fees', compact(
             'vatPercent', 'commission', 'pgFeePercent',
-            'shippingButwal', 'shippingMajor', 'shippingRemote',
-            'freeDeliveryInsideValley', 'freeDeliveryMajorCities'
+            'shippingLocal', 'shippingWithinState', 'shippingInterstate',
+            'freeDeliveryMin', 'freeDeliveryMetro'
         ));
     }
 
@@ -486,8 +486,8 @@ class AdminSettingController extends Controller
     {
         $fields = [
             'vat_percent', 'vendor_commission', 'pg_fee_percent',
-            'shipping_inside_butwal', 'shipping_major_cities', 'shipping_remote_areas',
-            'free_delivery_min_inside_valley', 'free_delivery_min_major_cities'
+            'shipping_local', 'shipping_within_state', 'shipping_interstate',
+            'free_delivery_min', 'free_delivery_min_metro'
         ];
         foreach ($fields as $field) {
             if ($request->has($field)) {
@@ -501,41 +501,6 @@ class AdminSettingController extends Controller
         Artisan::call('optimize:clear');
 
         return redirect()->back()->with('success', 'Global fees updated successfully.');
-    }
-
-    public function ncm_setting(Request $request)
-    {
-        // NCM Logistics Settings
-        $ncmMode = GeneralSetting::where('key', 'ncm_mode')->first();
-        $ncmDemoToken = GeneralSetting::where('key', 'ncm_demo_token')->first();
-        $ncmProdToken = GeneralSetting::where('key', 'ncm_prod_token')->first();
-        $ncmDemoUrl = GeneralSetting::where('key', 'ncm_demo_url')->first();
-        $ncmProdUrl = GeneralSetting::where('key', 'ncm_prod_url')->first();
-        $ncmWebhookUrl = GeneralSetting::where('key', 'ncm_webhook_url')->first();
-        $ncmAuthPrefix = GeneralSetting::where('key', 'ncm_auth_prefix')->first();
-
-        return view('backend/admin/setting/ncm-setting', compact(
-            'ncmMode', 'ncmDemoToken', 'ncmProdToken', 'ncmDemoUrl', 'ncmProdUrl', 'ncmWebhookUrl', 'ncmAuthPrefix'
-        ));
-    }
-
-    public function ncm_setting_update(Request $request)
-    {
-        $fields = [
-            'ncm_mode', 'ncm_demo_token', 'ncm_prod_token', 'ncm_demo_url', 'ncm_prod_url', 'ncm_webhook_url', 'ncm_auth_prefix'
-        ];
-        foreach ($fields as $field) {
-            if ($request->has($field)) {
-                GeneralSetting::updateOrCreate(
-                    ['key' => $field],
-                    ['value' => $request->$field]
-                );
-            }
-        }
-
-        Artisan::call('optimize:clear');
-
-        return redirect()->back()->with('success', 'NCM settings updated successfully.');
     }
 
     public function general_setting(Request $request)

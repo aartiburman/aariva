@@ -64,7 +64,7 @@ class CategoryController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $category = Category::create([
             'name' => $request->name,
@@ -132,7 +132,7 @@ class CategoryController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $category->update([
             'name'             => $request->name,
@@ -212,7 +212,7 @@ class CategoryController extends Controller
             }
 
             $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('ne');
+            $trNe = new GoogleTranslate('hi');
 
             $category = Category::create([
                 'name' => $name,

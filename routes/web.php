@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use  App\Http\Controllers\Admin\HomeController;
@@ -46,22 +47,12 @@ use App\Http\Controllers\Admin\CrmController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\WhatsAppController;
 use App\Http\Controllers\Admin\OrderNoteController;
-use App\Http\Controllers\Api\UserCheckout;
 
 Route::get('/pay/{order_reference_id}', [POSController::class, 'showPaymentPage'])->name('pos.payment');
 
 // Payment Result Pages
 Route::get('/payment-success', [WebPagesController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment-failure', [WebPagesController::class, 'paymentFailure'])->name('payment.failure');
-
-// NCM Webhook Callback as requested: https://nepoora.com/admin?orders_status
-Route::match(['get', 'post'], '/admin', function (Illuminate\Http\Request $request) {
-    if ($request->has('orders_status')) {   
-        return (new UserCheckout())->sync_ncm_status($request);
-    }
-    // If not a webhook, redirect to dashboard or show error
-    return redirect()->route('admin.dashboard');
-});
 
 
 //    Route::get('/', function () {
@@ -359,8 +350,6 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::post('general-setting-update', [AdminSettingController::class, 'general_setting_update'])->name('general.setting.update');
     Route::get('global-fees', [AdminSettingController::class, 'global_fees'])->name('global.fees');
     Route::post('global-fees-update', [AdminSettingController::class, 'update_global_fees'])->name('global.fees.update');
-    Route::get('ncm-setting', [AdminSettingController::class, 'ncm_setting'])->name('ncm.setting');
-    Route::post('ncm-setting-update', [AdminSettingController::class, 'ncm_setting_update'])->name('ncm.setting.update');
     Route::get('company-info', [AdminSettingController::class, 'company_info'])->name('company.info');
     Route::post('company-info-update', [AdminSettingController::class, 'company_info_update'])->name('company.info.update');
     Route::get('maintenance/enable', [AdminSettingController::class, 'enable_maintenance'])->name('maintenance.enable');
@@ -517,7 +506,6 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::post('bulk-update-order-status', [OrderController::class, 'bulk_update_order_status'])->name('bulk.update.order.status');
 
     Route::post('update-payment-status', [OrderController::class, 'update_payment_status'])->name('update.payment.status');
-    Route::post('orders/sync-ncm/{reference_id}', [OrderController::class, 'sync_ncm_status'])->name('admin.orders.sync_ncm');
     Route::get('orders-details/{reference_id}', [OrderController::class, 'orders_details'])->name('orders.details');
     Route::get('orders-invoice/{reference_id}', [OrderController::class, 'orders_invoice'])->name('orders.invoice');
     Route::get('restore-order/{id}', [OrderController::class, 'restore_order'])->name('restore.order');
@@ -648,8 +636,85 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend\Template1', 'as' => 
         });
     });
 
+    // Vendor Registration
+    Route::match(['get', 'post'], 'become-seller', function (Request $request) {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'phone' => ['required', 'string', 'max:20'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'store_name' => ['required', 'string', 'max:255'],
+                'business_name' => ['nullable', 'string', 'max:255'],
+                'address' => ['nullable', 'string', 'max:500'],
+                'documents.*' => ['nullable', 'file', 'mimes:pdf,jpeg,png,jpg,doc,docx', 'max:5120'],
+            ]);
+
+            $user = \App\Models\User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                'role' => 2,
+                'status' => 0,
+                'store_name' => $request->store_name,
+                'business_name' => $request->business_name,
+                'address' => $request->address,
+                'uqid' => 'VND-' . strtoupper(substr(md5(time()), 0, 8)),
+            ]);
+
+            // Upload documents
+            if ($request->hasFile('documents')) {
+                foreach ($request->file('documents') as $docId => $file) {
+                    $docPath = \App\Helpers\ImageHelper::compressImage($file, 'uploads/vendor_documents');
+                    \App\Models\VendorsDocument::create([
+                        'vendor_id' => $user->id,
+                        'document_id' => $docId,
+                        'document' => $docPath,
+                        'is_verify' => 0,
+                    ]);
+                }
+            }
+
+            // Notify Admin
+            $admin_email = \App\Models\EmailSetting::where('status', 1)->value('mail_from_address') ?? 'admin@ecom.com';
+            \App\Helpers\EmailHelper::send($admin_email, 'New Seller Registration: ' . $user->store_name,
+                'A new seller has registered.<br><br><b>Shop Name:</b> ' . $user->store_name . '<br><b>Email:</b> ' . $user->email);
+            \App\Helpers\NotificationHelper::notifyAdmins([
+                'title' => 'New Seller Registration',
+                'message' => 'New seller ' . $user->store_name . ' has registered.',
+                'type' => 'system', 'url' => route('vendors.list'),
+                'icon' => 'solar:user-bold-duotone', 'priority' => 'medium'
+            ]);
+
+            // Notify Vendor
+            $appUrl = config('app.url');
+            \App\Helpers\EmailHelper::send($user->email, 'Welcome to ' . config('app.name') . '! You have joined as a vendor',
+                '', 'emails.registration', [
+                    'owner_name' => $user->name,
+                    'store_name' => $user->store_name,
+                    'login_url'  => $appUrl . '/login',
+                    'email'      => $user->email,
+                    'password'   => $request->password
+                ]);
+            \App\Helpers\NotificationHelper::send($user, [
+                'title' => 'Welcome to ' . config('app.name'),
+                'message' => 'Your vendor account for ' . $user->store_name . ' has been successfully created. We will review your application.',
+                'type' => 'system', 'url' => route('login'),
+            ]);
+
+            return redirect()->route('frontend.become-seller')->with('success', 'Registration successful! We will review your application and get back to you soon.');
+        }
+
+        $kycDocuments = \App\Models\KYC_Document::where('is_active', 1)->get();
+        return view('frontend.auth.vendor-register', compact('kycDocuments'));
+    })->name('become-seller');
+
     // Frontend Pages
-    Route::view('blog', 'frontend.pages.blog')->name('blog');
+    Route::get('blog', function () {
+        $posts = \App\Models\Blog::where('status', 1)->with('author')->latest()->paginate(12);
+        return view('frontend.pages.blog', compact('posts'));
+    })->name('blog');
     Route::get('blog/{slug}', function ($slug) {
         $post = \App\Models\Blog::where('slug', $slug)->where('status', 1)->firstOrFail();
         return view('frontend.pages.blog-single', compact('post'));

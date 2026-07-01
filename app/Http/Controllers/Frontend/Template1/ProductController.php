@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend\Template1;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use App\Models\SubCategory;
 use App\Models\ChildCategory;
 use App\Models\ProductVariant;
@@ -42,6 +43,13 @@ class ProductController extends Controller
             $query->where('products.category_id', $request->category_id);
         }
 
+        if ($request->filled('brand')) {
+            $brand = Brand::where('slug', $request->brand)->first();
+            if ($brand) {
+                $query->where('products.brand_id', $brand->id);
+            }
+        }
+
         if ($request->filled('subcategory')) {
             $sub = SubCategory::where('slug', $request->subcategory)->first();
             if ($sub) {
@@ -49,6 +57,22 @@ class ProductController extends Controller
             }
         } elseif ($request->filled('subcategory_id')) {
             $query->where('products.subcategory_id', $request->subcategory_id);
+        }
+
+        if ($request->filled('min_price') || $request->filled('max_price')) {
+            $minPrice = $request->min_price ?? 0;
+            $maxPrice = $request->max_price ?? 9999999;
+            $query->whereHas('firstVariant', function ($q) use ($minPrice, $maxPrice) {
+                $q->whereRaw('(
+                    CASE 
+                        WHEN discount_type IN ("percent", "%", "percentage") 
+                        THEN price - (price * discount_value / 100) 
+                        WHEN discount_type IN ("fixed", "flat", "amount") 
+                        THEN price - discount_value 
+                        ELSE price 
+                    END
+                ) BETWEEN ? AND ?', [$minPrice, $maxPrice]);
+            });
         }
 
         if ($request->filled('search')) {
@@ -89,6 +113,18 @@ class ProductController extends Controller
 
         $products = $query->paginate(12);
 
+        $products->getCollection()->transform(function ($product) {
+            $variant = $product->firstVariant;
+            $product->image = $variant ? ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
+            $product->original_price = $variant ? $variant->price : 0;
+            $product->final_price = $variant ? PriceHelper::applyDiscount($variant->price, $variant->discount_type, $variant->discount_value) : 0;
+            $product->avg_rating = $product->approvedReviews->avg('rating') ?? 0;
+            $product->discount_percent = $product->original_price > 0 ? round((1 - $product->final_price / $product->original_price) * 100) : 0;
+            $product->formatted_price = PriceHelper::formatPrice($product->final_price);
+            $product->formatted_original_price = $product->final_price < $product->original_price ? PriceHelper::formatPrice($product->original_price) : null;
+            return $product;
+        });
+
         $userId = Auth::check() ? Auth::id() : null;
         $ipAddress = $request->ip();
 
@@ -108,9 +144,21 @@ class ProductController extends Controller
             ->pluck('product_id')
             ->toArray();
 
-        $categories = Category::where('is_active', 1)->select(['id', 'name', 'slug'])->get();
+        $categories = Category::where('is_active', 1)
+            ->withCount(['products' => function($q) {
+                $q->where('status', 1);
+            }])
+            ->select(['id', 'name', 'slug'])
+            ->get();
 
-        return view('frontend.products.index', compact('products', 'categories', 'cartProductIds', 'wishlistProductIds'));
+        $brands = Brand::where('status', 1)
+            ->withCount(['products' => function($q) {
+                $q->where('status', 1);
+            }])
+            ->select(['id', 'name', 'slug'])
+            ->get();
+
+        return view('frontend.products.index', compact('products', 'categories', 'brands', 'cartProductIds', 'wishlistProductIds'));
     }
 
     public function show($slug)

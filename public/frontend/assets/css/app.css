@@ -244,6 +244,11 @@ a {
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.primary-menu .navbar-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .primary-menu.offcanvas-body {
@@ -2504,5 +2509,32 @@ body {
 .btn-outline-dark.add-to-wishlist.active:hover {
     background: #dc3545;
     color: #fff;
+}
+
+/* Brand carousel logo styles */
+.brands-shops .owl-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brands-shops .item {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo {
+    max-height: 80px;
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.brand-logo:hover {
+    filter: grayscale(0%);
+    opacity: 1;
 }
 

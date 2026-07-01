@@ -44,7 +44,7 @@
                             <iconify-icon icon="solar:wallet-bold-duotone" class="avatar-title fs-24 text-success"></iconify-icon>
                         </div>
                         <h6 class="text-muted text-uppercase fs-11 fw-bold mb-1">Total Spent</h6>
-                        <h4 class="mb-0 fw-bold">{{ optional($orders->first())->currency_code ?? 'NPR' }} {{ number_format($totalSpent, 2) }}</h4>
+                        <h4 class="mb-0 fw-bold">{{ optional($orders->first())->currency_code ?? 'INR' }} {{ number_format($totalSpent, 2) }}</h4>
                     </div>
                 </div>
             </div>
@@ -195,7 +195,7 @@
                                             </a>
                                         </td>
                                         <td class="fs-13">{{ $order->created_at->format('M d, Y') }}</td>
-                                        <td class="fw-bold">{{ $order->currency_code ?? 'NPR' }} {{ number_format($order->total_cost, 2) }}</td>
+                                        <td class="fw-bold">{{ $order->currency_code ?? 'INR' }} {{ number_format($order->total_cost, 2) }}</td>
                                         <td class="fs-12 text-uppercase">{{ str_replace('_', ' ', $order->payment_mode) }}</td>
                                         <td>
                                             @if($order->payment_status == 1)

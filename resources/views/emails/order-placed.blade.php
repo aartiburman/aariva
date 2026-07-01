@@ -64,10 +64,10 @@
                         <div class="totals">
                             <div class="total-row"><span>Subtotal:</span> <span>{{ $sub_total }}</span></div>
                             <div class="total-row"><span>Delivery:</span> <span>@if($delivery_charges == 0) Free @else {{ $delivery_charges }} @endif</span></div>
-                            @if(isset($taxes) && (float)str_replace(['NPR ', ','], '', $taxes) > 0)
+                            @if(isset($taxes) && (float)str_replace(['INR ', ','], '', $taxes) > 0)
                             <div class="total-row"><span>Taxes:</span> <span>{{ $taxes }}</span></div>
                             @endif
-                            @if((float)str_replace(['NPR ', ','], '', $discount) > 0)
+                            @if((float)str_replace(['INR ', ','], '', $discount) > 0)
                             <div class="total-row" style="color: #2ecc71;"><span>Discount:</span> <span>-{{ $discount }}</span></div>
                             @endif
                             <div class="total-row grand-total"><span>Total Amount:</span> <span>@if(($delivery_charges ?? 0) == 0) Free @else {{ $total_cost }} @endif</span></div>

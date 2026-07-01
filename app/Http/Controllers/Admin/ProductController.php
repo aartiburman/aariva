@@ -240,7 +240,7 @@ class ProductController extends Controller
         $all_vendors = ($user->role == '1')
             ? User::whereIn('role', ['1', '2'])->get()->map(function($vendor) {
                 if ($vendor->role == '1') {
-                    $vendor->store_name = 'Nepoora';
+                    $vendor->store_name = 'Aariva';
                 }
                 return $vendor;
             })
@@ -522,7 +522,7 @@ class ProductController extends Controller
     
         try {
             $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('ne');
+            $trNe = new GoogleTranslate('hi');
 
             /* ================= MAIN PRODUCT ================= */
             $slug = $request->slug ? SlugHelper::uniqueProductSlug($request->slug) : SlugHelper::uniqueProductSlug($request->name);
@@ -744,7 +744,7 @@ class ProductController extends Controller
         : SlugHelper::uniqueProductSlug($request->name);
 
     $trAr = new GoogleTranslate('ar');
-    $trNe = new GoogleTranslate('ne');
+    $trNe = new GoogleTranslate('hi');
 
     /* ================= CREATE PRODUCT ================= */
     $product = Product::create([
@@ -1089,7 +1089,7 @@ class ProductController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         foreach ($request->sku as $index => $sku) {
             if (empty($sku)) continue;
@@ -1255,7 +1255,7 @@ class ProductController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $variantIds = [];
         foreach ($request->sku as $index => $sku) {
@@ -1474,7 +1474,7 @@ class ProductController extends Controller
         $finalDiscountPrice = $request->discount_price ?? $discountedPrice;
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         // Update product details
         $product->update([
@@ -1877,7 +1877,7 @@ class ProductController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $data = [
             'name'         => strtoupper($input['name']),
@@ -1916,7 +1916,7 @@ class ProductController extends Controller
         $size_id = $request->input('size_id');
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         // ✅ Find record
         $data  = [
@@ -2003,7 +2003,7 @@ class ProductController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $data = [
             'name'         => strtoupper($input['name']),
@@ -2039,7 +2039,7 @@ class ProductController extends Controller
         ]);
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $productSize = ProductSize::findOrFail($size_id);
         $productSize->name = $request->name;
@@ -2407,7 +2407,7 @@ class ProductController extends Controller
         } else {
             $vendors = User::whereIn('role', ['1', '2'])->get()->map(function($vendor) {
                 if ($vendor->role == '1') {
-                    $vendor->store_name = 'Nepoora';
+                    $vendor->store_name = 'Aariva';
                 }
                 return $vendor;
             });
@@ -2597,7 +2597,7 @@ class ProductController extends Controller
         $rowNumber = 1;
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         /* ===== PROCESS ROWS ===== */
         while (($row = fgetcsv($handle)) !== false) {

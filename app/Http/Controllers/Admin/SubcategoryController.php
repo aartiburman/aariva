@@ -76,7 +76,7 @@ class SubcategoryController extends Controller
             }
 
             $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('ne');
+            $trNe = new GoogleTranslate('hi');
 
             $subcategory = SubCategory::create([
                 'category_id' => $request->category_id,
@@ -229,7 +229,7 @@ class SubcategoryController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $subcategory = SubCategory::create([
             'name'        => $request->name,
@@ -303,7 +303,7 @@ class SubcategoryController extends Controller
         }
 
         $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('ne');
+        $trNe = new GoogleTranslate('hi');
 
         $subcategory->update([
             'name'           => $request->name,

@@ -1,5 +1,14 @@
 @extends('frontend.layouts.app')
 
+@section('title', config('app.name'))
+
+@section('meta_description', 'Welcome to ' . config('app.name') . ' - Explore endless collection of fashion, electronics, beauty, home essentials & more. Shop now for exclusive deals with fast delivery.')
+
+@section('meta_keywords', 'Aariva, one store endless collection, online shopping, fashion, electronics, beauty, home decor, best deals, ecommerce store')
+
+@section('og_title', config('app.name'))
+@section('og_description', 'Welcome to ' . config('app.name') . ' - Explore endless collection of fashion, electronics, beauty, home essentials & more. Shop now for exclusive deals with fast delivery.')
+
 @section('before-page-wrapper')
 <!--start slider section-->
 		<section class="slider-section mb-4">
@@ -11,10 +20,10 @@
 						<div class="position-relative">
 							<div class="position-absolute top-50 slider-content translate-middle">
 								<h3 class="h3 fw-bold d-none d-md-block">{{ $banner->title }}</h3>
-								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ $banner->link_url ?? 'javascript:;' }}">{{ __t('Shop Now') }}</a>
+								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ $banner->link_url ?? route('frontend.products.index') }}">{{ __t('Shop Now') }}</a>
 								</div>
 							  </div>
-							<a href="{{ $banner->link_url ?? 'javascript:;' }}">
+							<a href="{{ $banner->link_url ?? route('frontend.products.index') }}">
 								<img src="{{ is_array($banner->image) ? ($banner->image[0] ?? '') : $banner->image }}" class="img-fluid" alt="{{ $banner->title }}">
 							</a>
 						</div>
@@ -89,7 +98,7 @@
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">{{ __t('Men Wear') }}</h5>
 												<p class="card-text text-uppercase">{{ __t('Starting at $9') }}</p>
-												<a href="javascript:;" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
+												<a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
 											</div>
 										</div>
 									</div>
@@ -104,7 +113,7 @@
 										<div class="col">
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">{{ __t('Women Wear') }}</h5>
-												<p class="card-text text-uppercase">{{ __t('Starting at $9') }}</p>	<a href="javascript:;" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
+												<p class="card-text text-uppercase">{{ __t('Starting at $9') }}</p>	<a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
 											</div>
 										</div>
 									</div>
@@ -119,7 +128,7 @@
 										<div class="col">
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">{{ __t('Kids Wear') }}</h5>
-												<p class="card-text text-uppercase">{{ __t('Starting at $9') }}</p><a href="javascript:;" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
+												<p class="card-text text-uppercase">{{ __t('Starting at $9') }}</p><a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">{{ __t('SHOP NOW') }}</a>
 											</div>
 										</div>
 									</div>
@@ -143,28 +152,15 @@
 						<div class="product-grid">
 							<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 row-cols-xxl-5 g-3 g-sm-4">
 								@foreach ($products as $product)
-								@php
-									$variant = $product->firstVariant;
-									$image = $variant ? App\Helpers\ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
-									$originalPrice = $variant ? $variant->price : 0;
-									$finalPrice = $variant ? App\Helpers\PriceHelper::applyDiscount($variant->price, $variant->discount_type, $variant->discount_value) : 0;
-									$avgRating = $product->approvedReviews->avg('rating') ?? 0;
-									$inWishlist = in_array($product->id, $wishlistProductIds ?? []);
-									$inCart = in_array($product->id, $cartProductIds ?? []);
-									$slug = $product->slug ?? $product->id;
-									$discountPercent = $originalPrice > 0 ? round((1 - $finalPrice / $originalPrice) * 100) : 0;
-								@endphp
+								@php $inWishlist = in_array($product->id, $wishlistProductIds ?? []); $slug = $product->slug ?? $product->id; @endphp
 								<div class="col">
-									<div class="product-card-modern h-100">
+									<div class="product-card-modern h-100" data-url="{{ route('frontend.products.show', $slug) }}">
 										<div class="product-image-wrap">
 											<a href="{{ route('frontend.products.show', $slug) }}">
-												<img src="{{ $image }}" alt="{{ $product->name }}">
+												<img src="{{ $product->image }}" alt="{{ $product->name }}">
 											</a>
 											<div class="product-overlay"></div>
 											<div class="product-actions">
-									<a href="javascript:;" class="action-btn {{ in_array($product->id, $cartProductIds) ? 'remove-from-cart' : 'add-to-cart' }}" data-product-id="{{ $product->id }}" title="{{ in_array($product->id, $cartProductIds) ? 'Remove from Cart' : 'Add to Cart' }}">
-										<i class='bx {{ in_array($product->id, $cartProductIds) ? 'bx-cart-x' : 'bx-cart-add' }}"></i>
-									</a>
 									<a href="javascript:;" class="action-btn add-to-wishlist {{ $inWishlist ? 'active' : '' }}" data-product-id="{{ $product->id }}" title="Add to Wishlist">
 										<i class="bx {{ $inWishlist ? 'bxs-heart' : 'bx-heart' }}"></i>
 									</a>
@@ -174,30 +170,27 @@
 													<i class='bx bx-show-alt'></i> Quick View
 												</a>
 											</div>
-											@if ($discountPercent > 0)
-											<span class="discount-badge">{{ $discountPercent }}% OFF</span>
+											@if ($product->discount_percent > 0)
+											<span class="discount-badge">{{ $product->discount_percent }}% OFF</span>
 											@endif
 										</div>
 										<div class="product-body">
-											<a href="javascript:;" class="product-category">{{ $category->name ?? '' }}</a>
+											<a href="{{ route('frontend.products.index', ['category' => $category->slug ?? '']) }}" class="product-category">{{ $category->name ?? '' }}</a>
 											<a href="{{ route('frontend.products.show', $slug) }}" class="product-title">{{ $product->name }}</a>
 											<div class="product-rating">
 												@for ($i = 1; $i <= 5; $i++)
-												<i class="bx {{ $i <= round($avgRating) ? 'bxs-star text-warning' : 'bx-star text-muted' }}"></i>
+												<i class="bx {{ $i <= round($product->avg_rating) ? 'bxs-star text-warning' : 'bx-star text-muted' }}"></i>
 												@endfor
 												@if ($product->approvedReviews->count() > 0)
 												<span class="rating-count">({{ $product->approvedReviews->count() }})</span>
 												@endif
 											</div>
 											<div class="product-pricing">
-												<span class="current-price">{{ App\Helpers\PriceHelper::formatPrice($finalPrice) }}</span>
-												@if ($finalPrice < $originalPrice)
-												<span class="old-price">{{ App\Helpers\PriceHelper::formatPrice($originalPrice) }}</span>
+												<span class="current-price">{{ $product->formatted_price }}</span>
+												@if ($product->formatted_original_price)
+												<span class="old-price">{{ $product->formatted_original_price }}</span>
 												@endif
 											</div>
-											<a href="javascript:;" class="add-to-cart-btn {{ in_array($product->id, $cartProductIds) ? 'remove-from-cart' : 'add-to-cart' }}" data-product-id="{{ $product->id }}">
-									<i class='bx {{ in_array($product->id, $cartProductIds) ? "bx-cart-x" : "bx-cart-add" }}'></i> {{ in_array($product->id, $cartProductIds) ? __t('Remove from Cart') : __t('Add to Cart') }}
-								</a>
 										</div>
 									</div>
 								</div>
@@ -219,27 +212,15 @@
 						<div class="product-grid">
 							<div class="new-arrivals owl-carousel owl-theme position-relative">
 								@foreach ($newArrivals as $product)
-								@php
-									$variant = $product->firstVariant;
-									$image = $variant ? App\Helpers\ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
-									$originalPrice = $variant ? $variant->price : 0;
-									$finalPrice = $variant ? App\Helpers\PriceHelper::applyDiscount($variant->price, $variant->discount_type, $variant->discount_value) : 0;
-									$avgRating = $product->approvedReviews->avg('rating') ?? 0;
-									$inWishlist = in_array($product->id, $wishlistProductIds ?? []);
-									$slug = $product->slug ?? $product->id;
-									$discountPercent = $originalPrice > 0 ? round((1 - $finalPrice / $originalPrice) * 100) : 0;
-								@endphp
+								@php $inWishlist = in_array($product->id, $wishlistProductIds ?? []); $slug = $product->slug ?? $product->id; @endphp
 								 <div class="item">
-									<div class="product-card-modern h-100">
+									<div class="product-card-modern h-100" data-url="{{ route('frontend.products.show', $slug) }}">
 										<div class="product-image-wrap">
 											<a href="{{ route('frontend.products.show', $slug) }}">
-												<img src="{{ $image }}" alt="{{ $product->name }}">
+												<img src="{{ $product->image }}" alt="{{ $product->name }}">
 											</a>
 											<div class="product-overlay"></div>
 											<div class="product-actions">
-									<a href="javascript:;" class="action-btn {{ in_array($product->id, $cartProductIds) ? 'remove-from-cart' : 'add-to-cart' }}" data-product-id="{{ $product->id }}" title="{{ in_array($product->id, $cartProductIds) ? 'Remove from Cart' : 'Add to Cart' }}">
-										<i class='bx {{ in_array($product->id, $cartProductIds) ? 'bx-cart-x' : 'bx-cart-add' }}"></i>
-									</a>
 									<a href="javascript:;" class="action-btn add-to-wishlist {{ $inWishlist ? 'active' : '' }}" data-product-id="{{ $product->id }}" title="Add to Wishlist">
 										<i class="bx {{ $inWishlist ? 'bxs-heart' : 'bx-heart' }}"></i>
 									</a>
@@ -249,30 +230,27 @@
 													<i class='bx bx-show-alt'></i> {{ __t('Quick View') }}
 												</a>
 											</div>
-											@if ($discountPercent > 0)
-											<span class="discount-badge">{{ $discountPercent }}% {{ __t('OFF') }}</span>
+											@if ($product->discount_percent > 0)
+											<span class="discount-badge">{{ $product->discount_percent }}% {{ __t('OFF') }}</span>
 											@endif
 										</div>
 										<div class="product-body">
-											<a href="javascript:;" class="product-category">{{ $product->category->name ?? '' }}</a>
+											<a href="{{ route('frontend.products.index', ['category' => $product->category->slug ?? '']) }}" class="product-category">{{ $product->category->name ?? '' }}</a>
 											<a href="{{ route('frontend.products.show', $slug) }}" class="product-title">{{ $product->name }}</a>
 											<div class="product-rating">
 												@for ($i = 1; $i <= 5; $i++)
-												<i class="bx {{ $i <= round($avgRating) ? 'bxs-star text-warning' : 'bx-star text-muted' }}"></i>
+												<i class="bx {{ $i <= round($product->avg_rating) ? 'bxs-star text-warning' : 'bx-star text-muted' }}"></i>
 												@endfor
 												@if ($product->approvedReviews->count() > 0)
 												<span class="rating-count">({{ $product->approvedReviews->count() }})</span>
 												@endif
 											</div>
 											<div class="product-pricing">
-												<span class="current-price">{{ App\Helpers\PriceHelper::formatPrice($finalPrice) }}</span>
-												@if ($finalPrice < $originalPrice)
-												<span class="old-price">{{ App\Helpers\PriceHelper::formatPrice($originalPrice) }}</span>
+												<span class="current-price">{{ $product->formatted_price }}</span>
+												@if ($product->formatted_original_price)
+												<span class="old-price">{{ $product->formatted_original_price }}</span>
 												@endif
 											</div>
-											<a href="javascript:;" class="add-to-cart-btn {{ in_array($product->id, $cartProductIds) ? 'remove-from-cart' : 'add-to-cart' }}" data-product-id="{{ $product->id }}">
-									<i class='bx {{ in_array($product->id, $cartProductIds) ? "bx-cart-x" : "bx-cart-add" }}'></i> {{ in_array($product->id, $cartProductIds) ? __t('Remove from Cart') : __t('Add to Cart') }}
-								</a>
 										</div>
 									</div>
 								</div>
@@ -287,25 +265,45 @@
 					<div class="container">
 						<div class="add-banner">
 							<div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4 g-4">
+								@forelse ($promoBanners as $promo)
+								@php
+									$promoImg = $promo->image ? App\Helpers\ImageHelper::getBannerImage($promo->image) : asset('frontend/assets/images/promo/0' . ($loop->index + 1) . '.png');
+									$promoLink = $promo->link_url ?? 'javascript:;';
+									$promoBtnText = __('Shop Now');
+								@endphp
+								<div class="col d-flex">
+									<div class="card rounded-0 w-100 border-0 shadow-none">
+										<img src="{{ $promoImg }}" class="img-fluid" alt="{{ $promo->title }}">
+										@if($promo->title_ar)
+										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">{{ $promo->title_ar }}</span></div>
+										@endif
+										<div class="card-body text-center">
+											<h5 class="card-title">{{ $promo->title }}</h5>
+											<p class="card-text">{{ $promo->slug ?? '' }}</p>
+											<a href="{{ $promoLink }}" class="btn btn-dark btn-ecomm">{{ $promoBtnText }}</a>
+										</div>
+									</div>
+								</div>
+								@empty
 								<div class="col d-flex">
 									<div class="card rounded-0 w-100 border-0 shadow-none">
 										<img src="{{ asset('frontend/assets/images/promo/04.png') }}" class="img-fluid" alt="...">
-										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-10%</span>
-										</div>
+										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-10%</span></div>
 										<div class="card-body text-center">
 											<h5 class="card-title">{{ __t('Sunglasses Sale') }}</h5>
-											<p class="card-text">{{ __t('See all Sunglasses and get 10% off at all Sunglasses') }}</p> <a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('SHOP BY GLASSES') }}</a>
+											<p class="card-text">{{ __t('See all Sunglasses and get 10% off at all Sunglasses') }}</p>
+											<a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('SHOP BY GLASSES') }}</a>
 										</div>
 									</div>
 								</div>
 								<div class="col d-flex">
 									<div class="card rounded-0 w-100 border-0 shadow-none">
 										<img src="{{ asset('frontend/assets/images/promo/08.png') }}" class="img-fluid" alt="...">
-										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-80%</span>
-										</div>
+										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-80%</span></div>
 										<div class="card-body text-center">
 											<h5 class="card-title">{{ __t('Cosmetics Sales') }}</h5>
-											<p class="card-text">{{ __t('Buy Cosmetics products and get 30% off at all Cosmetics') }}</p> <a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('SHOP BY COSMETICS') }}</a>
+											<p class="card-text">{{ __t('Buy Cosmetics products and get 30% off at all Cosmetics') }}</p>
+											<a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('SHOP BY COSMETICS') }}</a>
 										</div>
 									</div>
 								</div>
@@ -316,23 +314,25 @@
 											<div class="border border-white border-2 py-3 bg-dark-3">
 												<h5 class="card-title text-white">{{ __t('Fashion Summer Sale') }}</h5>
 												<p class="card-text text-uppercase fs-1 lh-1 mt-3 mb-2 text-white">{{ __t('Up to 80% off') }}</p>
-												<p class="card-text fs-5 text-white">{{ __t('On Top Fashion Brands') }}</p>	<a href="javascript:;" class="btn btn-white btn-ecomm">{{ __t('SHOP BY FASHION') }}</a>
+												<p class="card-text fs-5 text-white">{{ __t('On Top Fashion Brands') }}</p>
+												<a href="javascript:;" class="btn btn-white btn-ecomm">{{ __t('SHOP BY FASHION') }}</a>
 											</div>
 										</div>
 									</div>
 								</div>
 								<div class="col d-flex">
 									<div class="card rounded-0 w-100 border-0 shadow-none">
-										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-50%</span>
-										</div>
+										<div class="position-absolute top-0 end-0 m-3 product-discount"><span class="">-50%</span></div>
 										<img src="{{ asset('frontend/assets/images/promo/07.png') }}" class="img-fluid" alt="...">
 										<div class="card-body text-center">
 											<h5 class="card-title fs-2 fw-bold text-uppercase">{{ __t('Super Sale') }}</h5>
 											<p class="card-text text-uppercase fs-5 lh-1 mb-2">{{ __t('Up to 50% off') }}</p>
-											<p class="card-text">{{ __t('On All Electronic') }}</p> <a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('HURRY UP!') }}</a>
+											<p class="card-text">{{ __t('On All Electronic') }}</p>
+											<a href="javascript:;" class="btn btn-dark btn-ecomm">{{ __t('HURRY UP!') }}</a>
 										</div>
 									</div>
 								</div>
+								@endforelse
 							</div>
 							<!--end row-->
 						</div>
@@ -427,6 +427,37 @@
 						 </div>
 						<div class="product-grid">
 							<div class="latest-news owl-carousel owl-theme">
+								@forelse ($blogPosts as $post)
+								@php
+									$postImg = $post->image ? App\Helpers\ImageHelper::getBlogImage($post->image) : asset('frontend/assets/images/blogs/0' . ($loop->index + 1) . '.png');
+									$postDate = $post->created_at ? date('d', strtotime($post->created_at)) : '24';
+									$postMonth = $post->created_at ? date('M', strtotime($post->created_at)) : 'FEB';
+									$postTitle = \Str::limit($post->title, 30);
+									$postDesc = \Str::limit(strip_tags($post->description ?? $post->content ?? ''), 100);
+								@endphp
+								<div class="item">
+									<div class="card rounded-0 product-card border">
+										<div class="news-date">
+											<div class="date-number">{{ $postDate }}</div>
+											<div class="date-month">{{ $postMonth }}</div>
+										</div>
+										<a href="{{ route('frontend.blog.show', $post->slug) }}">
+											<img src="{{ $postImg }}" class="card-img-top border-bottom" alt="{{ $post->title }}">
+										</a>
+										<div class="card-body">
+											<div class="news-title">
+												<a href="{{ route('frontend.blog.show', $post->slug) }}">
+													<h5 class="mb-3 text-capitalize">{{ $postTitle }}</h5>
+												</a>
+											</div>
+											<p class="news-content mb-0">{{ $postDesc }}</p>
+										</div>
+										<div class="card-footer border-top bg-transparent">
+											<a href="{{ route('frontend.blog.show', $post->slug) }}" class="link-dark">{{ __t('Read More') }}</a>
+										</div>
+									</div>
+								</div>
+								@empty
 								<div class="item">
 									<div class="card rounded-0 product-card border">
 										<div class="news-date">
@@ -493,72 +524,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="item">
-									<div class="card rounded-0 product-card border">
-										<div class="news-date">
-											<div class="date-number">24</div>
-											<div class="date-month">FEB</div>
-										</div>
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/blogs/04.png') }}" class="card-img-top border-bottom" alt="...">
-										</a>
-										<div class="card-body">
-											<div class="news-title">
-												<a href="javascript:;">
-													<h5 class="mb-3 text-capitalize">{{ __t('Blog Short Title') }}</h5>
-												</a>
-											</div>
-											<p class="news-content mb-0">{{ __t('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras non placerat mi. Etiam non tellus sem. Aenean...') }}</p>
-										</div>
-										<div class="card-footer border-top bg-transparent">
-											<a href="javascript:;" class="link-dark">{{ __t('0 Comments') }}</a>
-										</div>
-									</div>
-								</div>
-								<div class="item">
-									<div class="card rounded-0 product-card border">
-										<div class="news-date">
-											<div class="date-number">24</div>
-											<div class="date-month">FEB</div>
-										</div>
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/blogs/05.png') }}" class="card-img-top border-bottom" alt="...">
-										</a>
-										<div class="card-body">
-											<div class="news-title">
-												<a href="javascript:;">
-													<h5 class="mb-3 text-capitalize">{{ __t('Blog Short Title') }}</h5>
-												</a>
-											</div>
-											<p class="news-content mb-0">{{ __t('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras non placerat mi. Etiam non tellus sem. Aenean...') }}</p>
-										</div>
-										<div class="card-footer border-top bg-transparent">
-											<a href="javascript:;" class="link-dark">{{ __t('0 Comments') }}</a>
-										</div>
-									</div>
-								</div>
-								<div class="item">
-									<div class="card rounded-0 product-card border">
-										<div class="news-date">
-											<div class="date-number">24</div>
-											<div class="date-month">FEB</div>
-										</div>
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/blogs/06.png') }}" class="card-img-top border-bottom" alt="...">
-										</a>
-										<div class="card-body">
-											<div class="news-title">
-												<a href="javascript:;">
-													<h5 class="mb-3 text-capitalize">{{ __t('Blog Short Title') }}</h5>
-												</a>
-											</div>
-											<p class="news-content mb-0">{{ __t('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras non placerat mi. Etiam non tellus sem. Aenean...') }}</p>
-										</div>
-										<div class="card-footer border-top bg-transparent">
-											<a href="javascript:;" class="link-dark">{{ __t('0 Comments') }}</a>
-										</div>
-									</div>
-								</div>
+								@endforelse
 							</div>
 						</div>
 					</div>
@@ -570,55 +536,33 @@
 						<h3 class="d-none">{{ __t('Brands') }}</h3>
 						<div class="brand-grid">
 							<div class="brands-shops owl-carousel owl-theme border">
+								@forelse ($brands as $brand)
+								@php
+									$brandLogo = $brand->logo ? App\Helpers\ImageHelper::getBrandImage($brand->logo) : asset('frontend/assets/images/brands/0' . ($loop->index + 1) . '.png');
+								@endphp
 								<div class="item border-end">
-									<div class="p-4">
+									<div class="p-4 d-flex align-items-center justify-content-center" style="height: 120px;">
+										<a href="{{ route('frontend.products.index') }}?search={{ $brand->name }}">
+											<img src="{{ $brandLogo }}" class="img-fluid brand-logo" alt="{{ $brand->name }}" style="max-height: 80px; width: auto; object-fit: contain;">
+										</a>
+									</div>
+								</div>
+								@empty
+								<div class="item border-end">
+									<div class="p-4 d-flex align-items-center justify-content-center" style="height: 120px;">
 										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/01.png') }}" class="img-fluid" alt="...">
+											<img src="{{ asset('frontend/assets/images/brands/01.png') }}" class="img-fluid brand-logo" alt="..." style="max-height: 80px; width: auto; object-fit: contain;">
 										</a>
 									</div>
 								</div>
 								<div class="item border-end">
-									<div class="p-4">
+									<div class="p-4 d-flex align-items-center justify-content-center" style="height: 120px;">
 										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/02.png') }}" class="img-fluid" alt="...">
+											<img src="{{ asset('frontend/assets/images/brands/04.png') }}" class="img-fluid brand-logo" alt="..." style="max-height: 80px; width: auto; object-fit: contain;">
 										</a>
 									</div>
 								</div>
-								<div class="item border-end">
-									<div class="p-4">
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/03.png') }}" class="img-fluid" alt="...">
-										</a>
-									</div>
-								</div>
-								<div class="item border-end">
-									<div class="p-4">
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/04.png') }}" class="img-fluid" alt="...">
-										</a>
-									</div>
-								</div>
-								<div class="item border-end">
-									<div class="p-4">
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/05.png') }}" class="img-fluid" alt="...">
-										</a>
-									</div>
-								</div>
-								<div class="item border-end">
-									<div class="p-4">
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/06.png') }}" class="img-fluid" alt="...">
-										</a>
-									</div>
-								</div>
-								<div class="item border-end">
-									<div class="p-4">
-										<a href="javascript:;">
-											<img src="{{ asset('frontend/assets/images/brands/07.png') }}" class="img-fluid" alt="...">
-										</a>
-									</div>
-								</div>
+								@endforelse
 							</div>
 						</div>
 					</div>
@@ -960,6 +904,13 @@
 				<!--end bottom products section-->
 
 @push('scripts')
+<script>
+$(document).on('click', '.product-card-modern', function(e) {
+    if ($(e.target).closest('.action-btn, .quick-view-overlay').length) return;
+    var url = $(this).data('url');
+    if (url) window.location.href = url;
+});
+</script>
 <script src="{{ asset('frontend/assets/js/index.js') }}"></script>
 @endpush
 @endsection

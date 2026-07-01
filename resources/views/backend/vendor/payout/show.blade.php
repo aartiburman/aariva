@@ -49,7 +49,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="text-muted fs-12">PG Fee</div>
-                                <div class="fs-16">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->pg_fee_amount, 2) }}</div>
+                                <div class="fs-16">{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->pg_fee_amount, 2) }}</div>
                             </div>
                             <div class="col-md-4">
                                 <div class="text-muted fs-12">Payment Method</div>
@@ -126,8 +126,8 @@
                                     <tr>
                                         <td class="ps-4">{{ $tx->reference_id }}</td>
                                         <td>{{ ucfirst($tx->type) }}</td>
-                                        <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
-                                        <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'NPR' }} {{ number_format($tx->amount, 2) }}</td>
+                                        <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($payout->pg_fee_amount, 2) }}</td>
+                                        <td>{{ optional(optional($payout->vendor)->country)->currency_code ?? 'INR' }} {{ number_format($tx->amount, 2) }}</td>
                                         <td><span class="badge bg-success-subtle text-success px-2 py-1">{{ is_string($tx->status) ? ucfirst($tx->status) : ($tx->status ? 'Completed' : 'Completed') }}</span></td>
                                         <td class="pe-4 text-end">{{ \Carbon\Carbon::parse($tx->created_at)->format('Y-m-d H:i') }}</td>
                                     </tr>

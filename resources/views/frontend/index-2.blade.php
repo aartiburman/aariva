@@ -12,7 +12,7 @@
 								<h3 class="h3 fw-bold d-none d-md-block">New Trending</h3>
 								<h1 class="h1 fw-bold">Women Fashion</h1>
 								<p class="fw-bold text-dark d-none d-md-block"><i>Last call for upto 15%</i></p>
-								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.shop-grid') }}">Shop Now</a>
+								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.products.index') }}">Shop Now</a>
 								</div>
 							  </div>
 							<a href="javascript:;">
@@ -26,7 +26,7 @@
 								<h3 class="h3 fw-bold d-none d-md-block">New Trending</h3>
 								<h1 class="h1 fw-bold">Men Fashion</h1>
 								<p class="fw-bold text-dark d-none d-md-block"><i>Last call for upto 15%</i></p>
-								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.shop-grid') }}">Shop Now</a>
+								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.products.index') }}">Shop Now</a>
 								</div>
 							  </div>
 							<a href="javascript:;">
@@ -40,7 +40,7 @@
 								<h3 class="h3 fw-bold d-none d-md-block">New Trending</h3>
 								<h1 class="h1 fw-bold">Kids Fashion</h1>
 								<p class="fw-bold text-dark d-none d-md-block"><i>Last call for upto 15%</i></p>
-								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.shop-grid') }}">Shop Now</a>
+								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ route('frontend.products.index') }}">Shop Now</a>
 								</div>
 							  </div>
 							<a href="javascript:;">
@@ -111,7 +111,7 @@
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">Men Wear</h5>
 												<p class="card-text text-uppercase">Starting at $9</p>
-												<a href="javascript:;" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
+												<a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
 											</div>
 										</div>
 									</div>
@@ -126,7 +126,7 @@
 										<div class="col">
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">Women Wear</h5>
-												<p class="card-text text-uppercase">Starting at $9</p>	<a href="javascript:;" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
+												<p class="card-text text-uppercase">Starting at $9</p>	<a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
 											</div>
 										</div>
 									</div>
@@ -141,7 +141,7 @@
 										<div class="col">
 											<div class="card-body">
 												<h5 class="card-title text-uppercase fw-bold">Kids Wear</h5>
-												<p class="card-text text-uppercase">Starting at $9</p><a href="javascript:;" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
+												<p class="card-text text-uppercase">Starting at $9</p><a href="{{ route('frontend.products.index') }}" class="btn btn-outline-dark btn-ecomm">SHOP NOW</a>
 											</div>
 										</div>
 									</div>

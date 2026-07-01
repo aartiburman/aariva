@@ -52,7 +52,7 @@
                             </div>
                         </div>
                         <div class="product-body">
-                            <a href="javascript:;" class="product-category">{{ $product->category->name ?? __t('Category') }}</a>
+                            <a href="{{ route('frontend.products.index', ['category' => $product->category->slug ?? '']) }}" class="product-category">{{ $product->category->name ?? __t('Category') }}</a>
                             <a href="{{ route('frontend.products.show', $slug) }}" class="product-title">{{ $product->name ?? '' }}</a>
                             <div class="product-pricing">
                                 <span class="current-price">{{ App\Helpers\PriceHelper::formatPrice($finalPrice) }}</span>

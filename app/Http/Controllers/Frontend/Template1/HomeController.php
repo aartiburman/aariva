@@ -64,6 +64,11 @@ class HomeController extends Controller
             ->where('position', 'top')
             ->get();
 
+        $promoBanners = Banner::where('status', 1)
+            ->where('position', 'promo')
+            ->orderBy('order_by', 'ASC')
+            ->get();
+
         foreach ($banners as $banner) {
             $image = $banner->image;
             $decoded = json_decode($image, true);
@@ -82,6 +87,20 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+        $transformProduct = function ($product) {
+            $variant = $product->firstVariant;
+            $product->image = $variant ? ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
+            $product->original_price = $variant ? $variant->price : 0;
+            $product->final_price = $variant ? PriceHelper::applyDiscount($variant->price, $variant->discount_type, $variant->discount_value) : 0;
+            $product->avg_rating = $product->approvedReviews->avg('rating') ?? 0;
+            $product->discount_percent = $product->original_price > 0 ? round((1 - $product->final_price / $product->original_price) * 100) : 0;
+            $product->formatted_price = PriceHelper::formatPrice($product->final_price);
+            $product->formatted_original_price = $product->final_price < $product->original_price ? PriceHelper::formatPrice($product->original_price) : null;
+            return $product;
+        };
+
+        $allProducts = $allProducts->map($transformProduct);
+
         $categoryProducts = $allProducts->groupBy('category_id')->map(function ($items) {
             return $items->take(8);
         });
@@ -95,7 +114,8 @@ class HomeController extends Controller
             })
             ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
             ->limit(15)
-            ->get();
+            ->get()
+            ->map($transformProduct);
 
         $deal_products = Product::where('status', 1)
             ->whereHas('vendor', function ($q) {
@@ -104,7 +124,8 @@ class HomeController extends Controller
             ->whereJsonContains('product_in', '2')
             ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
             ->limit(15)
-            ->get();
+            ->get()
+            ->map($transformProduct);
 
         $bestseller_ids = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'))
             ->groupBy('product_id')
@@ -118,14 +139,15 @@ class HomeController extends Controller
                 $q->where('status', 1);
             })
             ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
-            ->get();
+            ->get()
+            ->map($transformProduct);
 
         $brands = Brand::where('status', 1)->get();
 
         $blogPosts = Blog::where('status', 1)
             ->with('author')
             ->latest()
-            ->limit(4)
+            ->limit(8)
             ->get();
 
         $generalSettings = GeneralSetting::pluck('value', 'key')->toArray();
@@ -140,6 +162,7 @@ class HomeController extends Controller
             'cartTotal',
             'brands',
             'blogPosts',
+            'promoBanners',
             'generalSettings',
             'categoryProducts',
             'newArrivals'

@@ -2,9 +2,9 @@
 
 @section('content')
 @php
-    $currency = 'NPR';
+    $currency = 'INR';
     if ($order->items->first() && $order->items->first()->vendor && $order->items->first()->vendor->country) {
-        $currency = $order->items->first()->vendor->country->currency ?? 'NPR';
+        $currency = $order->items->first()->vendor->country->currency ?? 'INR';
     }
 @endphp
 <div class="page-content">
@@ -23,14 +23,6 @@
                                     <i class="bx bx-arrow-back fs-16"></i> Back to Order List
                                 </a>
                                 <a href="{{ route('orders.invoice', $order->order_reference_id) }}" target="_blank" class="btn btn-soft-primary btn-sm"><i class="bx bx-printer fs-16"></i> Print Invoice</a>
-                                @if($order->items->where('logistics_provider', 'NCM')->isNotEmpty())
-                                    <button type="button" id="refresh_tracking" 
-                                        data-url="{{ route('admin.orders.sync_ncm', $order->order_reference_id) }}" 
-                                        data-token="{{ csrf_token() }}"
-                                        class="btn btn-soft-info btn-sm">
-                                        <i class="bx bx-refresh fs-16"></i> Sync NCM Status
-                                    </button>
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -129,16 +121,7 @@
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>
-                                            @if($item->logistics_provider == 'NCM')
-                                                <div class="d-flex flex-column gap-1">
-                                                    <span class="badge bg-soft-info text-info d-inline-block" style="width: fit-content;">NCM Tracking</span>
-                                                    <small class="text-muted fw-bold">#{{ $item->tracking_id }}</small>
-                                                    <span class="badge bg-soft-primary text-primary d-inline-block" style="width: fit-content;">{{ $item->logistics_status ?? 'Packed' }}</span>
-                                                    <a href="https://nepalcanmove.com/track?tracking_id={{ $item->tracking_id }}" target="_blank" class="text-primary fs-12"><i class="bx bx-link-external"></i> Track on NCM</a>
-                                                </div>
-                                            @else
-                                                <span class="text-muted small">Not Assigned</span>
-                                            @endif
+                                            <span class="text-muted small">{{ $item->tracking_id ? '#' . $item->tracking_id : 'Not Assigned' }}</span>
                                         </td>
                                         <td>
                                             <!-- Badge -->
@@ -262,31 +245,7 @@
                             </div>
                             @php
                                 $representative_status = $order->items->first()->status ?? 0;
-                                $ncmItems = $order->items->where('logistics_provider', 'NCM');
-                                $latestLogisticsStatus = $ncmItems->pluck('logistics_status')->unique()->last();
                             @endphp
-                            
-                            @if($ncmItems->isNotEmpty())
-                                <div class="track-order-item {{ $latestLogisticsStatus ? 'completed' : '' }}">
-                                    <span class="track-icon">
-                                        <i class="bx bx-package"></i>
-                                    </span>
-                                    <div class="track-content">
-                                        <h5 class="mt-0">Assigned to NCM</h5>
-                                        <p class="mb-0">Order sent to NCM Logistics.</p>
-                                    </div>
-                                </div>
-                                @if(in_array($latestLogisticsStatus, ['Dispatched', 'In Transit', 'Delivered']))
-                                    <div class="track-order-item completed">
-                                        <span class="track-icon">
-                                            <i class="bx bx-transfer"></i>
-                                        </span>
-                                        <div class="track-content">
-                                            <h5 class="mt-0">NCM Status: {{ $latestLogisticsStatus }}</h5>
-                                            <p class="mb-0">Updated via NCM Real-time tracking.</p>
-                                        </div>
-                                    </div>
-                                @endif
                             @endif
 
                             @if($representative_status >= 1)

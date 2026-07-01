@@ -1086,7 +1086,7 @@ class UserController extends Controller
         $referredReward = ReferralHelper::getReferredReward();
         $baseUrl = config('app.url', url('/'));
         $shareLink = rtrim($baseUrl, '/') . '/signup?ref=' . $code;
-        $shareMessage = "Use my referral code {$code} and get NPR {$referredReward} on your first order (min NPR 1000)! Sign up: {$shareLink}";
+        $shareMessage = "Use my referral code {$code} and get INR {$referredReward} on your first order (min INR 1000)! Sign up: {$shareLink}";
 
         return response()->json([
             'status' => true,
@@ -1096,7 +1096,7 @@ class UserController extends Controller
                 'copy_text' => $code,
                 'share_link' => $shareLink,
                 'share_message' => $shareMessage,
-                'reward_info' => 'You get NPR ' . ReferralHelper::getReferrerReward() . ' when they complete first order (min NPR ' . ReferralHelper::getMinCartValue() . '). They get NPR ' . ReferralHelper::getReferredReward() . '.',
+                'reward_info' => 'You get INR ' . ReferralHelper::getReferrerReward() . ' when they complete first order (min INR ' . ReferralHelper::getMinCartValue() . '). They get INR ' . ReferralHelper::getReferredReward() . '.',
             ],
         ], 200);
     }

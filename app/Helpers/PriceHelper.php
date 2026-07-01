@@ -38,8 +38,8 @@ class PriceHelper
 
     public static function formatPrice($price)
     {
-        $symbol = session('currency_symbol', 'NPR');
-        $code = session('currency_code', 'NPR');
+        $symbol = session('currency_symbol', 'INR');
+        $code = session('currency_code', 'INR');
 
         $decimalCurrencies = ['JPY', 'KRW', 'VND', 'IDR', 'HUF', 'TWD'];
         $decimals = in_array($code, $decimalCurrencies) ? 0 : 2;

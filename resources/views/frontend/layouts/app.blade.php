@@ -3,7 +3,7 @@
     use App\Models\Cart;
     $categories = Category::where('is_active', 1)
         ->with(['subCategories' => function ($q) {
-            $q->where('is_active', 1);
+            $q->where('is_active', 1)->with('childCategories');
         }])
         ->orderBy('name')
         ->get();
@@ -29,6 +29,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{{ asset('frontend/assets/images/favicon-32x32.png') }}" type="image/png" />
+
+    <!-- SEO Meta Tags -->
+    <title>@yield('title', config('app.name'))</title>
+    <meta name="description" content="@yield('meta_description', 'Discover endless collection at ' . config('app.name') . ' - Your one-stop shop for fashion, electronics, beauty & more. Unbeatable deals, fast delivery.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'Aariva, one store endless collection, online shopping, fashion, electronics, beauty, ecommerce, buy online, best deals')">
+    <meta name="robots" content="@yield('robots', 'index, follow')">
+    <link rel="canonical" href="@yield('canonical', url()->current())" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="@yield('og_url', url()->current())">
+    <meta property="og:title" content="@yield('og_title', config('app.name'))">
+    <meta property="og:description" content="@yield('og_description', 'Discover endless collection at ' . config('app.name') . ' - Your one-stop shop for fashion, electronics, beauty & more. Unbeatable deals, fast delivery.')">
+    <meta property="og:image" content="@yield('og_image', asset('frontend/assets/images/favicon-32x32.png'))">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="@yield('og_url', url()->current())">
+    <meta name="twitter:title" content="@yield('og_title', config('app.name'))">
+    <meta name="twitter:description" content="@yield('og_description', 'Discover endless collection at ' . config('app.name') . ' - Your one-stop shop for fashion, electronics, beauty & more. Unbeatable deals, fast delivery.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('frontend/assets/images/favicon-32x32.png'))">
+
     <link href="{{ asset('frontend/assets/plugins/OwlCarousel/css/owl.carousel.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('frontend/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css') }}" rel="stylesheet" />
     <link href="{{ asset('frontend/assets/css/pace.min.css') }}" rel="stylesheet" />
@@ -39,7 +63,6 @@
     <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link href="{{ asset('frontend/assets/css/icons.css') }}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Shopingo - eCommerce HTML Template')</title>
     @stack('styles')
 </head>
 
@@ -53,7 +76,7 @@
                         <ul class="navbar-nav ms-auto d-none d-lg-flex">
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.order-tracking') }}">{{ __t('Track Order') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.about-us') }}">{{ __t('About') }}</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('frontend.shop-categories') }}">{{ __t('Our Stores') }}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('frontend.products.index') }}">{{ __t('Our Stores') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.blog-post') }}">{{ __t('Blog') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.contact-us') }}">{{ __t('Contact') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="javascript:;">{{ __t('Help & FAQs') }}</a></li>
@@ -76,7 +99,6 @@
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'US') }}"><i class="flag-icon flag-icon-us me-2"></i><span>{{ __t('USA (USD)') }}</span></a>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'GB') }}"><i class="flag-icon flag-icon-gb me-2"></i><span>{{ __t('UK (GBP)') }}</span></a>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'IN') }}"><i class="flag-icon flag-icon-in me-2"></i><span>{{ __t('India (INR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'NP') }}"><i class="flag-icon flag-icon-np me-2"></i><span>{{ __t('Nepal (NPR)') }}</span></a>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'CN') }}"><i class="flag-icon flag-icon-cn me-2"></i><span>{{ __t('China (CNY)') }}</span></a>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'JP') }}"><i class="flag-icon flag-icon-jp me-2"></i><span>{{ __t('Japan (JPY)') }}</span></a>
                                     <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'KR') }}"><i class="flag-icon flag-icon-kr me-2"></i><span>{{ __t('South Korea (KRW)') }}</span></a>
@@ -213,34 +235,38 @@
                       </li>
                       @foreach ($categories as $category)
                       <li class="nav-item dropdown mega-menu">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="javascript:;">
+                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="{{ route('frontend.products.index', ['category' => $category->slug]) }}">
                           {{ $category->name }}
                         </a>
                         @if ($category->subCategories->isNotEmpty())
                         <div class="dropdown-menu mega-menu-content">
                           <div class="container">
                             <div class="row">
-                              <div class="col-md-9">
-                                <div class="row">
-                                  @foreach ($category->subCategories->chunk(3) as $chunk)
-                                  <div class="col-md-4">
-                                    @foreach ($chunk as $sub)
-                                    <h6 class="mega-menu-title">{{ $sub->name }}</h6>
+                              @foreach ($category->subCategories->chunk(4) as $chunk)
+                                @foreach ($chunk as $sub)
+                                  <div class="col-md-3">
+                                    <h6 class="mega-menu-title mb-3">
+                                      <a href="{{ route('frontend.products.index', ['category' => $sub->slug]) }}" class="text-decoration-none">
+                                        {{ $sub->name }}
+                                        @if ($sub->childCategories->isNotEmpty())
+                                          <i class='bx bx-chevron-right ms-1'></i>
+                                        @endif
+                                      </a>
+                                    </h6>
                                     @if ($sub->childCategories->isNotEmpty())
                                     <ul class="list-unstyled mb-4">
                                       @foreach ($sub->childCategories as $child)
-                                      <li><a class="mega-menu-link" href="javascript:;">{{ $child->name }}</a></li>
+                                      <li class="mb-2">
+                                        <a class="mega-menu-link" href="{{ route('frontend.products.index', ['category' => $child->slug]) }}">
+                                          {{ $child->name }}
+                                        </a>
+                                      </li>
                                       @endforeach
                                     </ul>
                                     @endif
-                                    @endforeach
                                   </div>
-                                  @endforeach
-                                </div>
-                              </div>
-                              <div class="col-md-3 d-none d-md-block">
-                                <img src="{{ asset('frontend/assets/images/products/01.png') }}" class="img-fluid rounded shadow" alt="category">
-                              </div>
+                                @endforeach
+                              @endforeach
                             </div>
                           </div>
                         </div>
@@ -360,7 +386,14 @@
                         </div>
                         <div class="col">
                             <div class="footer-section4">
-                                <h5 class="mb-4 text-uppercase fw-bold">{{ __t('Stay informed') }}</h5>
+                                <h5 class="mb-4 text-uppercase fw-bold">{{ __t('Quick Links') }}</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><a href="{{ route('frontend.become-seller') }}"><i class='bx bx-chevron-right'></i> {{ __t('Become a Seller') }}</a></li>
+                                    <li class="mb-2"><a href="{{ route('frontend.blog') }}"><i class='bx bx-chevron-right'></i> {{ __t('Blog') }}</a></li>
+                                    <li class="mb-2"><a href="{{ route('frontend.about-us') }}"><i class='bx bx-chevron-right'></i> {{ __t('About Us') }}</a></li>
+                                    <li class="mb-2"><a href="{{ route('frontend.contact-us') }}"><i class='bx bx-chevron-right'></i> {{ __t('Contact Us') }}</a></li>
+                                </ul>
+                                <h5 class="mb-4 text-uppercase fw-bold mt-4">{{ __t('Stay informed') }}</h5>
                                 <div class="subscribe">
                                     <input type="text" class="form-control" placeholder="Enter Your Email" />
                                     <div class="mt-3 d-grid">

@@ -1,5 +1,18 @@
 @extends('frontend.layouts.app')
 
+@section('title', ($post->title ?? 'Blog Post') . ' - ' . config('app.name'))
+
+@section('meta_description', \Str::limit(strip_tags($post->description ?? $post->content ?? ''), 160))
+
+@section('meta_keywords', ($post->title ?? 'blog') . ', ' . config('app.name') . ', article, shopping tips, lifestyle')
+
+@section('robots', 'index, follow')
+
+@section('og_type', 'article')
+@section('og_title', ($post->title ?? 'Blog Post') . ' - ' . config('app.name'))
+@section('og_description', \Str::limit(strip_tags($post->description ?? $post->content ?? ''), 160))
+@section('og_image', $post->image ? App\Helpers\ImageHelper::getBlogImage($post->image) : asset('frontend/assets/images/favicon-32x32.png'))
+
 @section('content')
 <section class="py-3 border-bottom border-top d-none d-md-flex bg-light">
     <div class="container">

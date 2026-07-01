@@ -38,7 +38,7 @@
                             <iconify-icon icon="solar:bill-list-bold-duotone" class="avatar-title fs-24 text-primary"></iconify-icon>
                         </div>
                         <h6 class="text-muted text-uppercase fs-11 fw-bold mb-1">Total Sales</h6>
-                        <h4 class="mb-0 fw-bold">{{ $vendor->currency ?? 'NPR' }} {{ number_format($vendor->total_sale, 2) }}</h4>
+                        <h4 class="mb-0 fw-bold">{{ $vendor->currency ?? 'INR' }} {{ number_format($vendor->total_sale, 2) }}</h4>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                             <iconify-icon icon="solar:wallet-bold-duotone" class="avatar-title fs-24 text-warning"></iconify-icon>
                         </div>
                         <h6 class="text-muted text-uppercase fs-11 fw-bold mb-1">Commission</h6>
-                        <h4 class="mb-0 fw-bold">{{ $vendor->currency ?? 'NPR' }} {{ number_format($total_commission, 2) }}</h4>
+                        <h4 class="mb-0 fw-bold">{{ $vendor->currency ?? 'INR' }} {{ number_format($total_commission, 2) }}</h4>
                     </div>
                 </div>
             </div>
@@ -84,7 +84,7 @@
                             </div>
                             <div>
                                 <h6 class="text-white text-opacity-75 text-uppercase fs-11 fw-bold mb-1">Monthly Revenue</h6>
-                                <h3 class="mb-0 fw-bold">{{ $vendor->currency ?? 'NPR' }} {{ number_format($monthly_revenue, 2) }}</h3>
+                                <h3 class="mb-0 fw-bold">{{ $vendor->currency ?? 'INR' }} {{ number_format($monthly_revenue, 2) }}</h3>
                             </div>
                         </div>
                         <iconify-icon icon="solar:chart-2-bold-duotone" class="position-absolute bottom-0 end-0 fs-100 text-white opacity-10 mb-n4 me-n4"></iconify-icon>
@@ -215,7 +215,7 @@
                                 </div>
                                 <div>
                                     <h6 class="mb-0 fs-13 fw-bold">Total Discounts</h6>
-                                    <p class="text-muted mb-0 fs-13">{{ $vendor->currency ?? 'NPR' }} {{ number_format($total_discount, 2) }} given</p>
+                                    <p class="text-muted mb-0 fs-13">{{ $vendor->currency ?? 'INR' }} {{ number_format($total_discount, 2) }} given</p>
                                 </div>
                             </div>
                             <div class="list-group-item bg-transparent d-flex align-items-center gap-3 py-3">
@@ -287,7 +287,7 @@
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h6 class="mb-0 fs-13">{{ $profit->category_name }}</h6>
-                                <span class="fw-bold fs-13 text-{{ $color }}">{{ $vendor->currency ?? 'NPR' }} {{ number_format($profit->total_profit, 2) }}</span>
+                                <span class="fw-bold fs-13 text-{{ $color }}">{{ $vendor->currency ?? 'INR' }} {{ number_format($profit->total_profit, 2) }}</span>
                             </div>
                             <div class="progress progress-sm rounded-pill" style="height: 6px;">
                                 <div class="progress-bar bg-{{ $color }} rounded-pill" role="progressbar" style="width: <?= $percent ?>%" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100"></div>

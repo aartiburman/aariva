@@ -29,10 +29,8 @@ use App\Models\WalletTransaction;
 use App\Models\Offer;
 use App\Models\Coupon;
 
-use App\Services\Logistics\NCMService;
 use App\Helpers\PriceCalculationHelper;
 use App\Helpers\CampaignBudgetHelper;
-use App\Services\Payment\KhaltiService;
 use App\Services\Payment\PhonePeService;
 use App\Services\Payment\PaytmService;
 
@@ -49,163 +47,9 @@ class UserCheckout extends Controller
 
     public function sync_ncm_status(Request $request, $reference_id = null)
     {
-        Log::info('NCM Webhook/Sync Request Received', $request->all());
-        
-        // Handle Test Webhook
-        if ($request->has('test') && $request->test) {
-            Log::info('NCM Test Webhook Received');
-            return response()->json(['status' => 'success', 'message' => 'Test webhook received']);
-        }
-
-        // 1. Handle Webhook Payload from NCM
-        $ncmService = new NCMService();
-        $updatedCount = 0;
-
-        // Handle Single Order Webhook (order_id)
-        if ($request->has('order_id') && $request->has('status')) {
-            $trackingId = $request->order_id;
-            $ncmStatus = $request->status;
-            Log::info('Processing NCM Single Order Webhook', ['order_id' => $trackingId, 'status' => $ncmStatus]);
-
-            $item = OrderItem::where('tracking_id', $trackingId)->where('logistics_provider', 'NCM')->first();
-            if ($item) {
-                $newLogisticsStatus = $ncmService->mapStatus($ncmStatus);
-                $newNumericStatus = $ncmService->mapNumericStatus($ncmStatus);
-
-                $updateData = [];
-                if ($newLogisticsStatus && $newLogisticsStatus !== $item->logistics_status) {
-                    $updateData['logistics_status'] = $newLogisticsStatus;
-                }
-                if ($newNumericStatus !== null && $newNumericStatus != $item->status) {
-                    $updateData['status'] = $newNumericStatus;
-                    if ($newNumericStatus == 3 && strtoupper($item->payment_mode) === 'COD') {
-                        $updateData['payment_status'] = 'Completed';
-                    }
-                }
-
-                if (!empty($updateData)) {
-                    $item->update($updateData);
-                    $updatedCount++;
-                }
-
-                Log::info('NCM Single Order Webhook Processed', ['item_id' => $item->id, 'updated' => !empty($updateData)]);
-               
-                return response()->json(['status' => 'received', 'message' => 'Webhook processed', 'updated' => $updatedCount]);
-            }
-        }
-
-        // Handle Bulk Order Webhook (order_ids)
-
-
-        if ($request->has('order_ids') && $request->has('status')) {
-            $trackingIds = $request->order_ids;
-            $ncmStatus = $request->status;
-            Log::info('Processing NCM Bulk Order Webhook', ['order_ids' => $trackingIds, 'status' => $ncmStatus]);
-
-            foreach ($trackingIds as $trackingId) {
-                $item = OrderItem::where('tracking_id', $trackingId)->where('logistics_provider', 'NCM')->first();
-                if ($item) {
-                    $newLogisticsStatus = $ncmService->mapStatus($ncmStatus);
-                    $newNumericStatus = $ncmService->mapNumericStatus($ncmStatus);
-
-                    $updateData = [];
-                    if ($newLogisticsStatus && $newLogisticsStatus !== $item->logistics_status) {
-                        $updateData['logistics_status'] = $newLogisticsStatus;
-                    }
-                    if ($newNumericStatus !== null && $newNumericStatus != $item->status) {
-                        $updateData['status'] = $newNumericStatus;
-                        if ($newNumericStatus == 3 && strtoupper($item->payment_mode) === 'COD') {
-                            $updateData['payment_status'] = 'Completed';
-                        }
-                    }
-
-                    if (!empty($updateData)) {
-                        $item->update($updateData);
-                        $updatedCount++;
-                    }
-                }
-            }
-
-            Log::info('NCM Bulk Order Webhook Processed', ['updated' => $updatedCount]);
-            return response()->json(['status' => 'received', 'message' => 'Bulk webhook processed', 'updated' => $updatedCount]);
-        }
-
-        // Handle Legacy Webhook Format (id) - for backward compatibility
-        if ($request->has('id') && $request->has('status')) {
-            $trackingId = $request->id;
-            $ncmStatus = $request->status;
-            Log::info('Processing NCM Legacy Webhook', ['id' => $trackingId, 'status' => $ncmStatus]);
-
-            $item = OrderItem::where('tracking_id', $trackingId)->where('logistics_provider', 'NCM')->first();
-            if ($item) {
-                $newLogisticsStatus = $ncmService->mapStatus($ncmStatus);
-                $newNumericStatus = $ncmService->mapNumericStatus($ncmStatus);
-
-                $updateData = [];
-                if ($newLogisticsStatus && $newLogisticsStatus !== $item->logistics_status) {
-                    $updateData['logistics_status'] = $newLogisticsStatus;
-                }
-                if ($newNumericStatus !== null && $newNumericStatus != $item->status) {
-                    $updateData['status'] = $newNumericStatus;
-                    if ($newNumericStatus == 3 && strtoupper($item->payment_mode) === 'COD') {
-                        $updateData['payment_status'] = 'Completed';
-                    }
-                }
-
-                if (!empty($updateData)) {
-                    $item->update($updateData);
-                    $updatedCount++;
-                }
-
-                Log::info('NCM Legacy Webhook Processed', ['item_id' => $item->id, 'updated' => !empty($updateData)]);
-                return response()->json(['status' => true, 'message' => 'Webhook processed']);
-            }
-        }
-
-        // 2. Handle Manual Sync via Reference ID
-        $reference_id = $reference_id ?? $request->reference_id;
-        if (!$reference_id) {
-            return response()->json(['status' => false, 'message' => 'Reference ID or Webhook data is required'], 400);
-        }
-
-        $order = Order::where('order_reference_id', $reference_id)->first();
-        if (!$order) {
-            return response()->json(['status' => false, 'message' => 'Order not found'], 404);
-        }
-        $items = $order->items()->where('logistics_provider', 'NCM')->get();
-
-        foreach ($items as $item) {
-            $trackingData = $ncmService->trackShipment($item->tracking_id);
-            if ($trackingData && isset($trackingData['status'])) {
-                $ncmStatus = $trackingData['status'];
-                $newLogisticsStatus = $ncmService->mapStatus($ncmStatus);
-                $newNumericStatus = $ncmService->mapNumericStatus($ncmStatus);
-
-                $updateData = [];
-                if ($newLogisticsStatus && $newLogisticsStatus !== $item->logistics_status) {
-                    $updateData['logistics_status'] = $newLogisticsStatus;
-                }
-
-                if ($newNumericStatus !== null && $newNumericStatus != $item->status) {
-                    $updateData['status'] = $newNumericStatus;
-
-                    // If delivered, also mark payment as completed for COD
-                    if ($newNumericStatus == 3 && strtoupper($item->payment_mode) === 'COD') {
-                        $updateData['payment_status'] = 'Completed';
-                    }
-                }
-
-                if (!empty($updateData)) {
-                    $item->update($updateData);
-                    $updatedCount++;
-                }
-            }
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => $updatedCount > 0 ? "Synced successfully. {$updatedCount} item(s) updated." : "All statuses are up to date."
-        ]);
+        // TODO: NCMService has been removed. This method needs to be refactored.
+        Log::warning('sync_ncm_status called but NCMService is no longer available.');
+        return response()->json(['status' => false, 'message' => 'NCM service not available'], 503);
     }
 
     public function place_order(Request $request)
@@ -246,7 +90,7 @@ class UserCheckout extends Controller
             ->select('users.*', 'countries.currency_code')
             ->first();
 
-        $currency_code = $userData->currency_code ?? 'NPR';
+        $currency_code = $userData->currency_code ?? 'INR';
 
         // SHIPPING ADDRESS
         $cityId = $request->city_id;
@@ -392,20 +236,6 @@ class UserCheckout extends Controller
                     ]);
                     
                     $orderItem->load(['order', 'order.user', 'order.shippingAddress', 'order.shippingAddress.city', 'vendor', 'vendor.city', 'product']);
-                    Log::info('place_order immediate: About to call NCM createShipment', [
-                        'order_item_id' => $orderItem->id,
-                        'order_item' => $orderItem->toArray()
-                    ]);
-                    try {
-                        $ncmService = new NCMService();
-                        $ncmResult = $ncmService->createShipment($orderItem);
-                        Log::info('place_order immediate: NCM createShipment result', ['result' => $ncmResult]);
-                    } catch (\Exception $e) {
-                        Log::error('place_order immediate: NCM createShipment exception: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine(), [
-                            'exception' => $e,
-                            'trace' => $e->getTraceAsString()
-                        ]);
-                    }
 
                     if (!empty($item['campaign_id']) && (float)$item['campaign_unit_discount'] > 0) {
                         $discountUsage = (float)$item['campaign_unit_discount'] * (int)$item['qty'];
@@ -569,24 +399,6 @@ class UserCheckout extends Controller
         ];
 
         try {
-            if (strtoupper($request->payment_mode) === 'KHALTI') {
-                Log::info("Initiating Khalti for Pending Order (Cart): {$orderReferenceId}, Amount: {$totalCostAfterRewards}");
-                $khaltiResponse = KhaltiService::initiatePayment($tempOrder, $userData);
-                if ($khaltiResponse['status']) {
-                    $gateway = \App\Models\PaymentGateway::where('slug', 'khalti')->first();
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Order placed. Redirecting to Khalti.',
-                        'payment_url' => $khaltiResponse['payment_url'],
-                        'pidx' => $khaltiResponse['pidx'],
-                        'order_reference_id' => $orderReferenceId,
-                        'verify_url' => $gateway?->success_url ?? config('app.url') . '/api/khalti/verify',
-                        'payload' => $khaltiResponse['payload']
-                    ], 201);
-                }
-                return response()->json(['status' => false, 'message' => 'Khalti Error: ' . $khaltiResponse['message'], 'payload' => $khaltiResponse['payload']], 400);
-            }
-
             if (strtoupper($request->payment_mode) === 'PHONEPE') {
                 $phonePeResponse = PhonePeService::initiatePayment($tempOrder);
                 if ($phonePeResponse['status']) {
@@ -660,7 +472,7 @@ class UserCheckout extends Controller
             ->select('users.*', 'countries.currency_code')
             ->first();
 
-        $currency_code = $userData->currency_code ?? 'NPR';
+        $currency_code = $userData->currency_code ?? 'INR';
 
         try {
             /* === PRE-CALCULATION LOGIC === */
@@ -809,20 +621,6 @@ class UserCheckout extends Controller
                     ]);
                     
                     $orderItem->load(['order', 'order.user', 'order.shippingAddress', 'order.shippingAddress.city', 'vendor', 'vendor.city', 'product']);
-                    Log::info('buy_now immediate: About to call NCM createShipment', [
-                        'order_item_id' => $orderItem->id,
-                        'order_item' => $orderItem->toArray()
-                    ]);
-                    try {
-                        $ncmService = new NCMService();
-                        $ncmResult = $ncmService->createShipment($orderItem);
-                        Log::info('buy_now immediate: NCM createShipment result', ['result' => $ncmResult]);
-                    } catch (\Exception $e) {
-                        Log::error('buy_now immediate: NCM createShipment exception: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine(), [
-                            'exception' => $e,
-                            'trace' => $e->getTraceAsString()
-                        ]);
-                    }
 
                     if (!empty($item['campaign_id']) && (float)$item['campaign_unit_discount'] > 0) {
                         $discountUsage = (float)$item['campaign_unit_discount'] * (int)$item['qty'];
@@ -982,25 +780,6 @@ class UserCheckout extends Controller
                 'user' => $userData,
             ];
 
-            if (strtoupper($request->payment_mode) === 'KHALTI') {
-                Log::info("Initiating Khalti for Pending Order: {$orderReferenceId}, Amount: {$totalCostAfterRewards}");
-
-                $khaltiResponse = KhaltiService::initiatePayment($tempOrder, $userData);
-
-                if ($khaltiResponse['status']) {
-                    $gateway = \App\Models\PaymentGateway::where('slug', 'khalti')->first();
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Order placed. Redirecting to Khalti.',
-                        'payment_url' => $khaltiResponse['payment_url'],
-                        'pidx' => $khaltiResponse['pidx'],
-                        'order_reference_id' => $orderReferenceId,
-                        'verify_url' => $gateway?->success_url ?? config('app.url') . '/api/khalti/verify',
-                        'payload' => $khaltiResponse['payload']
-                    ], 201);
-                }
-                return response()->json(['status' => false, 'message' => 'Khalti Error: ' . $khaltiResponse['message'], 'payload' => $khaltiResponse['payload']], 400);
-            }
             // PhonePe Logic
 
             if (strtoupper($request->payment_mode) === 'PHONEPE') {

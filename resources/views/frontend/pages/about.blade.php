@@ -1,5 +1,14 @@
 @extends('frontend.layouts.app')
 
+@section('title', 'About Us - ' . config('app.name'))
+
+@section('meta_description', 'Learn more about ' . config('app.name') . ' - your trusted one-store destination for endless collection. Discover our story, mission, and commitment to quality.')
+
+@section('meta_keywords', 'about ' . config('app.name') . ', our story, online store, ecommerce')
+
+@section('og_title', 'About Us - ' . config('app.name'))
+@section('og_description', 'Learn more about ' . config('app.name') . ' - your trusted one-store destination for endless collection. Discover our story, mission, and commitment to quality.')
+
 @section('content')
 <section class="py-3 border-bottom border-top d-none d-md-flex bg-light">
     <div class="container">
