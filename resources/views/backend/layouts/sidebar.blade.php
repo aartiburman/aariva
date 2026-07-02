@@ -47,12 +47,11 @@
                               </li>
                              
                          </ul>
-                    </div>
-               </li>
+                     </div>
+                </li>
 
-
-               <li class="nav-item">
-                    <a class="nav-link menu-arrow {{ request()->routeIs(['category.*','add.category', 'edit.category','subcategory.*', 'child.category.*', 'brand.*']) ? 'active' : '' }}" href="#sidebarCategory" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['category.*', 'subcategory.*', 'child.category.*', 'brand.*']) ? 'true' : 'false' }}" aria-controls="sidebarCategory">
+                <li class="nav-item">
+                     <a class="nav-link menu-arrow {{ request()->routeIs(['category.*','add.category', 'edit.category','subcategory.*', 'child.category.*', 'brand.*']) ? 'active' : '' }}" href="#sidebarCategory" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs(['category.*', 'subcategory.*', 'child.category.*', 'brand.*']) ? 'true' : 'false' }}" aria-controls="sidebarCategory">
                          <span class="nav-icon">
                               <iconify-icon icon="solar:clipboard-list-linear"></iconify-icon>
                          </span>

@@ -198,3 +198,4 @@ Artisan::command('promotions:expire', function () {
 })->purpose('Deactivate expired campaigns and coupons');
 
 Schedule::command('promotions:expire')->hourly();
+
