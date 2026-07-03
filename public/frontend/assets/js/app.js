@@ -212,45 +212,48 @@ $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {
 });
 
 // =============================================
-// AJAX - ADD TO CART
+// AJAX - ADD TO CART / REMOVE FROM CART
 // =============================================
 $(document).on('click', '.add-to-cart', function(e) {
     e.preventDefault();
     var $btn = $(this);
-    var productId = $btn.data('product-id');
-    var variantId = $btn.data('variant-id');
-    var qty = $btn.data('qty') || 1;
+    var productId = $btn.attr('data-product-id');
+    var variantId = $btn.attr('data-variant-id');
+    var qty = $btn.attr('data-qty') || 1;
 
     if (!productId) {
         alert('Product ID is required');
         return;
     }
 
-    var originalHtml = $btn.html();
     $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Adding...');
 
     $.ajax({
-        url: addToCartUrl || '/cart/add',
+        url: addToCartUrl,
         method: 'POST',
         data: {
-            _token: csrfToken || $('meta[name="csrf-token"]').attr('content'),
+            _token: csrfToken,
             product_id: productId,
             variant_id: variantId,
             qty: qty
         },
         success: function(res) {
             if (res.status) {
-                $btn.html('<i class="bx bx-check"></i> Added');
-                setTimeout(function() {
-                    $btn.html(originalHtml).prop('disabled', false);
-                }, 2000);
-                if (typeof refreshCartCount === 'function') {
-                    refreshCartCount();
-                }
                 showToast('success', res.message || 'Item added to cart');
+                // Toggle ALL buttons for this product to remove state
+                $('[data-product-id="' + productId + '"]').not('.add-to-wishlist').each(function() {
+                    var $b = $(this);
+                    $b.removeClass('add-to-cart').addClass('remove-from-cart');
+                    if ($b.hasClass('btn-ecomm')) {
+                        $b.html('<i class="bx bx-cart-x"></i> Remove from Cart');
+                    } else {
+                        $b.html('<i class="bx bx-cart-x"></i>');
+                    }
+                });
+                refreshCartCount();
             } else {
                 showToast('error', res.message || 'Failed to add item');
-                $btn.html(originalHtml).prop('disabled', false);
+                $btn.prop('disabled', false);
             }
         },
         error: function(xhr) {
@@ -259,7 +262,56 @@ $(document).on('click', '.add-to-cart', function(e) {
                 msg = xhr.responseJSON.message;
             }
             showToast('error', msg);
-            $btn.html(originalHtml).prop('disabled', false);
+            $btn.prop('disabled', false);
+        }
+    });
+});
+
+$(document).on('click', '.remove-from-cart', function(e) {
+    e.preventDefault();
+    var $btn = $(this);
+    var productId = $btn.data('product-id');
+
+    if (!productId) {
+        alert('Product ID is required');
+        return;
+    }
+
+    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Removing...');
+
+    $.ajax({
+        url: removeFromCartUrl,
+        method: 'POST',
+        data: {
+            _token: csrfToken,
+            product_id: productId
+        },
+        success: function(res) {
+            if (res.status) {
+                showToast('success', res.message || 'Item removed from cart');
+                // Toggle ALL buttons for this product back to add state
+                $('[data-product-id="' + productId + '"]').not('.add-to-wishlist').each(function() {
+                    var $b = $(this);
+                    $b.removeClass('remove-from-cart').addClass('add-to-cart');
+                    if ($b.hasClass('btn-ecomm')) {
+                        $b.html('<i class="bx bx-cart-add"></i> Add to Cart');
+                    } else {
+                        $b.html('<i class="bx bx-cart-add"></i>');
+                    }
+                });
+                refreshCartCount();
+            } else {
+                showToast('error', res.message || 'Failed to remove item');
+                $btn.prop('disabled', false);
+            }
+        },
+        error: function(xhr) {
+            var msg = 'Failed to remove item';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            showToast('error', msg);
+            $btn.prop('disabled', false);
         }
     });
 });
@@ -281,30 +333,42 @@ $(document).on('click', '.add-to-wishlist', function(e) {
         return;
     }
 
-    var originalHtml = $btn.html();
     $btn.prop('disabled', true);
 
     $.ajax({
-        url: wishlistToggleUrl || '/wishlist/toggle',
+        url: wishlistToggleUrl,
         method: 'POST',
         data: {
-            _token: csrfToken || $('meta[name="csrf-token"]').attr('content'),
+            _token: csrfToken,
             product_id: productId
         },
         success: function(res) {
             if (res.status) {
-                if (res.is_in_wishlist) {
-                    $btn.addClass('active text-danger');
-                    $btn.find('i').attr('class', 'bx bxs-heart');
-                } else {
-                    $btn.removeClass('active text-danger');
-                    $btn.find('i').attr('class', 'bx bx-heart');
-                }
+                $btn.prop('disabled', false);
+                // Update ALL wishlist buttons for this product
+                $('.add-to-wishlist[data-product-id="' + productId + '"]').each(function() {
+                    var $b = $(this);
+                    if (res.is_in_wishlist) {
+                        $b.addClass('active text-danger');
+                        if ($b.hasClass('btn-ecomm')) {
+                            $b.html('<i class="bx bxs-heart"></i> Remove from Wishlist');
+                        } else {
+                            $b.find('i').attr('class', 'bx bxs-heart');
+                        }
+                    } else {
+                        $b.removeClass('active text-danger');
+                        if ($b.hasClass('btn-ecomm')) {
+                            $b.html('<i class="bx bx-heart"></i> Add to Wishlist');
+                        } else {
+                            $b.find('i').attr('class', 'bx bx-heart');
+                        }
+                    }
+                });
                 showToast('success', res.message || 'Wishlist updated');
             } else {
                 showToast('error', res.message || 'Failed to update wishlist');
+                $btn.prop('disabled', false);
             }
-            $btn.prop('disabled', false);
         },
         error: function(xhr) {
             var msg = 'Failed to update wishlist';

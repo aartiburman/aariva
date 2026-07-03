@@ -50,9 +50,19 @@ class BannerController extends Controller
     {
         $request->validate([
             'title'    => 'required|string|max:255',
-            'image'    => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
             'position' => 'required|string',
         ]);
+
+        if ($request->image_type === 'multiple') {
+            $request->validate([
+                'images'    => 'required|array|min:1',
+                'images.*'  => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            ]);
+        } else {
+            $request->validate([
+                'image'    => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+            ]);
+        }
 
         /* =========================
          * CHECK BANNER LIMITS
@@ -79,12 +89,18 @@ class BannerController extends Controller
         }
 
         /* =========================
-         * UPLOAD SINGLE IMAGE
+         * UPLOAD IMAGE(S)
          * ========================= */
-        $imageName = null;
+        $imageValue = null;
 
-        if ($request->hasFile('image')) {
-            $imageName = ImageHelper::compressImage($request->file('image'), 'uploads/banners');
+        if ($request->image_type === 'multiple' && $request->hasFile('images')) {
+            $uploaded = [];
+            foreach ($request->file('images') as $img) {
+                $uploaded[] = ImageHelper::compressImage($img, 'uploads/banners');
+            }
+            $imageValue = json_encode($uploaded);
+        } elseif ($request->hasFile('image')) {
+            $imageValue = ImageHelper::compressImage($request->file('image'), 'uploads/banners');
         }
 
         /* =========================
@@ -106,7 +122,7 @@ class BannerController extends Controller
             'title_ar'   => $request->title ? $trAr->translate($request->title) : null,
             'title_ne'   => $request->title ? $trNe->translate($request->title) : null,
             'slug'       => $slug,
-            'image'      => $imageName, // Store as string
+            'image'      => $imageValue,
             'link_type'  => $request->link_type,
             'link_id'    => $request->link_id,
             'link_url'   => $request->link_url,
@@ -116,7 +132,6 @@ class BannerController extends Controller
             'start_date' => $request->start_date,
             'end_date'   => $request->end_date,
         ];
-        // echo '<pre>'; print_r($data); echo '</pre>'; die;
         Banner::create($data);
 
         return redirect('banner-list')->with('success', 'Banner added successfully');
@@ -181,20 +196,25 @@ class BannerController extends Controller
         }
 
         /* =========================
-         * HANDLE NEW UPLOADED IMAGE
+         * HANDLE NEW UPLOADED IMAGE(S)
          * ========================= */
-        $imageName = $banner->image;
+        $imageValue = $banner->image;
 
-        if ($request->hasFile('image')) {
-            // Delete old image if it's not JSON
+        if ($request->image_type === 'multiple' && $request->hasFile('images')) {
+            $existing = json_decode($banner->image, true);
+            $images = is_array($existing) ? $existing : [];
+            foreach ($request->file('images') as $img) {
+                $images[] = ImageHelper::compressImage($img, 'uploads/banners');
+            }
+            $imageValue = json_encode($images);
+        } elseif ($request->hasFile('image')) {
             if ($banner->image && !is_array(json_decode($banner->image, true))) {
                 $oldPath = public_path('uploads/banners/' . $banner->image);
                 if (file_exists($oldPath)) {
                     @unlink($oldPath);
                 }
             }
-
-            $imageName = ImageHelper::compressImage($request->file('image'), 'uploads/banners');
+            $imageValue = ImageHelper::compressImage($request->file('image'), 'uploads/banners');
         }
 
         /* =========================
@@ -216,7 +236,7 @@ class BannerController extends Controller
             'title_ar'   => $request->title ? $trAr->translate($request->title) : null,
             'title_ne'   => $request->title ? $trNe->translate($request->title) : null,
             'slug'       => $slug,
-            'image'      => $imageName, // store as string
+            'image'      => $imageValue,
             'link_type'  => $request->link_type,
             'link_url'   => $request->link_url,
             'position'   => $request->position,

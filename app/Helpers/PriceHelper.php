@@ -38,7 +38,7 @@ class PriceHelper
 
     public static function formatPrice($price)
     {
-        $symbol = session('currency_symbol', 'INR');
+        $symbol = session('currency_symbol', '₹');
         $code = session('currency_code', 'INR');
 
         $decimalCurrencies = ['JPY', 'KRW', 'VND', 'IDR', 'HUF', 'TWD'];

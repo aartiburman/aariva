@@ -17,7 +17,7 @@ class LanguageMiddleware
     {
         $locale = $request->get('lang') ?: session('locale', config('app.locale'));
         
-        if (in_array($locale, ['en', 'ar', 'zh', 'ja', 'hi', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi'])) {
+        if (in_array($locale, ['en', 'ar', 'zh', 'ja', 'hi', 'hing', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi'])) {
             app()->setLocale($locale);
         } else {
             app()->setLocale(config('app.locale'));

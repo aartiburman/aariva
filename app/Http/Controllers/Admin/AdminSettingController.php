@@ -19,6 +19,7 @@ use App\Helpers\ImageHelper;
 use App\Models\User;
 use App\Helpers\EmailHelper;
 use App\Models\KYC_Document;
+use App\Models\Country;
 
 class AdminSettingController extends Controller
 {
@@ -522,6 +523,7 @@ class AdminSettingController extends Controller
         $contactEmail = GeneralSetting::where('key', 'contact_email')->first();
         $contactPhone = GeneralSetting::where('key', 'contact_phone')->first();
         $defaultCurrency = GeneralSetting::where('key', 'default_currency')->first();
+        $language = GeneralSetting::where('key', 'language')->first();
         $timezone = GeneralSetting::where('key', 'timezone')->first();
         $address = GeneralSetting::where('key', 'address')->first();
         $websiteLogoDark = GeneralSetting::where('key', 'website_logo_dark')->first();
@@ -537,19 +539,21 @@ class AdminSettingController extends Controller
         // Payout Controls
         $payoutFrequencies = GeneralSetting::where('key', 'payout_frequencies')->first();
         $selectedFrequencies = $payoutFrequencies ? json_decode($payoutFrequencies->value, true) : ['weekly', 'monthly', 'bi-weekly', 'daily'];
+
+        $countries = Country::where('is_active', 1)->orderBy('name')->get();
         return view('backend/admin/setting/add-general-setting', compact(
             'commission', 'pgFeePercent', 'isMaintenance', 'currentCustomUrl', 'selectedRoles',
-            'websiteName', 'contactEmail', 'contactPhone', 'defaultCurrency',
+            'websiteName', 'contactEmail', 'contactPhone', 'defaultCurrency', 'language',
             'timezone', 'address', 'websiteLogoDark', 'websiteLogoLight', 'favicon',
             'referralReferrerReward', 'referralReferredReward', 'referralMinCart', 'referralEnabled',
-            'selectedFrequencies'
+            'selectedFrequencies', 'countries'
         ));
     }
 
     public function general_setting_update(Request $request)
     {
         // Website Information
-        $fields = ['website_name', 'contact_email', 'contact_phone', 'default_currency', 'timezone', 'address'];
+        $fields = ['website_name', 'contact_email', 'contact_phone', 'default_currency', 'language', 'timezone', 'address'];
         foreach ($fields as $field) {
             if ($request->has($field)) {
                 GeneralSetting::updateOrCreate(

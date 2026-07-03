@@ -27,8 +27,8 @@ class GeoLocationMiddleware
                     'country'        => $location->countryName,
                     'country_code'   => $location->countryCode,
                     'city'           => $location->cityName,
-                    'currency_code'  => $country->currency_code ?? 'USD',
-                    'currency_symbol' => $country->currency ?? '$',
+                    'currency_code'  => $country->currency_code ?? 'INR',
+                    'currency_symbol' => $country->currency ?? '₹',
                 ]);
             }
         }

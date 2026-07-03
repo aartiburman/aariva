@@ -11,7 +11,7 @@ class LanguageController extends Controller
     public function changeLanguage(Request $request, string $lang)
     {
         $supported = [
-            'en', 'ar', 'zh', 'ja', 'hi', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi',
+            'en', 'ar', 'zh', 'ja', 'hi', 'de', 'fr', 'ko', 'pt', 'es', 'ru', 'it', 'tr', 'th', 'vi', 'hing',
         ];
 
         if (! in_array($lang, $supported, true)) {
@@ -24,6 +24,7 @@ class LanguageController extends Controller
             'zh' => 'CN',
             'ja' => 'JP',
             'hi' => 'IN',
+            'hing' => 'IN',
             'de' => 'DE',
             'fr' => 'FR',
             'ko' => 'KR',

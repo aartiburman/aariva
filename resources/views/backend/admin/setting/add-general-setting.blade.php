@@ -45,18 +45,21 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Default Currency</label>
                                         <select name="default_currency" class="form-select">
-                                            <option value="AED" {{ (optional($defaultCurrency)->value) == 'AED' ? 'selected' : '' }}>AED (United Arab Emirates Dirham)</option>
-                                            <option value="USD" {{ (optional($defaultCurrency)->value) == 'USD' ? 'selected' : '' }}>USD (United States Dollar)</option>
-                                            <option value="INR" {{ (optional($defaultCurrency)->value) == 'INR' ? 'selected' : '' }}>INR (Indian Rupee)</option>
-                                            <!-- Add more currencies as needed -->
+                                            @foreach($countries as $c)
+                                            <option value="{{ $c->currency_code }}" {{ (optional($defaultCurrency)->value) == $c->currency_code ? 'selected' : '' }}>
+                                                {{ $c->currency_code }} ({{ $c->currency }} - {{ $c->name }})
+                                            </option>
+                                            @endforeach
                                         </select>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Language</label>
                                          <select name="language" class="form-select">
-                                            <option value="en">English</option>
-                                            <!-- Add more languages as needed -->
+                                            <option value="en" {{ (optional($language)->value ?? 'en') == 'en' ? 'selected' : '' }}>English</option>
+                                            <option value="hi" {{ (optional($language)->value ?? '') == 'hi' ? 'selected' : '' }}>हिन्दी</option>
+                                            <option value="hing" {{ (optional($language)->value ?? '') == 'hing' ? 'selected' : '' }}>Hinglish</option>
+                                            <option value="ar" {{ (optional($language)->value ?? '') == 'ar' ? 'selected' : '' }}>العربية</option>
                                         </select>
                                     </div>
 

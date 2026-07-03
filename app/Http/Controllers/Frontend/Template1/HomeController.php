@@ -79,6 +79,16 @@ class HomeController extends Controller
             }
         }
 
+        foreach ($promoBanners as $banner) {
+            $image = $banner->image;
+            $decoded = json_decode($image, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $banner->image = array_map(fn($img) => ImageHelper::getBannerImage($img), $decoded);
+            } else {
+                $banner->image = $image ? [ImageHelper::getBannerImage($image)] : [];
+            }
+        }
+
         $allProducts = Product::where('status', 1)
             ->whereHas('vendor', function ($q) {
                 $q->where('status', 1);

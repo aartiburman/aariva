@@ -1,6 +1,7 @@
 @php
     use App\Models\Category;
     use App\Models\Cart;
+    use App\Models\Country;
     $categories = Category::where('is_active', 1)
         ->with(['subCategories' => function ($q) {
             $q->where('is_active', 1)->with('childCategories');
@@ -21,6 +22,8 @@
     $cartTotalPrice = $headerCartItems->sum(function ($ci) {
         return ($ci->variant->price ?? $ci->price ?? 0) * $ci->qty;
     });
+
+    $headerCountries = Country::where('is_active', 1)->orderBy('name')->get();
 @endphp
 <!doctype html>
 <html lang="en">
@@ -91,33 +94,44 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
                                     <div class="lang d-flex gap-1">
-                                        <div><i class="flag-icon flag-icon-{{ strtolower(session('country_code', 'US')) }}"></i></div>
-                                        <div><span>{{ strtoupper(session('currency_code', 'USD')) }}</span></div>
+                                        <div><i class="flag-icon flag-icon-{{ strtolower(session('country_code', 'IN')) }}"></i></div>
+                                        <div><span>{{ strtoupper(session('currency_code', 'INR')) }}</span></div>
                                     </div>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-lg-end">
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'US') }}"><i class="flag-icon flag-icon-us me-2"></i><span>{{ __t('USA (USD)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'GB') }}"><i class="flag-icon flag-icon-gb me-2"></i><span>{{ __t('UK (GBP)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'IN') }}"><i class="flag-icon flag-icon-in me-2"></i><span>{{ __t('India (INR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'CN') }}"><i class="flag-icon flag-icon-cn me-2"></i><span>{{ __t('China (CNY)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'JP') }}"><i class="flag-icon flag-icon-jp me-2"></i><span>{{ __t('Japan (JPY)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'KR') }}"><i class="flag-icon flag-icon-kr me-2"></i><span>{{ __t('South Korea (KRW)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'DE') }}"><i class="flag-icon flag-icon-de me-2"></i><span>{{ __t('Germany (EUR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'FR') }}"><i class="flag-icon flag-icon-fr me-2"></i><span>{{ __t('France (EUR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'AE') }}"><i class="flag-icon flag-icon-ae me-2"></i><span>{{ __t('UAE (AED)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'AU') }}"><i class="flag-icon flag-icon-au me-2"></i><span>{{ __t('Australia (AUD)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'SG') }}"><i class="flag-icon flag-icon-sg me-2"></i><span>{{ __t('Singapore (SGD)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'MY') }}"><i class="flag-icon flag-icon-my me-2"></i><span>{{ __t('Malaysia (MYR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'TH') }}"><i class="flag-icon flag-icon-th me-2"></i><span>{{ __t('Thailand (THB)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'BR') }}"><i class="flag-icon flag-icon-br me-2"></i><span>{{ __t('Brazil (BRL)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'RU') }}"><i class="flag-icon flag-icon-ru me-2"></i><span>{{ __t('Russia (RUB)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'SA') }}"><i class="flag-icon flag-icon-sa me-2"></i><span>{{ __t('Saudi Arabia (SAR)') }}</span></a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'BD') }}"><i class="flag-icon flag-icon-bd me-2"></i><span>{{ __t('Bangladesh (BDT)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'PK') }}"><i class="flag-icon flag-icon-pk me-2"></i><span>{{ __t('Pakistan (PKR)') }}</span></a>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', 'LK') }}"><i class="flag-icon flag-icon-lk me-2"></i><span>{{ __t('Sri Lanka (LKR)') }}</span></a>
+                                    @foreach($headerCountries as $hc)
+                                    <a class="dropdown-item d-flex align-items-center" href="{{ route('change.country', $hc->shortname) }}">
+                                        <i class="flag-icon flag-icon-{{ strtolower($hc->shortname) }} me-2"></i>
+                                        <span>{{ __t($hc->name . ' (' . $hc->currency_code . ')') }}</span>
+                                    </a>
+                                    @endforeach
                                 </div>
                             </li>
+                            @if(session('country_code') === 'IN')
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
+                                    <i class='bx bx-globe me-1'></i>
+                                    <span>
+                                        @switch(session('locale', 'en'))
+                                            @case('hi') हिन्दी @break
+                                            @case('hing') Hinglish @break
+                                            @default English
+                                        @endswitch
+                                    </span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-lg-end">
+                                    <a class="dropdown-item {{ session('locale') === 'en' ? 'active' : '' }}" href="{{ route('change.language', 'en') }}">
+                                        <i class='bx bx-check me-2 {{ session('locale') === 'en' ? '' : 'invisible' }}'></i> English
+                                    </a>
+                                    <a class="dropdown-item {{ session('locale') === 'hi' ? 'active' : '' }}" href="{{ route('change.language', 'hi') }}">
+                                        <i class='bx bx-check me-2 {{ session('locale') === 'hi' ? '' : 'invisible' }}'></i> हिन्दी
+                                    </a>
+                                    <a class="dropdown-item {{ session('locale') === 'hing' ? 'active' : '' }}" href="{{ route('change.language', 'hing') }}">
+                                        <i class='bx bx-check me-2 {{ session('locale') === 'hing' ? '' : 'invisible' }}'></i> Hinglish
+                                    </a>
+                                </div>
+                            </li>
+                            @endif
                         </ul>
                         <ul class="navbar-nav social-link ms-lg-2 ms-auto">
                             <li class="nav-item"> <a class="nav-link" href="javascript:;"><i class='bx bxl-facebook'></i></a></li>
@@ -168,52 +182,12 @@
                                         <li class="nav-item"><a href="javascript:;" class="nav-link cart-link" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login"><i class='bx bx-user'></i></a></li>
                                         @endauth
                                         <li class="nav-item"><a href="{{ route('frontend.wishlist.index') }}" class="nav-link cart-link"><i class='bx bx-heart'></i></a></li>
-                                        <li class="nav-item dropdown dropdown-large">
-                                            <a href="#" class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative cart-link" data-bs-toggle="dropdown">
-                                                <span class="alert-count">{{ $cartCount }}</span>
-                                                <i class='bx bx-shopping-bag'></i>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a href="{{ route('frontend.cart.index') }}">
-                                                    <div class="cart-header">
-                                                        <p class="cart-header-title mb-0">{{ $cartCount }} {{ __t('ITEMS') }}</p>
-                                                        <p class="cart-header-clear ms-auto mb-0">{{ __t('VIEW CART') }}</p>
-                                                    </div>
-                                                </a>
-                                                <div class="cart-list">
-                                                    @forelse ($headerCartItems->take(5) as $ci)
-                                                    @php
-                                                        $ciImg = $ci->image ? App\Helpers\ImageHelper::getProductImage($ci->image) : asset('frontend/assets/images/products/01.png');
-                                                        $ciName = $ci->product->name ?? 'Product';
-                                                        $ciPrice = $ci->variant->price ?? $ci->price ?? 0;
-                                                    @endphp
-                                                    <a class="dropdown-item" href="{{ route('frontend.products.show', $ci->product->slug ?? $ci->product_id) }}">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-grow-1">
-                                                                <h6 class="cart-product-title">{{ $ciName }}</h6>
-                                                                <p class="cart-product-price">{{ $ci->qty }} X {{ App\Helpers\PriceHelper::formatPrice($ciPrice) }}</p>
-                                                            </div>
-                                                            <div class="position-relative">
-                                                                <a href="javascript:;" class="cart-product-cancel position-absolute mini-cart-remove" data-cart-id="{{ $ci->id }}"><i class='bx bx-x'></i></a>
-                                                                <div class="cart-product">
-                                                                    <img src="{{ $ciImg }}" class="" alt="{{ $ciName }}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                    @empty
-                                                    <div class="dropdown-item text-center py-3 text-muted">{{ __t('Your cart is empty') }}</div>
-                                                    @endforelse
-                                                </div>
-                                                @if ($headerCartItems->count() > 0)
-                                                <a href="{{ route('frontend.cart.index') }}">
-                                                    <div class="cart-footer text-center pt-3 pb-3 border-top">
-                                                        <h6 class="mb-0">{{ __t('Total:') }} {{ App\Helpers\PriceHelper::formatPrice($cartTotalPrice) }}</h6>
-                                                    </div>
-                                                </a>
-                                                @endif
-                                            </div>
-                                        </li>
+<li class="nav-item">
+    <a href="{{ route('frontend.cart.index') }}" class="nav-link position-relative cart-link">
+        <span class="alert-count">{{ $cartCount }}</span>
+        <i class='bx bx-shopping-bag'></i>
+    </a>
+</li>
                                     </ul>
                                 </nav>
                             </div>

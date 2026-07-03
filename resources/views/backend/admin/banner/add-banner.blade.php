@@ -118,10 +118,49 @@
                                     </div>
 
                                     <div class="mb-3">
+                                        <label class="form-label">Image Type</label>
+                                        <div class="d-flex gap-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input image-type-radio" type="radio" name="image_type" id="imgTypeSingle" value="single" checked>
+                                                <label class="form-check-label" for="imgTypeSingle">Single Image</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input image-type-radio" type="radio" name="image_type" id="imgTypeMultiple" value="multiple">
+                                                <label class="form-check-label" for="imgTypeMultiple">Multiple Images</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="singleImageInput">
                                         <label class="form-label">Banner Image</label>
                                         <input type="file" name="image" class="form-control @error('image') is-invalid @enderror">
                                         @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
+
+                                    <div class="mb-3 d-none" id="multipleImageInput">
+                                        <label class="form-label">Banner Images (can select multiple)</label>
+                                        <input type="file" name="images[]" class="form-control @error('images.*') is-invalid @enderror" multiple accept="image/*">
+                                        @error('images.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        <small class="text-muted">Select multiple images at once</small>
+                                    </div>
+
+                                    @push('scripts')
+                                    <script>
+                                    $(document).ready(function() {
+                                        $('.image-type-radio').on('change', function() {
+                                            if ($(this).val() === 'multiple') {
+                                                $('#singleImageInput').addClass('d-none');
+                                                $('#multipleImageInput').removeClass('d-none');
+                                                $('#singleImageInput input[name="image"]').removeAttr('required');
+                                            } else {
+                                                $('#singleImageInput').removeClass('d-none');
+                                                $('#multipleImageInput').addClass('d-none');
+                                            }
+                                        });
+                                    });
+                                    </script>
+                                    @endpush
+
                                     <div class="p-3 bg-light mb-3 rounded">
                                         <div class="row justify-content-end g-2">
 

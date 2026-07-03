@@ -108,13 +108,37 @@
                 </div>
               </div>
 
+              @php $isMulti = $banner->image && is_array(json_decode($banner->image, true)) && json_last_error() === JSON_ERROR_NONE; @endphp
+
               <div class="mb-3">
+                <label class="form-label">Image Type</label>
+                <div class="d-flex gap-4">
+                  <div class="form-check">
+                    <input class="form-check-input image-type-radio" type="radio" name="image_type" id="imgTypeSingle" value="single" {{ $isMulti ? '' : 'checked' }}>
+                    <label class="form-check-label" for="imgTypeSingle">Single Image</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input image-type-radio" type="radio" name="image_type" id="imgTypeMultiple" value="multiple" {{ $isMulti ? 'checked' : '' }}>
+                    <label class="form-check-label" for="imgTypeMultiple">Multiple Images</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3 {{ $isMulti ? 'd-none' : '' }}" id="singleImageInput">
                 <label class="form-label">Banner Image</label>
                 <input type="file" name="image" class="form-control @error('image') is-invalid @enderror">
                 @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+              </div>
+
+              <div class="mb-3 {{ $isMulti ? '' : 'd-none' }}" id="multipleImageInput">
+                <label class="form-label">Add More Images</label>
+                <input type="file" name="images[]" class="form-control @error('images.*') is-invalid @enderror" multiple accept="image/*">
+                @error('images.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <small class="text-muted">New images will be added to existing ones</small>
+              </div>
                 
                 @if(!empty($banner->image_data) && is_array($banner->image_data))
-                <div class="d-flex flex-wrap gap-2 mt-2">
+                <div class="d-flex flex-wrap gap-2 mt-2 mb-3">
                   @foreach($banner->image_data as $img)
                   <div class="position-relative banner-image-container" data-name="{{ $img['name'] }}">
                     <img
@@ -129,7 +153,22 @@
                   @endforeach
                 </div>
                 @endif
-              </div>
+
+              @push('scripts')
+              <script>
+              $(document).ready(function() {
+                $('.image-type-radio').on('change', function() {
+                  if ($(this).val() === 'multiple') {
+                    $('#singleImageInput').addClass('d-none');
+                    $('#multipleImageInput').removeClass('d-none');
+                  } else {
+                    $('#singleImageInput').removeClass('d-none');
+                    $('#multipleImageInput').addClass('d-none');
+                  }
+                });
+              });
+              </script>
+              @endpush
 
               <button type="submit" class="btn btn-primary">Update Banner</button>
             </form>

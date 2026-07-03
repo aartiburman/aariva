@@ -26,11 +26,11 @@ class SetLocale
         App::setLocale($locale);
 
         if (! session('country_code')) {
-            $defaultCountry = \App\Models\Country::where('shortname', 'US')->first();
+            $defaultCountry = \App\Models\Country::where('shortname', 'IN')->first();
             session([
-                'country_code'   => 'US',
-                'currency_code'  => $defaultCountry->currency_code ?? 'USD',
-                'currency_symbol' => $defaultCountry->currency ?? '$',
+                'country_code'   => 'IN',
+                'currency_code'  => $defaultCountry->currency_code ?? 'INR',
+                'currency_symbol' => $defaultCountry->currency ?? '₹',
             ]);
         }
 
