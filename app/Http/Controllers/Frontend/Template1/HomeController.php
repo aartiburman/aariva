@@ -89,14 +89,6 @@ class HomeController extends Controller
             }
         }
 
-        $allProducts = Product::where('status', 1)
-            ->whereHas('vendor', function ($q) {
-                $q->where('status', 1);
-            })
-            ->with(['category:id,name,slug', 'firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
-            ->latest()
-            ->get();
-
         $transformProduct = function ($product) {
             $variant = $product->firstVariant;
             $product->image = $variant ? ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
@@ -109,13 +101,25 @@ class HomeController extends Controller
             return $product;
         };
 
-        $allProducts = $allProducts->map($transformProduct);
+        $newArrivals = Product::where('status', 1)
+            ->whereHas('vendor', fn($q) => $q->where('status', 1))
+            ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
+            ->latest()
+            ->limit(15)
+            ->get()
+            ->map($transformProduct);
 
-        $categoryProducts = $allProducts->groupBy('category_id')->map(function ($items) {
+        $latestProducts = Product::where('status', 1)
+            ->whereHas('vendor', fn($q) => $q->where('status', 1))
+            ->with(['category:id,name,slug', 'firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
+            ->latest()
+            ->limit(200)
+            ->get()
+            ->map($transformProduct);
+
+        $categoryProducts = $latestProducts->groupBy('category_id')->map(function ($items) {
             return $items->take(8);
         });
-
-        $newArrivals = $allProducts->take(15);
 
         $featured_products = Product::where('status', 1)
             ->where('is_featured', 1)

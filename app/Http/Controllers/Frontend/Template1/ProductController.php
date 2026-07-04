@@ -226,6 +226,15 @@ class ProductController extends Controller
         $allColors = [];
         $allSizes = [];
 
+        $allSizeIds = [];
+        foreach ($product->variants as $variant) {
+            $sizes = json_decode($variant->size, true);
+            if (is_array($sizes)) {
+                array_push($allSizeIds, ...$sizes);
+            }
+        }
+        $allSizeNames = ProductSize::whereIn('id', array_unique($allSizeIds))->pluck('name', 'id');
+
         foreach ($product->variants as $variant) {
             $variant->original_price = $variant->price;
             $calc = PriceCalculationHelper::calculateItemPrice($product, $variant->id);
@@ -251,9 +260,9 @@ class ProductController extends Controller
 
             $sizes = json_decode($variant->size, true);
             if (is_array($sizes)) {
-                $sizeValues = ProductSize::whereIn('id', $sizes)->pluck('name')->toArray();
+                $sizeValues = array_values(array_filter(array_map(fn($id) => $allSizeNames[$id] ?? null, $sizes)));
                 $variant->size = $sizeValues;
-                $allSizes = array_merge($allSizes, $sizeValues);
+                array_push($allSizes, ...$sizeValues);
             }
 
             $images = [];

@@ -1,14 +1,7 @@
 @php
-    use App\Models\Category;
     use App\Models\Cart;
     use App\Models\Country;
     use App\Models\Wishlist;
-    $categories = Category::where('is_active', 1)
-        ->with(['subCategories' => function ($q) {
-            $q->where('is_active', 1)->with('childCategories');
-        }])
-        ->orderBy('name')
-        ->get();
 
     $cartUserId = Auth::check() ? Auth::id() : null;
     $cartIp = request()->ip();
@@ -30,7 +23,9 @@
         $q->where('ip_address', $cartIp);
     })->count();
 
-    $headerCountries = Country::where('is_active', 1)->orderBy('name')->get();
+    $headerCountries = Cache::remember('countries.active', 3600, function () {
+        return Country::where('is_active', 1)->orderBy('name')->get();
+    });
 @endphp
 <!doctype html>
 <html lang="en">

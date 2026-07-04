@@ -16,6 +16,11 @@ class PriceCalculationHelper
      * Calculate price for a single item (product or variant)
      * Includes: Product/Variant Discount, Offer, and Campaign
      */
+    protected static array $vatCache = [];
+    protected static array $offerCache = [];
+    protected static array $campaignCache = [];
+    protected static array $variantCache = [];
+
     public static function calculateItemPrice($product, $variantId = null, $qty = 1)
     {
         if (is_numeric($product)) {
@@ -31,9 +36,19 @@ class PriceCalculationHelper
             $product->load('vendor:id,vendor_tax');
         }
 
+        // Use already-loaded variant if available, otherwise query once per product
         $variant = null;
         if ($variantId) {
-            $variant = ProductVariant::find($variantId);
+            if ($product->relationLoaded('variants')) {
+                $variant = $product->variants->firstWhere('id', $variantId);
+            }
+            if (!$variant) {
+                $cacheKey = 'variant.' . $variantId;
+                if (!isset(self::$variantCache[$cacheKey])) {
+                    self::$variantCache[$cacheKey] = ProductVariant::find($variantId);
+                }
+                $variant = self::$variantCache[$cacheKey];
+            }
         }
 
         $unitPrice = (float) ($variant->price ?? $product->price);
@@ -51,7 +66,7 @@ class PriceCalculationHelper
 
         $priceAfterProductDiscount = max(0, $unitPrice - $productUnitDiscount);
 
-        // 2. Check for Offers
+        // 2. Check for Offers (cached per product)
         $offerUnitDiscount = 0.0;
         $offerIdField = $product->offer_id ?? null;
         $offerIds = [];
@@ -65,78 +80,83 @@ class PriceCalculationHelper
         }
 
         if (!empty($offerIds)) {
-            $offer = Offer::whereIn('id', $offerIds)
-                ->where('status', 1)
-                ->where(function ($q) use ($today) {
-                    $q->whereNull('valid_from')->orWhere('valid_from', '<=', $today);
-                })
-                ->where(function ($q) use ($today) {
-                    $q->whereNull('valid_until')->orWhere('valid_until', '>=', $today);
-                })
-                ->first();
+            $offerCacheKey = 'offer.' . $product->id;
+            if (!isset(self::$offerCache[$offerCacheKey])) {
+                self::$offerCache[$offerCacheKey] = Offer::whereIn('id', $offerIds)
+                    ->where('status', 1)
+                    ->where(function ($q) use ($today) {
+                        $q->whereNull('valid_from')->orWhere('valid_from', '<=', $today);
+                    })
+                    ->where(function ($q) use ($today) {
+                        $q->whereNull('valid_until')->orWhere('valid_until', '>=', $today);
+                    })
+                    ->first();
+            }
+            $offer = self::$offerCache[$offerCacheKey];
 
             if ($offer) {
-                if (in_array((string)$offer->type, ['1', 'percent', '%'])) { // Percent
+                if (in_array((string)$offer->type, ['1', 'percent', '%'])) {
                     $offerUnitDiscount = round($priceAfterProductDiscount * ((float)$offer->value) / 100, 2);
-                } else { // Fixed
+                } else {
                     $offerUnitDiscount = round((float)$offer->value, 2);
                 }
             }
         }
 
-        // 3. Check for Campaigns
+        // 3. Check for Campaigns (cached per product)
         $campaignUnitDiscount = 0.0;
         $activeCampaign = null;
-        
-        $activeCampaign = $product->campaigns()
-            ->where('campaigns.is_active', 1)
-            ->where('campaigns.status', 1)
-            ->where(function ($q) use ($today) {
-                $q->whereNull('campaigns.start_date')->orWhere('campaigns.start_date', '<=', $today);
-            })
-            ->where(function ($q) use ($today) {
-                $q->whereNull('campaigns.end_date')->orWhere('campaigns.end_date', '>=', $today);
-            })
-            ->wherePivot('status', 1) // campaign_products.status = 1
-            ->whereHas('vendors', function ($q) use ($product) {
-                $q->where('users.id', $product->vendor_id)
-                    ->where('campaign_vendors.active', 1)
-                    ->whereIn('campaign_vendors.status', ['approved', '1'])
-                    // Check budget: total must be greater than spent if budget is set
-                    ->where(function ($qb) {
-                        $qb->whereColumn('campaign_vendors.budget_spent', '<', 'campaign_vendors.budget_total')
-                           ->orWhere('campaign_vendors.budget_total', '<=', 0);
-                    });
-            })
-            ->with('offer')
-            ->first();
+
+        $campaignCacheKey = 'campaign.' . $product->id;
+        if (!isset(self::$campaignCache[$campaignCacheKey])) {
+            self::$campaignCache[$campaignCacheKey] = $product->campaigns()
+                ->where('campaigns.is_active', 1)
+                ->where('campaigns.status', 1)
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('campaigns.start_date')->orWhere('campaigns.start_date', '<=', $today);
+                })
+                ->where(function ($q) use ($today) {
+                    $q->whereNull('campaigns.end_date')->orWhere('campaigns.end_date', '>=', $today);
+                })
+                ->wherePivot('status', 1)
+                ->whereHas('vendors', function ($q) use ($product) {
+                    $q->where('users.id', $product->vendor_id)
+                        ->where('campaign_vendors.active', 1)
+                        ->whereIn('campaign_vendors.status', ['approved', '1'])
+                        ->where(function ($qb) {
+                            $qb->whereColumn('campaign_vendors.budget_spent', '<', 'campaign_vendors.budget_total')
+                               ->orWhere('campaign_vendors.budget_total', '<=', 0);
+                        });
+                })
+                ->with('offer')
+                ->first();
+        }
+        $activeCampaign = self::$campaignCache[$campaignCacheKey];
 
         if ($activeCampaign) {
-            // If campaign exists, it takes precedence or overlaps with offer
             if ($activeCampaign->offer_id && $activeCampaign->offer) {
-                // Campaign related with offer: overlap campaign discount with offer discount
                 if (in_array((string)$activeCampaign->offer->type, ['1', 'percent', '%'])) {
                     $campaignUnitDiscount = round($priceAfterProductDiscount * ((float)$activeCampaign->offer->value) / 100, 2);
                 } else {
                     $campaignUnitDiscount = round((float)$activeCampaign->offer->value, 2);
                 }
-                // When campaign has an offer, we zero out the standalone offer to "overlap" / replace it
                 $offerUnitDiscount = 0.0;
             } else {
-                // Campaign has no relation with offer: take campaign discount
                 $campaignUnitDiscount = round($priceAfterProductDiscount * ((float)$activeCampaign->discount_percent) / 100, 2);
-                // Also zero out standalone offer if campaign takes precedence
                 $offerUnitDiscount = 0.0;
             }
         }
 
         $priceAfterAllDiscounts = max(0, $priceAfterProductDiscount - $offerUnitDiscount - $campaignUnitDiscount);
 
-        // When didn't find vendor_tax should take vat_percent in general setting
-        // When get vendor_tax so take both vat addition
+        // Cache VAT percent (same for all products in a request)
+        if (!isset(self::$vatCache['vat_percent'])) {
+            self::$vatCache['vat_percent'] = (float) (GeneralSetting::where('key', 'vat_percent')->value('value') ?? 0.0);
+        }
+        $vatPercent = self::$vatCache['vat_percent'];
+
         $vendorTax = (float) ($product->vendor->vendor_tax ?? 0.0);
-        $vatPercent = (float) (GeneralSetting::where('key', 'vat_percent')->value('value') ?? 0.0);
-        
+
         if ($vendorTax > 0) {
             $taxRate = $vendorTax + $vatPercent;
         } else {
@@ -163,9 +183,19 @@ class PriceCalculationHelper
 
     public static function calculateShippingFee($cityId = null, $subtotal = 0.0, $userCityId = null)
     {
-        $shippingRate = (float) (GeneralSetting::where('key', 'shipping_charge')->value('value') ?? 100.0);
-        $freeShippingMin = (float) (GeneralSetting::where('key', 'free_shipping_min')->value('value') ?? 500.0);
-        $freeForSameCity = (bool) (GeneralSetting::where('key', 'free_shipping_same_city')->value('value') ?? true);
+        if (!isset(self::$vatCache['shipping_charge'])) {
+            self::$vatCache['shipping_charge'] = (float) (GeneralSetting::where('key', 'shipping_charge')->value('value') ?? 100.0);
+        }
+        if (!isset(self::$vatCache['free_shipping_min'])) {
+            self::$vatCache['free_shipping_min'] = (float) (GeneralSetting::where('key', 'free_shipping_min')->value('value') ?? 500.0);
+        }
+        if (!isset(self::$vatCache['free_shipping_same_city'])) {
+            self::$vatCache['free_shipping_same_city'] = (bool) (GeneralSetting::where('key', 'free_shipping_same_city')->value('value') ?? true);
+        }
+
+        $shippingRate = self::$vatCache['shipping_charge'];
+        $freeShippingMin = self::$vatCache['free_shipping_min'];
+        $freeForSameCity = self::$vatCache['free_shipping_same_city'];
 
         if (!$cityId) {
             return $subtotal >= $freeShippingMin ? 0.0 : $shippingRate;

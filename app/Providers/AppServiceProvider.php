@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ use App\Models\VendorPolicy;
 
 
 use App\Models\GeneralSetting;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -50,40 +52,47 @@ class AppServiceProvider extends ServiceProvider
             // Silently fail if DB is not ready
         }
 
-        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+        View::composer('frontend.*', function ($view) {
             try {
-                if (!str_contains($view->getName(), 'errors::')) {
-                    $categories = Category::with(['subCategories.childCategories'])->where('is_active', 1)->get();
-                    $notificationSetting = NotificationSetting::first();
-                    
-                    // Fetch site settings
-                    $siteSettings = GeneralSetting::whereIn('key', ['website_logo_dark', 'website_logo_light', 'favicon', 'website_name', 'contact_phone', 'contact_email', 'address'])->get()->pluck('value', 'key');
-                    $siteLogoDark = $siteSettings['website_logo_dark'] ?? null;
-                    $siteLogoLight = $siteSettings['website_logo_light'] ?? null;
-                    $siteFavicon = $siteSettings['favicon'] ?? null;
-                    $siteName = $siteSettings['website_name'] ?? 'Aariva';
-                    $contactPhone = $siteSettings['contact_phone'] ?? null;
-                    $contactEmail = $siteSettings['contact_email'] ?? null;
-                    $address = $siteSettings['address'] ?? null;
+                $categories = Cache::remember('categories.nav', 3600, function () {
+                    return Category::where('is_active', 1)
+                        ->with(['subCategories' => function ($q) {
+                            $q->where('is_active', 1)->with('childCategories');
+                        }])
+                        ->orderBy('name')
+                        ->get();
+                });
 
-                    $activeVendorPolicy = null;
-                    if (Auth::check() && Auth::user()->role == '2' && Auth::user()->agreement == 0) {
-                        $activeVendorPolicy = VendorPolicy::where('status', 1)->latest('id')->first();
-                    }
+                $notificationSetting = Cache::remember('notification.setting', 3600, function () {
+                    return NotificationSetting::first();
+                });
 
-                    $view->with([
-                        'categories' => $categories,
-                        'notificationSetting' => $notificationSetting,
-                        'activeVendorPolicy' => $activeVendorPolicy,
-                        'siteLogoDark' => $siteLogoDark,
-                        'siteLogoLight' => $siteLogoLight,
-                        'siteFavicon' => $siteFavicon,
-                        'siteName' => $siteName,
-                        'contactPhone' => $contactPhone,
-                        'contactEmail' => $contactEmail,
-                        'contactAddress' => $address,
-                    ]);
+                $siteSettings = Cache::remember('site.settings', 3600, function () {
+                    return GeneralSetting::whereIn('key', [
+                        'website_logo_dark', 'website_logo_light', 'favicon', 'website_name',
+                        'contact_phone', 'contact_email', 'address'
+                    ])->get()->pluck('value', 'key');
+                });
+
+                $activeVendorPolicy = null;
+                if (Auth::check() && Auth::user()->role === '2' && Auth::user()->agreement == 0) {
+                    $activeVendorPolicy = Cache::remember('vendor.policy.active', 3600, function () {
+                        return VendorPolicy::where('status', 1)->latest('id')->first();
+                    });
                 }
+
+                $view->with([
+                    'categories' => $categories,
+                    'notificationSetting' => $notificationSetting,
+                    'siteLogoDark' => $siteSettings['website_logo_dark'] ?? null,
+                    'siteLogoLight' => $siteSettings['website_logo_light'] ?? null,
+                    'siteFavicon' => $siteSettings['favicon'] ?? null,
+                    'siteName' => $siteSettings['website_name'] ?? 'Aariva',
+                    'contactPhone' => $siteSettings['contact_phone'] ?? null,
+                    'contactEmail' => $siteSettings['contact_email'] ?? null,
+                    'contactAddress' => $siteSettings['address'] ?? null,
+                    'activeVendorPolicy' => $activeVendorPolicy,
+                ]);
             } catch (\Exception $e) {
                 $view->with([
                     'siteName' => 'Aariva',
