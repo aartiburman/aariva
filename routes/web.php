@@ -710,6 +710,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend\Template1', 'as' => 
         return view('frontend.auth.vendor-register', compact('kycDocuments'));
     })->name('become-seller');
 
+    // Sitemap
+    Route::get('sitemap.xml', 'SitemapController@index')->name('sitemap');
+    Route::get('robots.txt', function () {
+        return response("User-agent: *\nDisallow:\nSitemap: " . route('frontend.sitemap') . "\n", 200, ['Content-Type' => 'text/plain']);
+    });
+
     // Frontend Pages
     Route::get('blog', function () {
         $posts = \App\Models\Blog::where('status', 1)->with('author')->latest()->paginate(12);

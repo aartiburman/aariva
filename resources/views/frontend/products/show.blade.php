@@ -1,19 +1,31 @@
+@php
+    $variant = $product->variants->first();
+    $productOgImage = $variant && !empty($variant->images) ? $variant->images[0] : asset('frontend/assets/images/products/01.png');
+    $metaTitle = $product->meta_title ?: ($product->name . ' - ' . config('app.name'));
+    $metaDescription = $product->meta_description ?: \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 160);
+    $inStock = $variant && $variant->stock > 0;
+@endphp
+
 @extends('frontend.layouts.app')
 
-@section('title', ($product->name ?? 'Product') . ' - ' . config('app.name'))
-
-@section('meta_description', \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 160))
-
+@section('title', $metaTitle)
+@section('meta_description', $metaDescription)
 @section('meta_keywords', ($product->name ?? 'product') . ', buy ' . ($product->name ?? '') . ', ' . config('app.name') . ', online shopping, best price')
+@section('canonical', route('frontend.products.show', $product->slug))
 
 @section('og_type', 'product')
-@section('og_title', ($product->name ?? 'Product') . ' - ' . config('app.name'))
-@section('og_description', \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 160))
-@php
-    $variant = $product->firstVariant ?? $product->variants->first();
-    $productOgImage = isset($variant) && $variant ? App\Helpers\ImageHelper::getProductImage($variant->image) : asset('frontend/assets/images/products/01.png');
-@endphp
+@section('og_title', $metaTitle)
+@section('og_description', $metaDescription)
 @section('og_image', $productOgImage)
+@section('og_url', route('frontend.products.show', $product->slug))
+@push('head-links')
+<meta property="product:availability" content="{{ $inStock ? 'in stock' : 'out of stock' }}" />
+<meta property="product:price:amount" content="{{ $variant ? $variant->actual_price : 0 }}" />
+<meta property="product:price:currency" content="{{ session('currency_code', 'USD') }}" />
+@if($product->category)
+    <link rel="prefetch" href="{{ route('frontend.products.index', ['category' => $product->category->slug]) }}">
+@endif
+@endpush
 
 @section('content')
 <!--start breadcrumb-->
@@ -46,38 +58,27 @@
                     <div class="col-12 col-lg-5">
                         <div class="image-zoom-section">
                             @php
-                                $galleryImages = [];
-                                if($product->variants->isNotEmpty()) {
-                                    foreach($product->variants as $v) {
-                                        if($v->image) {
-                                            $imgs = is_array(json_decode($v->image, true)) ? json_decode($v->image, true) : explode(',', $v->image);
-                                            foreach($imgs as $img) {
-                                                $galleryImages[] = App\Helpers\ImageHelper::getProductImage(trim($img));
-                                            }
-                                        }
-                                    }
-                                    $galleryImages = array_unique($galleryImages);
-                                }
-                                if(empty($galleryImages)) {
-                                    $galleryImages = [
+                                $selectedVariant = $variant ?? $product->variants->first();
+                                $initialImages = $selectedVariant && !empty($selectedVariant->images)
+                                    ? $selectedVariant->images
+                                    : [
                                         asset('frontend/assets/images/products/01.png'),
                                         asset('frontend/assets/images/products/02.png'),
                                         asset('frontend/assets/images/products/03.png'),
                                         asset('frontend/assets/images/products/04.png'),
                                     ];
-                                }
                             @endphp
-                            <div class="product-gallery owl-carousel owl-theme border mb-3 p-3" data-slider-id="1">
-                                @foreach($galleryImages as $img)
+                            <div class="product-gallery owl-carousel owl-theme border mb-3 p-3">
+                                @foreach($initialImages as $i => $img)
                                     <div class="item">
-                                        <img src="{{ $img }}" class="img-fluid" alt="{{ $product->name }}">
+                                        <img src="{{ $img }}" class="img-fluid" alt="{{ $product->name }}" {{ $i > 0 ? 'loading="lazy"' : 'fetchpriority="high"' }}>
                                     </div>
                                 @endforeach
                             </div>
-                            <div class="owl-thumbs d-flex justify-content-center flex-wrap" data-slider-id="1">
-                                @foreach($galleryImages as $img)
-                                    <button class="owl-thumb-item mx-1 mb-2">
-                                        <img src="{{ $img }}" class="" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="product-thumbs d-flex justify-content-center flex-wrap">
+                                @foreach($initialImages as $i => $img)
+                                    <button class="product-thumb-item mx-1 mb-2 border">
+                                        <img src="{{ $img }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover;" loading="lazy">
                                     </button>
                                 @endforeach
                             </div>
@@ -99,17 +100,17 @@
                                     <p class="mb-0">({{ $product->approvedReviews->count() }} Reviews)</p>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center mt-3 gap-2">
+                            <div class="d-flex align-items-center mt-3 gap-2" id="priceSection">
                                 @php
                                     $originalPrice = $variant ? $variant->price : 0;
                                     $finalPrice = $variant ? App\Helpers\PriceHelper::applyDiscount($variant->price, $variant->discount_type, $variant->discount_value) : 0;
                                 @endphp
                                 @if($finalPrice < $originalPrice)
-                                    <h5 class="mb-0 text-decoration-line-through text-light-3">{{ App\Helpers\PriceHelper::formatPrice($originalPrice) }}</h5>
+                                    <h5 class="mb-0 text-decoration-line-through text-light-3" id="originalPrice">{{ App\Helpers\PriceHelper::formatPrice($originalPrice) }}</h5>
                                 @endif
-                                <h4 class="mb-0">{{ App\Helpers\PriceHelper::formatPrice($finalPrice) }}</h4>
+                                <h4 class="mb-0" id="finalPrice">{{ App\Helpers\PriceHelper::formatPrice($finalPrice) }}</h4>
                                 @if($finalPrice < $originalPrice)
-                                    <span class="badge bg-success ms-2">
+                                    <span class="badge bg-success ms-2" id="discountBadge">
                                         @if($variant->discount_type === 'percent' || $variant->discount_type === '%' || $variant->discount_type === 'percentage')
                                             {{ $variant->discount_value }}% OFF
                                         @else
@@ -128,8 +129,27 @@
                                     <h6>{{ __('Variants') }}:</h6>
                                     <select class="form-select form-select-sm" id="variantSelect">
                                         @foreach($product->variants as $v)
-                                            <option value="{{ $v->id }}" {{ $variant && $v->id === $variant->id ? 'selected' : '' }} data-price="{{ $v->price }}" data-discount-type="{{ $v->discount_type }}" data-discount-value="{{ $v->discount_value }}">
-                                                {{ $v->product_variant_label ?? ('Variant ' . $loop->iteration) }} - {{ App\Helpers\PriceHelper::formatPrice(App\Helpers\PriceHelper::applyDiscount($v->price, $v->discount_type, $v->discount_value)) }}
+                                            @php
+                                                $vFinalPrice = App\Helpers\PriceHelper::applyDiscount($v->price, $v->discount_type, $v->discount_value);
+                                                $vHasDiscount = $vFinalPrice < $v->price;
+                                                $vDiscountLabel = '';
+                                                if ($vHasDiscount) {
+                                                    $dType = strtolower($v->discount_type);
+                                                    $vDiscountLabel = in_array($dType, ['percent', 'percentage', '%'])
+                                                        ? $v->discount_value . '% OFF'
+                                                        : App\Helpers\PriceHelper::formatPrice($v->discount_value) . ' OFF';
+                                                }
+                                            @endphp
+                                            <option value="{{ $v->id }}" {{ $variant && $v->id === $variant->id ? 'selected' : '' }}
+                                                data-price="{{ $v->price }}"
+                                                data-discount-type="{{ $v->discount_type }}"
+                                                data-discount-value="{{ $v->discount_value }}"
+                                                data-images='{{ json_encode($v->images ?? []) }}'
+                                                data-stock="{{ $v->stock ?? 0 }}"
+                                                data-formatted-original="{{ $vHasDiscount ? App\Helpers\PriceHelper::formatPrice($v->price) : '' }}"
+                                                data-formatted-final="{{ App\Helpers\PriceHelper::formatPrice($vFinalPrice) }}"
+                                                data-discount-label="{{ $vDiscountLabel }}">
+                                                {{ $v->product_variant_label ?? ('Variant ' . $loop->iteration) }} - {{ App\Helpers\PriceHelper::formatPrice($vFinalPrice) }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -149,41 +169,41 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2 mt-4">
-                                <a href="javascript:;" 
+                                <button type="button" 
                                     class="btn btn-dark btn-ecomm px-4 {{ $product->is_in_cart ? 'remove-from-cart' : 'add-to-cart' }}" 
                                     data-product-id="{{ $product->id }}" 
                                     data-variant-id="{{ $variant ? $variant->id : '' }}" 
                                     data-qty="1"
                                     id="cartBtn">
                                     <i class="bx {{ $product->is_in_cart ? 'bx-cart-x' : 'bx-cart-add' }}"></i> {{ $product->is_in_cart ? __('Remove from Cart') : __('Add to Cart') }}
-                                </a>
-                                <a href="javascript:;" 
+                                </button>
+                                <button type="button" 
                                     class="btn btn-outline-dark btn-ecomm px-4 add-to-wishlist ms-2 {{ $product->is_in_wishlist ? 'active text-danger' : '' }}" 
                                     data-product-id="{{ $product->id }}" 
                                     data-variant-id="{{ $variant ? $variant->id : '' }}" 
                                     data-qty="1"
                                     id="wishlistBtn">
                                     <i class="bx {{ $product->is_in_wishlist ? 'bxs-heart' : 'bx-heart' }}"></i> {{ $product->is_in_wishlist ? __('Remove from Wishlist') : __('Add to Wishlist') }}
-                                </a>
+                                </button>
                             </div>
                             <hr class="my-4">
                             <div class="product-sharing">
                                 <h6 class="mb-2">{{ __('Share this product') }}:</h6>
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                     <div class="">
-                                        <button type="button" class="btn-social bg-twitter"><i class="bx bxl-twitter"></i></button>
+                                        <a href="https://twitter.com/intent/tweet?text={{ urlencode($product->name) }}&url={{ urlencode(route('frontend.products.show', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="btn-social bg-twitter"><i class="bx bxl-twitter"></i></a>
                                     </div>
                                     <div class="">
-                                        <button type="button" class="btn-social bg-facebook"><i class="bx bxl-facebook"></i></button>
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('frontend.products.show', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="btn-social bg-facebook"><i class="bx bxl-facebook"></i></a>
                                     </div>
                                     <div class="">
-                                        <button type="button" class="btn-social bg-linkedin"><i class="bx bxl-linkedin"></i></button>
+                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('frontend.products.show', $product->slug)) }}&title={{ urlencode($product->name) }}" target="_blank" rel="noopener noreferrer" class="btn-social bg-linkedin"><i class="bx bxl-linkedin"></i></a>
                                     </div>
                                     <div class="">
-                                        <button type="button" class="btn-social bg-youtube"><i class="bx bxl-youtube"></i></button>
+                                        <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(route('frontend.products.show', $product->slug)) }}&media={{ urlencode($productOgImage) }}&description={{ urlencode($product->name) }}" target="_blank" rel="noopener noreferrer" class="btn-social bg-pinterest"><i class="bx bxl-pinterest"></i></a>
                                     </div>
                                     <div class="">
-                                        <button type="button" class="btn-social bg-pinterest"><i class="bx bxl-pinterest"></i></button>
+                                        <a href="https://api.whatsapp.com/send?text={{ urlencode($product->name . ' - ' . route('frontend.products.show', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="btn-social bg-success"><i class="bx bxl-whatsapp"></i></a>
                                     </div>
                                 </div>
                             </div>
@@ -310,12 +330,12 @@
                         <div class="card">
                             <div class="position-relative overflow-hidden">
                                 <div class="add-cart position-absolute top-0 end-0 mt-3 me-3">
-                                    <a href="javascript:;" class="{{ $similarProduct->is_in_cart ? 'remove-from-cart' : 'add-to-cart' }}" 
+                                    <button type="button" class="{{ $similarProduct->is_in_cart ? 'remove-from-cart' : 'add-to-cart' }}" 
                                         data-product-id="{{ $similarProduct->id }}" 
                                         data-variant-id="{{ $similarProduct->firstVariant ? $similarProduct->firstVariant->id : '' }}" 
                                         data-qty="1">
                                         <i class="bx {{ $similarProduct->is_in_cart ? 'bx-cart-x' : 'bx-cart-add' }}"></i>
-                                    </a>
+                                    </button>
                                 </div>
                                 <div class="quick-view position-absolute start-0 bottom-0 end-0">
                                     <a href="{{ route('frontend.products.show', $similarProduct->slug) }}" class="btn btn-light btn-sm">{{ __('View Product') }}</a>
@@ -335,10 +355,10 @@
                                         <h6 class="mb-0 fw-bold product-short-title">{{ $similarProduct->name }}</h6>
                                     </div>
                                     <div class="icon-wishlist">
-                                        <a href="javascript:;" class="add-to-wishlist {{ $similarProduct->is_in_wishlist ? 'active text-danger' : '' }}" 
+                                        <button type="button" class="add-to-wishlist {{ $similarProduct->is_in_wishlist ? 'active text-danger' : '' }}" 
                                             data-product-id="{{ $similarProduct->id }}">
                                             <i class="bx {{ $similarProduct->is_in_wishlist ? 'bxs-heart' : 'bx-heart' }}"></i>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="product-price d-flex align-items-center justify-content-start gap-2 mt-2">
@@ -364,47 +384,188 @@
 @endif
 <!--end similar products-->
 
+@php
+    $avgRating = $product->approvedReviews->avg('rating') ?? 0;
+    $reviewCount = $product->approvedReviews->count();
+    $brandName = $product->brand->name ?? '';
+    $currency = session('currency_code', 'USD');
+    $offerPrice = $variant ? $variant->actual_price : 0;
+    $originalPrice = $variant ? $variant->original_price : 0;
+@endphp
+
+<script type="application/ld+json">
+{
+    "<?php echo '@'; ?>context": "https://schema.org",
+    "<?php echo '@'; ?>type": "BreadcrumbList",
+    "itemListElement": [
+        {"<?php echo '@'; ?>type": "ListItem", "position": 1, "name": "Home", "item": "{{ route('frontend.home') }}" }
+        @if($product->category)
+        ,{"<?php echo '@'; ?>type": "ListItem", "position": 2, "name": "{{ $product->category->name }}", "item": "{{ route('frontend.products.index', ['category' => $product->category->slug]) }}" }
+        @endif
+        ,{"<?php echo '@'; ?>type": "ListItem", "position": {{ $product->category ? 3 : 2 }}, "name": "{{ $product->name }}", "item": "{{ route('frontend.products.show', $product->slug) }}" }
+    ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "<?php echo '@'; ?>context": "https://schema.org",
+    "<?php echo '@'; ?>type": "Product",
+    "name": "{{ $product->name }}",
+    "description": "{{ \Str::limit(strip_tags($product->description ?? $product->short_description ?? ''), 300) }}",
+    "sku": "{{ $variant->sku ?? $product->id }}",
+    @if($brandName)
+    "brand": {
+        "<?php echo '@'; ?>type": "Brand",
+        "name": "{{ $brandName }}"
+    },
+    @endif
+    "image": "{{ $productOgImage }}",
+    @if($reviewCount > 0)
+    "aggregateRating": {
+        "<?php echo '@'; ?>type": "AggregateRating",
+        "ratingValue": "{{ number_format($avgRating, 1) }}",
+        "reviewCount": "{{ $reviewCount }}",
+        "bestRating": "5"
+    },
+    @endif
+    "offers": {
+        "<?php echo '@'; ?>type": "Offer",
+        "url": "{{ route('frontend.products.show', $product->slug) }}",
+        "priceCurrency": "{{ $currency }}",
+        "price": "{{ $offerPrice }}",
+        "priceValidUntil": "{{ now()->addMonths(6)->toDateString() }}",
+        "availability": "{{ $inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+        "itemCondition": "https://schema.org/NewCondition"
+    }
+}
+</script>
+
+@endsection
+
+@push('styles')
+<style>
+.product-thumb-item {
+    width: 80px; height: 80px; padding: 2px;
+    background: transparent; cursor: pointer; opacity: 0.6;
+}
+.product-thumb-item.active-thumb {
+    opacity: 1; border-color: #000 !important;
+}
+.product-thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+
+@media (max-width: 1199px) {
+    .wrapper { display: block !important; }
+    .header-wrapper.fixed-header {
+        position: relative !important;
+        top: auto !important;
+    }
+    body { padding-top: 0 !important; }
+    .page-wrapper { margin-top: 0 !important; }
+}
+</style>
+@endpush
+
 @push('scripts')
 <script>
 $(function() {
-    // Update cart button qty and variant id when select changes
-    $('#qtySelect, #variantSelect').on('change', function() {
-        var qty = $('#qtySelect').val();
-        var variantId = $('#variantSelect').val() || '';
-        $('#cartBtn').attr('data-qty', qty);
-        $('#cartBtn').attr('data-variant-id', variantId);
-        
-        // Update displayed price when variant changes
-        var selectedOption = $('#variantSelect option:selected');
-        if(selectedOption.length > 0) {
-            // We could update the price display here if needed
+    var productName = '{{ $product->name }}';
+    var allVariantImages = {!! json_encode($product->variants->pluck('images', 'id')->map(function($imgs) { return $imgs ?: []; })->toArray()) !!};
+
+    function initGallery() {
+        var $g = $('.product-gallery');
+
+        $g.owlCarousel({
+            items: 1, loop: true, margin: 0,
+            nav: false, dots: false
+        });
+
+        // Sync active thumb on carousel change
+        $g.on('changed.owl.carousel', function(e) {
+            $('.product-thumb-item').removeClass('active-thumb')
+                .eq(e.item.index).addClass('active-thumb');
+        });
+
+        // Thumbnail click -> go to slide
+        $('.product-thumb-item').on('click', function() {
+            var idx = $(this).index();
+            $g.trigger('to.owl.carousel', [idx, 300]);
+        });
+
+        // Mark first thumb active
+        $('.product-thumb-item').first().addClass('active-thumb');
+    }
+
+    function replaceGallery(images) {
+        var $g = $('.product-gallery');
+        var $t = $('.product-thumbs');
+
+        if (!images || !images.length) return;
+
+        if ($g.data('owl.carousel')) {
+            $g.owlCarousel('destroy');
         }
+        $g.empty();
+        $t.empty();
+
+        $.each(images, function(i, src) {
+            $g.append('<div class="item"><img src="' + src + '" class="img-fluid" alt="' + productName + '"></div>');
+            $t.append('<button class="product-thumb-item mx-1 mb-2 border"><img src="' + src + '" alt="' + productName + '" style="width: 60px; height: 60px; object-fit: cover;"></button>');
+        });
+
+        initGallery();
+    }
+
+    // Variant switching
+    $('#variantSelect').on('change', function() {
+        var vid = $(this).val();
+        if (!vid) return;
+
+        $('#cartBtn, #wishlistBtn').attr('data-variant-id', vid);
+
+        var imgs = allVariantImages[vid];
+        if (imgs && imgs.length) {
+            replaceGallery(imgs);
+        }
+
+        var opt = $(this).find('option:selected');
+        var ff = opt.data('formatted-final') || '';
+        var fo = opt.data('formatted-original') || '';
+        var dl = opt.data('discount-label') || '';
+
+        if (fo && dl) {
+            var $o = $('#originalPrice');
+            var $b = $('#discountBadge');
+            if (!$o.length) {
+                $('#priceSection').prepend('<h5 class="mb-0 text-decoration-line-through text-light-3" id="originalPrice">' + fo + '</h5>');
+            } else {
+                $o.text(fo).show();
+            }
+            if (!$b.length) {
+                $('#priceSection').append('<span class="badge bg-success ms-2" id="discountBadge">' + dl + '</span>');
+            } else {
+                $b.text(dl).show();
+            }
+        } else {
+            $('#originalPrice').remove();
+            $('#discountBadge').remove();
+        }
+        $('#finalPrice').text(ff);
     });
-    
-    // Initialize product gallery carousel
-    $('.product-gallery').owlCarousel({
-        items: 1,
-        loop: true,
-        margin: 0,
-        nav: false,
-        dots: false,
-        thumbs: true,
-        thumbImage: true,
-        thumbContainerClass: 'owl-thumbs',
-        thumbItemClass: 'owl-thumb-item'
+
+    $('#qtySelect').on('change', function() {
+        var qty = $(this).val();
+        var vid = $('#variantSelect').val() || '';
+        $('#cartBtn').attr('data-qty', qty).attr('data-variant-id', vid);
     });
-    
-    // Initialize similar products carousel
+
+    initGallery();
+
     $('.similar-products').owlCarousel({
-        loop: true,
-        margin: 30,
-        nav: true,
-        dots: false,
+        loop: true, margin: 30, nav: true, dots: false,
         responsive: {
-            0: { items: 1 },
-            576: { items: 2 },
-            768: { items: 3 },
-            992: { items: 4 }
+            0: { items: 1 }, 576: { items: 2 },
+            768: { items: 3 }, 992: { items: 4 }
         }
     });
 });

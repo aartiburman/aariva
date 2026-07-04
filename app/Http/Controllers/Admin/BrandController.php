@@ -73,6 +73,8 @@ class BrandController extends Controller
             'description'    => $request->description,
             'description_ar' => $trAr->translate($request->description??''),
             'description_ne' => $trNe->translate($request->description??''),
+            'meta_title'     => $request->meta_title,
+            'meta_description' => $request->meta_description,
             'status'         => $request->status,
         ]);
 
@@ -244,6 +246,8 @@ class BrandController extends Controller
             'description'    => $request->description,
             'description_ar' => $request->description ? $trAr->translate($request->description) : null,
             'description_ne' => $request->description ? $trNe->translate($request->description) : null,
+            'meta_title'     => $request->meta_title,
+            'meta_description' => $request->meta_description,
             'status'         => $request->status,
       ];
     //   echo "<pre>";print_r($data);die;

@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\LanguageMiddleware::class,
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\SingleSessionMiddleware::class,
+            \App\Http\Middleware\RedirectMiddleware::class,
         ]);
 
         $middleware->api(append: [

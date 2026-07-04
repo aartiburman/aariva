@@ -126,7 +126,16 @@
                   @enderror
                 </div>
 
-
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Meta Title</label>
+                    <input type="text" name="meta_title" class="form-control" maxlength="255" placeholder="SEO title (optional)" value="{{ old('meta_title', $brand->meta_title ?? '') }}">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Meta Description</label>
+                    <textarea name="meta_description" class="form-control" rows="2" maxlength="500" placeholder="SEO description (optional)">{{ old('meta_description', $brand->meta_description ?? '') }}</textarea>
+                  </div>
+                </div>
 
                 <!-- Status -->
                 <div class="mb-3">

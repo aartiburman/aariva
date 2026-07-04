@@ -110,6 +110,14 @@
                         </div>
                         <textarea name="description" class="form-control" rows="4" placeholder="Detailed description..." maxlength="5000" required>{{ old('description', $product_data->description) }}</textarea>
                       </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold fs-13">Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" maxlength="255" placeholder="SEO title (optional)" value="{{ old('meta_title', $product_data->meta_title ?? '') }}">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold fs-13">Meta Description</label>
+                        <textarea name="meta_description" class="form-control" rows="2" maxlength="500" placeholder="SEO description (optional)">{{ old('meta_description', $product_data->meta_description ?? '') }}</textarea>
+                      </div>
                     </div>
                   </div>
                 </div>

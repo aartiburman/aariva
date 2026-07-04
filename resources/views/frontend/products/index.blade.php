@@ -1,13 +1,80 @@
+@php
+    $seoTitle = 'Shop - ' . config('app.name');
+    $seoDescription = 'Shop endless collection at ' . config('app.name') . ' - Browse thousands of products across fashion, electronics, beauty, home & more. Best prices, fast shipping, easy returns.';
+    $seoKeywords = 'shop online, ' . config('app.name') . ', buy fashion, electronics, beauty products, home decor, best deals, online store';
+    $cleanParams = request()->only(['category', 'subcategory', 'child_category', 'brand', 'search']);
+    $canonicalUrl = $cleanParams ? route('frontend.products.index', $cleanParams) : route('frontend.products.index');
+    $hasFilter = request()->filled('sort') || request()->filled('min_price') || request()->filled('max_price');
+    $isSearch = request()->filled('search');
+
+    if ($currentCategory && $currentCategory->meta_title) {
+        $seoTitle = $currentCategory->meta_title;
+    } elseif ($currentCategory) {
+        $seoTitle = $currentCategory->name . ' - ' . config('app.name');
+    }
+    if ($currentCategory && $currentCategory->meta_description) {
+        $seoDescription = $currentCategory->meta_description;
+    }
+
+    if ($currentSubCategory && $currentSubCategory->meta_title) {
+        $seoTitle = $currentSubCategory->meta_title;
+    } elseif ($currentSubCategory) {
+        $seoTitle = $currentSubCategory->name . ' - ' . config('app.name');
+    }
+    if ($currentSubCategory && $currentSubCategory->meta_description) {
+        $seoDescription = $currentSubCategory->meta_description;
+    }
+
+    if ($currentChildCategory && $currentChildCategory->meta_title) {
+        $seoTitle = $currentChildCategory->meta_title;
+    } elseif ($currentChildCategory) {
+        $seoTitle = $currentChildCategory->name . ' - ' . config('app.name');
+    }
+    if ($currentChildCategory && $currentChildCategory->meta_description) {
+        $seoDescription = $currentChildCategory->meta_description;
+    }
+
+    if ($currentBrand && $currentBrand->meta_title) {
+        $seoTitle = $currentBrand->meta_title;
+    } elseif ($currentBrand) {
+        $seoTitle = $currentBrand->name . ' - ' . config('app.name');
+    }
+    if ($currentBrand && $currentBrand->meta_description) {
+        $seoDescription = $currentBrand->meta_description;
+    }
+
+    if ($isSearch) {
+        $seoTitle = 'Search: ' . e(request('search')) . ' - ' . config('app.name');
+        $seoDescription = 'Search results for "' . e(request('search')) . '" at ' . config('app.name');
+    }
+@endphp
+
 @extends('frontend.layouts.app')
 
-@section('title', 'Shop - ' . config('app.name'))
+@section('title', $seoTitle)
+@section('meta_description', $seoDescription)
+@section('meta_keywords', $seoKeywords)
+@if ($hasFilter || $products->total() === 0)
+    @section('robots', 'noindex, follow')
+@endif
+@if ($products->onFirstPage())
+    @section('canonical', $canonicalUrl)
+@else
+    @section('canonical', $canonicalUrl)
+    @section('robots', 'noindex, follow')
+@endif
 
-@section('meta_description', 'Shop endless collection at ' . config('app.name') . ' - Browse thousands of products across fashion, electronics, beauty, home &amp; more. Best prices, fast shipping, easy returns.')
+@section('og_title', $seoTitle)
+@section('og_description', $seoDescription)
 
-@section('meta_keywords', 'shop online, ' . config('app.name') . ', buy fashion, electronics, beauty products, home decor, best deals, online store')
-
-@section('og_title', 'Shop - ' . config('app.name'))
-@section('og_description', 'Shop endless collection at ' . config('app.name') . ' - Browse thousands of products across fashion, electronics, beauty, home &amp; more. Best prices, fast shipping, easy returns.')
+@push('head-links')
+@if ($products->previousPageUrl())
+    <link rel="prev" href="{{ $products->previousPageUrl() }}">
+@endif
+@if ($products->nextPageUrl())
+    <link rel="next" href="{{ $products->nextPageUrl() }}">
+@endif
+@endpush
 
 @section('content')
 <!--start breadcrumb-->
@@ -148,7 +215,7 @@
                                           <a href="javascript:;" class="add-to-wishlist {{ $inWishlist ? 'active' : '' }}" data-product-id="{{ $product->id }}"><i class="bx {{ $inWishlist ? 'bxs-heart' : 'bx-heart' }}"></i></a>
                                       </div>
                                       <a href="{{ route('frontend.products.show', $slug) }}">
-                                        <img src="{{ $product->image }}" class="img-fluid" alt="{{ $product->name }}">
+                                        <img src="{{ $product->image }}" class="img-fluid" alt="{{ $product->name }}" loading="lazy">
                                       </a>
                                       @if ($product->discount_percent > 0)
                                       <span class="discount-badge">{{ $product->discount_percent }}% {{ __t('OFF') }}</span>
@@ -197,4 +264,44 @@
     </div>
 </section>
 <!--end shop area-->
+<script type="application/ld+json">
+{
+    "<?php echo '@'; ?>context": "https://schema.org",
+    "<?php echo '@'; ?>type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "<?php echo '@'; ?>type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ route('frontend.home') }}"
+        },
+        {
+            "<?php echo '@'; ?>type": "ListItem",
+            "position": 2,
+            "name": "{{ $currentCategory->name ?? ($currentSubCategory->name ?? ($currentBrand->name ?? 'Shop')) }}",
+            "item": "{{ url()->current() }}"
+        }
+    ]
+}
+</script>
+
+@if($products->count() > 0)
+<script type="application/ld+json">
+{
+    "<?php echo '@'; ?>context": "https://schema.org",
+    "<?php echo '@'; ?>type": "ItemList",
+    "itemListElement": [
+        @foreach($products as $i => $product)
+        {
+            "<?php echo '@'; ?>type": "ListItem",
+            "position": {{ $loop->iteration + (($products->currentPage() - 1) * $products->perPage()) }},
+            "url": "{{ route('frontend.products.show', $product->slug ?? $product->id) }}",
+            "name": "{{ $product->name }}"
+        }@if(!$loop->last),@endif
+        @endforeach
+    ]
+}
+</script>
+@endif
+
 @endsection

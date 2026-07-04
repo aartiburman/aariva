@@ -553,6 +553,8 @@ class ProductController extends Controller
                 'description'          => $request->description,
                 'description_ar'       => $request->description ? $translate($request->description, 'ar') : null,
                 'description_ne'       => $request->description ? $translate($request->description, 'ne') : null,
+                'meta_title'           => $request->meta_title,
+                'meta_description'     => $request->meta_description,
                 'vendor_id'            => Auth::id(),
                 'offer_id'             => isset($request->offers) ? json_encode($request->offers) : null,
                 'product_in'           => isset($request->product_in) ? json_encode($request->product_in) : null,
@@ -1500,6 +1502,8 @@ class ProductController extends Controller
             'description' => $request->description ?? null,
             'description_ar' => $request->description ? $trAr->translate($request->description) : null,
             'description_ne' => $request->description ? $trNe->translate($request->description) : null,
+            'meta_title'           => $request->meta_title,
+            'meta_description'     => $request->meta_description,
 
             'offer_id' =>    isset($request->offers) ? json_encode($request->offers) : null,
             'product_in' =>  isset($request->product_in) ? json_encode($request->product_in) : null,

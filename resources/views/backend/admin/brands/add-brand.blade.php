@@ -101,6 +101,14 @@
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
                                 </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Title</label>
+                                    <input type="text" name="meta_title" class="form-control" maxlength="255" placeholder="SEO title (optional)" value="{{ old('meta_title') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Description</label>
+                                    <textarea name="meta_description" class="form-control" rows="2" maxlength="500" placeholder="SEO description (optional)">{{ old('meta_description') }}</textarea>
+                                </div>
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Status</label>
                                     <select name="status" class="form-select @error('status') is-invalid @enderror">

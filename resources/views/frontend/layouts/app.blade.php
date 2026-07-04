@@ -2,6 +2,7 @@
     use App\Models\Category;
     use App\Models\Cart;
     use App\Models\Country;
+    use App\Models\Wishlist;
     $categories = Category::where('is_active', 1)
         ->with(['subCategories' => function ($q) {
             $q->where('is_active', 1)->with('childCategories');
@@ -22,6 +23,12 @@
     $cartTotalPrice = $headerCartItems->sum(function ($ci) {
         return ($ci->variant->price ?? $ci->price ?? 0) * $ci->qty;
     });
+    
+    $wishlistCount = Wishlist::when($cartUserId, function ($q) use ($cartUserId) {
+        $q->where('user_id', $cartUserId);
+    }, function ($q) use ($cartIp) {
+        $q->where('ip_address', $cartIp);
+    })->count();
 
     $headerCountries = Country::where('is_active', 1)->orderBy('name')->get();
 @endphp
@@ -39,6 +46,11 @@
     <meta name="keywords" content="@yield('meta_keywords', 'Aariva, one store endless collection, online shopping, fashion, electronics, beauty, ecommerce, buy online, best deals')">
     <meta name="robots" content="@yield('robots', 'index, follow')">
     <link rel="canonical" href="@yield('canonical', url()->current())" />
+    <link rel="alternate" href="{{ url()->current() }}?lang=en" hreflang="x-default" />
+    <link rel="alternate" href="{{ url()->current() }}?lang=en" hreflang="en" />
+    <link rel="alternate" href="{{ url()->current() }}?lang=ar" hreflang="ar" />
+    <link rel="alternate" href="{{ url()->current() }}?lang=hi" hreflang="hi" />
+    {!! $__env->yieldPushContent('head-links') !!}
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="@yield('og_type', 'website')">
@@ -56,6 +68,45 @@
     <meta name="twitter:description" content="@yield('og_description', 'Discover endless collection at ' . config('app.name') . ' - Your one-stop shop for fashion, electronics, beauty & more. Unbeatable deals, fast delivery.')">
     <meta name="twitter:image" content="@yield('og_image', asset('frontend/assets/images/favicon-32x32.png'))">
 
+    {!! $__env->yieldPushContent('pagination-links') !!}
+
+    <script type="application/ld+json">
+    {
+        "<?php echo '@'; ?>context": "https://schema.org",
+        "<?php echo '@'; ?>type": "Organization",
+        "name": "{{ config('app.name') }}",
+        "url": "{{ url('/') }}",
+        "logo": "{{ asset('frontend/assets/images/favicon-32x32.png') }}",
+        "contactPoint": {
+            "<?php echo '@'; ?>type": "ContactPoint",
+            "telephone": "+1-555-555-5555",
+            "contactType": "customer service"
+        },
+        "sameAs": [
+            "https://facebook.com/{{ config('app.name') }}",
+            "https://twitter.com/{{ config('app.name') }}",
+            "https://instagram.com/{{ config('app.name') }}"
+        ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "<?php echo '@'; ?>context": "https://schema.org",
+        "<?php echo '@'; ?>type": "WebSite",
+        "name": "{{ config('app.name') }}",
+        "url": "{{ url('/') }}",
+        "potentialAction": {
+            "<?php echo '@'; ?>type": "SearchAction",
+            "target": {
+                "<?php echo '@'; ?>type": "EntryPoint",
+                "urlTemplate": "{{ route('frontend.products.index') }}?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
     <link href="{{ asset('frontend/assets/plugins/OwlCarousel/css/owl.carousel.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('frontend/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css') }}" rel="stylesheet" />
     <link href="{{ asset('frontend/assets/css/pace.min.css') }}" rel="stylesheet" />
@@ -66,7 +117,25 @@
     <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link href="{{ asset('frontend/assets/css/icons.css') }}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @stack('styles')
+    {!! $__env->yieldPushContent('styles') !!}
+    <style>
+    .search-results-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 9999;
+        background: #fff; border: 1px solid #dee2e6; border-top: none;
+        max-height: 420px; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .search-result-item {
+        display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+        cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.15s;
+    }
+    .search-result-item:hover { background: #f8f9fa; }
+    .search-result-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+    .search-result-item .result-info { flex: 1; min-width: 0; }
+    .search-result-item .result-info .result-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .search-result-item .result-info .result-meta { font-size: 12px; color: #6c757d; }
+    .search-result-item .result-price { font-size: 14px; font-weight: 600; color: #212529; white-space: nowrap; }
+    .search-result-section { padding: 6px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6c757d; background: #f8f9fa; border-bottom: 1px solid #e9ecef; letter-spacing: 0.5px; }
+    </style>
 </head>
 
 <body>
@@ -157,20 +226,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-xl order-4 order-xl-0">
-                            <div class="input-group flex-nowrap pb-3 pb-xl-0">
-                                <input type="text" class="form-control w-100 border-dark border border-3" placeholder="Search for Products">
-                                <button class="btn btn-dark btn-ecomm border-3" type="button">{{ __t('Search') }}</button>
-                            </div>
+                        <div class="col-12 col-xl order-4 order-xl-0 position-relative">
+                            <form action="{{ route('frontend.products.index') }}" method="GET" class="input-group flex-nowrap pb-3 pb-xl-0" autocomplete="off">
+                                <input type="text" name="search" id="headerSearchInput" class="form-control w-100 border-dark border border-3" placeholder="Search for Products" value="{{ request('search') }}">
+                                <button class="btn btn-dark btn-ecomm border-3" type="submit" id="headerSearchBtn">{{ __t('Search') }}</button>
+                            </form>
+                            <div id="searchResults" class="search-results-dropdown d-none"></div>
                         </div>
                         <div class="col-auto d-none d-xl-flex">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="fs-1 text-content"><i class='bx bx-headphone'></i></div>
-                                <div class="">
-                                    <p class="mb-0 text-content">{{ __t('CALL US NOW') }}</p>
-                                    <h5 class="mb-0">+011 5827918</h5>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="fs-1 text-content"><i class='bx bx-headphone'></i></div>
+                                    <div class="">
+                                        <p class="mb-0 text-content">{{ __t('CALL US NOW') }}</p>
+                                        <h5 class="mb-0">{{ $contactPhone ?? '+011 5827918' }}</h5>
+                                    </div>
                                 </div>
-                            </div>
                         </div>
                         <div class="col-auto ms-auto">
                             <div class="top-cart-icons">
@@ -181,7 +251,12 @@
                                         @else
                                         <li class="nav-item"><a href="javascript:;" class="nav-link cart-link" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login"><i class='bx bx-user'></i></a></li>
                                         @endauth
-                                        <li class="nav-item"><a href="{{ route('frontend.wishlist.index') }}" class="nav-link cart-link"><i class='bx bx-heart'></i></a></li>
+                                        <li class="nav-item">
+    <a href="{{ route('frontend.wishlist.index') }}" class="nav-link cart-link position-relative">
+        <span class="alert-count wishlist-count">{{ $wishlistCount }}</span>
+        <i class='bx bx-heart'></i>
+    </a>
+</li>
 <li class="nav-item">
     <a href="{{ route('frontend.cart.index') }}" class="nav-link position-relative cart-link">
         <span class="alert-count">{{ $cartCount }}</span>
@@ -303,16 +378,15 @@
                                 <h5 class="mb-4 text-uppercase fw-bold">{{ __t('Contact Info') }}</h5>
                                 <div class="address mb-3">
                                     <h6 class="mb-0 text-uppercase fw-bold">{{ __t('Address') }}</h6>
-                                    <p class="mb-0">{{ __t('123 Street Name, City, Australia') }}</p>
+                                    <p class="mb-0">{{ $contactAddress ?? __('123 Street Name, City, Australia') }}</p>
                                 </div>
                                 <div class="phone mb-3">
                                     <h6 class="mb-0 text-uppercase fw-bold">{{ __t('Phone') }}</h6>
-                                    <p class="mb-0">{{ __t('Toll Free (123) 472-796') }}</p>
-                                    <p class="mb-0">{{ __t('Mobile : +91-9910XXXX') }}</p>
+                                    <p class="mb-0">{{ $contactPhone ?? __('Toll Free (123) 472-796') }}</p>
                                 </div>
                                 <div class="email mb-3">
                                     <h6 class="mb-0 text-uppercase fw-bold">{{ __t('Email') }}</h6>
-                                    <p class="mb-0">{{ __t('mail@example.com') }}</p>
+                                    <p class="mb-0">{{ $contactEmail ?? __('mail@example.com') }}</p>
                                 </div>
                                 <div class="working-days mb-3">
                                     <h6 class="mb-0 text-uppercase fw-bold">{{ __t('WORKING DAYS') }}</h6>
@@ -589,6 +663,117 @@
         });
     });
     </script>
-    @stack('scripts')
+    <script>
+    $(function() {
+        var searchUrl = '{{ route("frontend.products.search") }}';
+        var shopUrl = '{{ route("frontend.products.index") }}';
+        var debounceTimer;
+        var $input = $('#headerSearchInput');
+        var $results = $('#searchResults');
+
+        function getResultUrl(item) {
+            switch (item.type) {
+                case 'product': return '{{ url("product") }}/' + item.slug;
+                case 'category': return shopUrl + '?category=' + item.slug;
+                case 'subcategory': return shopUrl + '?subcategory=' + item.slug;
+                case 'child_category': return shopUrl + '?child_category=' + item.slug;
+                default: return '#';
+            }
+        }
+
+        function typeLabel(type) {
+            var labels = { product: 'Products', category: 'Categories', subcategory: 'Subcategories', child_category: 'Subcategories' };
+            return labels[type] || '';
+        }
+
+        function renderResults(data) {
+            $results.empty().removeClass('d-none');
+
+            if (!data || data.length === 0) {
+                $results.append('<div class="search-result-item" style="cursor:default;color:#6c757d;font-size:13px;justify-content:center">No results found</div>');
+                return;
+            }
+
+            var grouped = {};
+            $.each(data, function(i, item) {
+                if (!grouped[item.type]) grouped[item.type] = [];
+                grouped[item.type].push(item);
+            });
+
+            var order = ['product', 'category', 'subcategory', 'child_category'];
+            $.each(order, function(t, type) {
+                var items = grouped[type];
+                if (!items || !items.length) return;
+
+                $results.append('<div class="search-result-section">' + typeLabel(type) + '</div>');
+
+                $.each(items, function(i, item) {
+                    var imgHtml = item.image ? '<img src="' + item.image + '" alt="">' : '';
+                    var priceHtml = item.price ? '<span class="result-price">' + item.price + '</span>' : '';
+                    var url = getResultUrl(item);
+                    $results.append(
+                        '<a href="' + url + '" class="search-result-item">' +
+                            imgHtml +
+                            '<div class="result-info">' +
+                                '<div class="result-name">' + $('<span>').text(item.name).html() + '</div>' +
+                                (item.type !== 'product' ? '<div class="result-meta">' + typeLabel(item.type).slice(0,-1) + '</div>' : '') +
+                            '</div>' +
+                            priceHtml +
+                        '</a>'
+                    );
+                });
+            });
+        }
+
+        $input.on('input', function() {
+            var q = $(this).val().trim();
+            if (q.length < 2) {
+                $results.addClass('d-none');
+                return;
+            }
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
+                $.getJSON(searchUrl, { q: q }, function(res) {
+                    if (res.status && res.data) {
+                        renderResults(res.data);
+                    }
+                }).fail(function() {
+                    $results.addClass('d-none');
+                });
+            }, 2000);
+        });
+
+        // Form submit: redirect to product page if exact name match
+        $('form').has($input).on('submit', function(e) {
+            e.preventDefault();
+            var q = $input.val().trim();
+            if (q.length < 2) { $input.closest('form')[0].submit(); return; }
+
+            $.getJSON(searchUrl, { q: q }, function(res) {
+                if (res.status && res.data) {
+                    var products = res.data.filter(function(item) { return item.type === 'product'; });
+                    var exact = products.filter(function(item) { return item.name.toLowerCase() === q.toLowerCase(); });
+                    if (exact.length === 1) {
+                        window.location.href = getResultUrl(exact[0]);
+                        return;
+                    }
+                }
+                $input.closest('form')[0].submit();
+            }).fail(function() {
+                $input.closest('form')[0].submit();
+            });
+        });
+
+        // Hide dropdown on focus loss
+        $input.on('blur', function() {
+            setTimeout(function() { $results.addClass('d-none'); }, 200);
+        });
+        $input.on('focus', function() {
+            if ($results.children().length) $results.removeClass('d-none');
+        });
+    });
+    </script>
+    {!! $__env->yieldPushContent('scripts') !!}
 </body>
 </html>

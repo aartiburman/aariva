@@ -70,7 +70,7 @@
                                 <!-- Description -->
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">Description</label>
-                                    <textarea name="description" class="form-control" rows="4" placeholder="Type Description">{{ $subcategory->category->description }}</textarea>
+                                    <textarea name="description" class="form-control" rows="4" placeholder="Type Description">{{ $subcategory->description }}</textarea>
                                 </div>
                             </div>
 
@@ -104,7 +104,17 @@
               </div>
 
            
-              <div class="d-flex justify-content-end gap-2">
+                              <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Title</label>
+                                    <input type="text" name="meta_title" class="form-control" maxlength="255" placeholder="SEO title (optional)" value="{{ old('meta_title', $subcategory->meta_title ?? '') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Description</label>
+                                    <textarea name="meta_description" class="form-control" rows="2" maxlength="500" placeholder="SEO description (optional)">{{ old('meta_description', $subcategory->meta_description ?? '') }}</textarea>
+                                </div>
+                              </div>
+                              <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('subcategory.list') }}" class="btn border-secondary">Cancel</a>
                                 <button type="submit" class="btn btn-primary">Update SubCategory</button>
                             </div>

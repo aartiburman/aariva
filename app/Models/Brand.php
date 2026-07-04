@@ -15,6 +15,8 @@ class Brand extends Model
         'description',
         'description_ar',
         'description_ne',
+        'meta_title',
+        'meta_description',
         'status',
         'category_id',
         'subcategory_id',

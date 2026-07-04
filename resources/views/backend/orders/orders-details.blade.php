@@ -246,7 +246,6 @@
                             @php
                                 $representative_status = $order->items->first()->status ?? 0;
                             @endphp
-                            @endif
 
                             @if($representative_status >= 1)
                             <div class="track-order-item completed">

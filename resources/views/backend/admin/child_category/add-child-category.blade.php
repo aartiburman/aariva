@@ -78,6 +78,17 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Title</label>
+                                    <input type="text" name="meta_title" class="form-control" maxlength="255" placeholder="SEO title (optional)" value="{{ old('meta_title') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Meta Description</label>
+                                    <textarea name="meta_description" class="form-control" rows="2" maxlength="500" placeholder="SEO description (optional)">{{ old('meta_description') }}</textarea>
+                                </div>
+                            </div>
+
                             <!-- Status -->
                             <div class="mb-4 mt-2">
                                 <div class="form-check form-switch">

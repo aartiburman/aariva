@@ -22,6 +22,8 @@ class SubCategory extends Model
         'description',
         'description_ar',
         'description_ne',
+        'meta_title',
+        'meta_description',
         'is_active',
     ];
 

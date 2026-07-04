@@ -18,34 +18,7 @@ class LanguageController extends Controller
             return redirect()->back();
         }
 
-        $languageCountryMap = [
-            'en' => 'US',
-            'ar' => 'SA',
-            'zh' => 'CN',
-            'ja' => 'JP',
-            'hi' => 'IN',
-            'hing' => 'IN',
-            'de' => 'DE',
-            'fr' => 'FR',
-            'ko' => 'KR',
-            'pt' => 'BR',
-            'es' => 'ES',
-            'ru' => 'RU',
-            'it' => 'IT',
-            'tr' => 'TR',
-            'th' => 'TH',
-            'vi' => 'VN',
-        ];
-
-        $countryCode = $languageCountryMap[$lang];
-        $country = \App\Models\Country::where('shortname', $countryCode)->first();
-
-        session([
-            'locale' => $lang,
-            'country_code' => $countryCode,
-            'currency_code' => $country->currency_code ?? 'USD',
-            'currency_symbol' => $country->currency ?? '$',
-        ]);
+        session(['locale' => $lang]);
 
         App::setLocale($lang);
 

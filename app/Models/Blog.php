@@ -14,7 +14,9 @@ class Blog extends Model
         'image',
         'status',
         'author_id',
-        'views'
+        'views',
+        'meta_title',
+        'meta_description'
     ];
 
     public function author()

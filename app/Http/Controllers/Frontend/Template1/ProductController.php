@@ -59,6 +59,15 @@ class ProductController extends Controller
             $query->where('products.subcategory_id', $request->subcategory_id);
         }
 
+        if ($request->filled('child_category')) {
+            $child = ChildCategory::where('slug', $request->child_category)->first();
+            if ($child) {
+                $query->where('products.child_category_id', $child->id);
+            }
+        } elseif ($request->filled('child_category_id')) {
+            $query->where('products.child_category_id', $request->child_category_id);
+        }
+
         if ($request->filled('min_price') || $request->filled('max_price')) {
             $minPrice = $request->min_price ?? 0;
             $maxPrice = $request->max_price ?? 9999999;
@@ -148,17 +157,38 @@ class ProductController extends Controller
             ->withCount(['products' => function($q) {
                 $q->where('status', 1);
             }])
-            ->select(['id', 'name', 'slug'])
+            ->select(['id', 'name', 'slug', 'meta_title', 'meta_description'])
             ->get();
 
         $brands = Brand::where('status', 1)
             ->withCount(['products' => function($q) {
                 $q->where('status', 1);
             }])
-            ->select(['id', 'name', 'slug'])
+            ->select(['id', 'name', 'slug', 'meta_title', 'meta_description'])
             ->get();
 
-        return view('frontend.products.index', compact('products', 'categories', 'brands', 'cartProductIds', 'wishlistProductIds'));
+        $currentCategory = null;
+        if ($request->filled('category')) {
+            $currentCategory = Category::where('slug', $request->category)
+                ->select(['id', 'name', 'slug', 'meta_title', 'meta_description', 'description'])->first();
+        }
+        $currentSubCategory = null;
+        if ($request->filled('subcategory')) {
+            $currentSubCategory = SubCategory::where('slug', $request->subcategory)
+                ->select(['id', 'name', 'slug', 'meta_title', 'meta_description', 'description'])->first();
+        }
+        $currentChildCategory = null;
+        if ($request->filled('child_category')) {
+            $currentChildCategory = ChildCategory::where('slug', $request->child_category)
+                ->select(['id', 'name', 'slug', 'meta_title', 'meta_description', 'description'])->first();
+        }
+        $currentBrand = null;
+        if ($request->filled('brand')) {
+            $currentBrand = Brand::where('slug', $request->brand)
+                ->select(['id', 'name', 'slug', 'meta_title', 'meta_description', 'description'])->first();
+        }
+
+        return view('frontend.products.index', compact('products', 'categories', 'brands', 'cartProductIds', 'wishlistProductIds', 'currentCategory', 'currentSubCategory', 'currentChildCategory', 'currentBrand'));
     }
 
     public function show($slug)
@@ -293,6 +323,13 @@ class ProductController extends Controller
     {
         $searchTerm = trim($request->get('q', ''));
 
+        $results = [];
+
+        if (strlen($searchTerm) < 2) {
+            return response()->json(['status' => true, 'data' => []]);
+        }
+
+        // Search products
         $products = Product::where('status', 1)
             ->whereHas('vendor', function ($q) {
                 $q->where('status', 1);
@@ -303,31 +340,101 @@ class ProductController extends Controller
                     ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
             })
             ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value'])
-            ->limit(10)
-            ->get()
-            ->map(function ($product) {
-                $image = null;
-                $price = null;
-                if ($product->firstVariant) {
-                    $image = ImageHelper::getProductImage($product->firstVariant->image);
-                    $price = PriceHelper::applyDiscount(
-                        $product->firstVariant->price,
-                        $product->firstVariant->discount_type,
-                        $product->firstVariant->discount_value
-                    );
+            ->limit(5)
+            ->get();
+
+        foreach ($products as $product) {
+            $image = null;
+            $price = null;
+            if ($product->firstVariant) {
+                $rawImg = $product->firstVariant->image;
+                if ($rawImg) {
+                    $decoded = json_decode($rawImg, true);
+                    $firstImg = is_array($decoded) ? ($decoded[0] ?? null) : $rawImg;
+                    $image = $firstImg ? ImageHelper::getProductImage($firstImg) : null;
                 }
-                return [
-                    'id'    => $product->id,
-                    'name'  => $product->name,
-                    'slug'  => $product->slug,
-                    'image' => $image,
-                    'price' => $price,
-                ];
-            });
+                $price = PriceHelper::formatPrice(PriceHelper::applyDiscount(
+                    $product->firstVariant->price,
+                    $product->firstVariant->discount_type,
+                    $product->firstVariant->discount_value
+                ));
+            }
+            $results[] = [
+                'type'  => 'product',
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'slug'  => $product->slug,
+                'image' => $image,
+                'price' => $price,
+            ];
+        }
+
+        // Search categories
+        $categories = \App\Models\Category::where('is_active', 1)
+            ->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+            })
+            ->limit(3)
+            ->get();
+
+        foreach ($categories as $cat) {
+            $results[] = [
+                'type'  => 'category',
+                'id'    => $cat->id,
+                'name'  => $cat->name,
+                'slug'  => $cat->slug,
+                'image' => null,
+                'price' => null,
+            ];
+        }
+
+        // Search subcategories
+        $subcategories = \App\Models\SubCategory::where('is_active', 1)
+            ->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+            })
+            ->limit(3)
+            ->get();
+
+        foreach ($subcategories as $sub) {
+            $results[] = [
+                'type'  => 'subcategory',
+                'id'    => $sub->id,
+                'name'  => $sub->name,
+                'slug'  => $sub->slug,
+                'image' => null,
+                'price' => null,
+            ];
+        }
+
+        // Search child categories
+        $childCategories = \App\Models\ChildCategory::where('is_active', 1)
+            ->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+            })
+            ->limit(3)
+            ->get();
+
+        foreach ($childCategories as $child) {
+            $results[] = [
+                'type'  => 'child_category',
+                'id'    => $child->id,
+                'name'  => $child->name,
+                'slug'  => $child->slug,
+                'image' => null,
+                'price' => null,
+            ];
+        }
 
         return response()->json([
             'status' => true,
-            'data'   => $products,
+            'data'   => $results,
         ]);
     }
 }

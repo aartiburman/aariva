@@ -44,6 +44,8 @@ class BlogController extends Controller
             'image' => $imageName,
             'status' => $request->has('status') ? 1 : 0,
             'author_id' => Auth::id(),
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
         ]);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog created successfully');
@@ -79,6 +81,8 @@ class BlogController extends Controller
             'description' => $request->description,
             'content' => $request->content,
             'status' => $request->has('status') ? 1 : 0,
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
         ]);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog updated successfully');

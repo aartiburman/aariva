@@ -244,6 +244,8 @@ class SubcategoryController extends Controller
             'description' => $request->description,
             'description_ar' => $request->description ? $trAr->translate($request->description) : null,
             'description_ne' => $request->description ? $trNe->translate($request->description) : null,
+            'meta_title'           => $request->meta_title,
+            'meta_description'     => $request->meta_description,
 
             'is_active'   => $request->has('is_active') ? 1 : 0,
             'image'       => $fileName,
@@ -315,6 +317,8 @@ class SubcategoryController extends Controller
             'description'    => $request->description,
             'description_ar' => $request->description ? $trAr->translate($request->description) : null,
             'description_ne' => $request->description ? $trNe->translate($request->description) : null,
+            'meta_title'     => $request->meta_title,
+            'meta_description' => $request->meta_description,
             'image'          => $fileName,
         ]);
 

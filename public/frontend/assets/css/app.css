@@ -2071,8 +2071,10 @@ body.bg-theme15 {
 }
 
 /* Add padding to body to prevent content from going under fixed header */
-body {
-    padding-top: 200px;
+@media (min-width: 1200px) {
+    body {
+        padding-top: 200px;
+    }
 }
 
 /* Mega Menu Styles */
@@ -2255,6 +2257,10 @@ body {
     
     .fixed-header {
         position: relative;
+    }
+
+    .page-wrapper {
+        margin-top: 0;
     }
 }
 
