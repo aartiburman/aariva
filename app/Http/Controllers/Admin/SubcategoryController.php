@@ -89,25 +89,25 @@ class SubcategoryController extends Controller
 
     public function subcategory_list(Request $request)
     {
-        $base_query = SubCategory::select('sub_categories.*', 'categories.name as category_name')
-            ->leftJoin('categories', 'categories.id', '=', 'sub_categories.category_id')
-            ->orderBy('sub_categories.updated_at', 'DESC');
+        $base_query = SubCategory::select('subcategories.*', 'categories.name as category_name')
+            ->leftJoin('categories', 'categories.id', '=', 'subcategories.category_id')
+            ->orderBy('subcategories.updated_at', 'DESC');
 
         if ($request->filled('search')) {
-            $base_query->where('sub_categories.name', 'like', '%' . trim($request->search) . '%');
+            $base_query->where('subcategories.name', 'like', '%' . trim($request->search) . '%');
         }
 
         if ($request->filled('is_active')) {
-            $base_query->where('sub_categories.is_active', $request->is_active);
+            $base_query->where('subcategories.is_active', $request->is_active);
         }
 
         if ($request->filled('date_range')) {
             $dates = explode(' to ', $request->date_range);
             if (count($dates) == 2) {
-                $base_query->whereDate('sub_categories.created_at', '>=', $dates[0])
-                           ->whereDate('sub_categories.created_at', '<=', $dates[1]);
+                $base_query->whereDate('subcategories.created_at', '>=', $dates[0])
+                           ->whereDate('subcategories.created_at', '<=', $dates[1]);
             } else {
-                $base_query->whereDate('sub_categories.created_at', $dates[0]);
+                $base_query->whereDate('subcategories.created_at', $dates[0]);
             }
         }
 
@@ -126,8 +126,8 @@ class SubcategoryController extends Controller
         $active_subcategories = SubCategory::where('is_active', 1)->count();
         $total_products = \App\Models\Product::whereNotNull('subcategory_id')->count();
 
-        $featured_subcategories = SubCategory::select('sub_categories.*', 'categories.name as category_name')
-            ->leftJoin('categories', 'categories.id', '=', 'sub_categories.category_id')
+        $featured_subcategories = SubCategory::select('subcategories.*', 'categories.name as category_name')
+            ->leftJoin('categories', 'categories.id', '=', 'subcategories.category_id')
             ->get()
             ->each(function($sub) {
                 $sub->products_count = \App\Models\Product::where('subcategory_id', $sub->id)->count();
@@ -150,25 +150,25 @@ class SubcategoryController extends Controller
 
     public function export_subcategories(Request $request)
     {
-        $query = SubCategory::select('sub_categories.*', 'categories.name as category_name')
-            ->leftJoin('categories', 'categories.id', '=', 'sub_categories.category_id')
-            ->orderBy('sub_categories.id', 'DESC');
+        $query = SubCategory::select('subcategories.*', 'categories.name as category_name')
+            ->leftJoin('categories', 'categories.id', '=', 'subcategories.category_id')
+            ->orderBy('subcategories.id', 'DESC');
 
         if ($request->filled('search')) {
-            $query->where('sub_categories.name', 'like', '%' . trim($request->search) . '%');
+            $query->where('subcategories.name', 'like', '%' . trim($request->search) . '%');
         }
 
         if ($request->filled('is_active')) {
-            $query->where('sub_categories.is_active', $request->is_active);
+            $query->where('subcategories.is_active', $request->is_active);
         }
 
         if ($request->filled('date_range')) {
             $dates = explode(' to ', $request->date_range);
             if (count($dates) == 2) {
-                $query->whereDate('sub_categories.created_at', '>=', $dates[0])
-                      ->whereDate('sub_categories.created_at', '<=', $dates[1]);
+                $query->whereDate('subcategories.created_at', '>=', $dates[0])
+                      ->whereDate('subcategories.created_at', '<=', $dates[1]);
             } else {
-                $query->whereDate('sub_categories.created_at', $dates[0]);
+                $query->whereDate('subcategories.created_at', $dates[0]);
             }
         }
 
@@ -210,7 +210,7 @@ class SubcategoryController extends Controller
     {
         $request->validate([
             'name'        => 'required|min:3',
-            'slug'        => 'required|unique:sub_categories,slug',
+            'slug'        => 'required|unique:subcategories,slug',
             'category_id' => 'required|exists:categories,id',
         ]);
 
@@ -260,7 +260,7 @@ class SubcategoryController extends Controller
     {    
         
         $categories = Category::select('*')->where('is_active', 1)->get();
-        $subcategory = SubCategory::select('sub_categories.*')->where('slug', $slug)->first();
+        $subcategory = SubCategory::select('subcategories.*')->where('slug', $slug)->first();
              $subcategory->image =ImageHelper::getSubCategoryImage($subcategory->image);
         return view('backend/admin/subcategory/edit-subcategory', compact('subcategory','categories'));
     }

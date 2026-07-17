@@ -60,7 +60,7 @@ class ChildCategoryController extends Controller
             'name'            => 'required|min:2',
             'slug'            => 'nullable|unique:child_categories,slug',
             'category_id'     => 'required|exists:categories,id',
-            'subcategory_id'  => 'required|exists:sub_categories,id',
+            'subcategory_id'  => 'required|exists:subcategories,id',
             'description'     => 'nullable',
             'meta_title'      => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
@@ -106,7 +106,7 @@ class ChildCategoryController extends Controller
         $request->validate([
             'name' => 'required|min:2',
             'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:sub_categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
         ]);
 
         try {
@@ -136,9 +136,9 @@ class ChildCategoryController extends Controller
 
     public function child_category_list(Request $request)
     {
-        $base_query = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'categories.image as category_image', 'sub_categories.name as sub_categories_name')
+        $base_query = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'categories.image as category_image', 'subcategories.name as sub_categories_name')
             ->leftJoin('categories', 'categories.id', 'child_categories.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'child_categories.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'child_categories.subcategory_id')
             ->orderBy('child_categories.updated_at', 'desc');
 
         if ($request->filled('search')) {
@@ -178,9 +178,9 @@ class ChildCategoryController extends Controller
         $active_child_categories = ChildCategory::where('is_active', 1)->count();
         $total_products = \App\Models\Product::whereNotNull('child_category_id')->count();
 
-        $featured_child_categories = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'categories.image as category_image', 'sub_categories.name as sub_categories_name')
+        $featured_child_categories = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'categories.image as category_image', 'subcategories.name as sub_categories_name')
             ->leftJoin('categories', 'categories.id', 'child_categories.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'child_categories.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'child_categories.subcategory_id')
             ->get()
             ->each(function($child) {
                 $child->products_count = \App\Models\Product::where('child_category_id', $child->id)->count();
@@ -200,9 +200,9 @@ class ChildCategoryController extends Controller
 
     public function export_child_categories(Request $request)
     {
-        $query = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'sub_categories.name as sub_categories_name')
+        $query = ChildCategory::select('child_categories.*', 'categories.name as category_name', 'subcategories.name as sub_categories_name')
             ->leftJoin('categories', 'categories.id', 'child_categories.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'child_categories.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'child_categories.subcategory_id')
             ->orderBy('child_categories.id', 'desc');
 
         if ($request->filled('search')) {
@@ -273,7 +273,7 @@ class ChildCategoryController extends Controller
         $request->validate([
             'child_category_id' => 'required|exists:child_categories,id',
             'category_id'       => 'required|exists:categories,id',
-            'subcategory_id'    => 'required|exists:sub_categories,id',
+            'subcategory_id'    => 'required|exists:subcategories,id',
             'name'              => 'required|string|min:2',
             'slug'              => 'nullable|unique:child_categories,slug,' . $request->child_category_id,
             'is_active'         => 'required|boolean',

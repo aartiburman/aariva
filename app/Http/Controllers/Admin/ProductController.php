@@ -65,7 +65,7 @@ class ProductController extends Controller
         $query = Product::with(['variants'])
             ->leftJoin('users as vendor', 'vendor.id', '=', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', '=', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', '=', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', '=', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
             ->select(
@@ -73,7 +73,7 @@ class ProductController extends Controller
                 'vendor.name as vendor_name',
                 'vendor.store_name',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
@@ -98,7 +98,7 @@ class ProductController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('products.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('categories.name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('sub_categories.name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('subcategories.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('child_categories.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('vendor.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('vendor.store_name', 'LIKE', "%{$searchTerm}%")
@@ -264,13 +264,13 @@ class ProductController extends Controller
                 'products.*',
                 'vendor.name as vendor_name',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->orderBy('products.updated_at', 'DESC')
@@ -329,13 +329,13 @@ class ProductController extends Controller
                 'products.*',
                 'vendor.name as vendor_name',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->orderBy('products.updated_at', 'DESC')
@@ -393,13 +393,13 @@ class ProductController extends Controller
                 'products.*',
                 'vendor.name as vendor_name',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->orderBy('products.updated_at', 'DESC')
@@ -627,7 +627,7 @@ class ProductController extends Controller
         'slug'              => 'nullable|string|max:255|unique:products,slug',
 
         'category_id'       => 'required|exists:categories,id',
-        'subcategory_id'    => 'nullable|exists:sub_categories,id',
+        'subcategory_id'    => 'nullable|exists:subcategories,id',
         'child_category_id' => 'nullable|exists:child_categories,id',
         'brand_id'          => 'nullable|exists:brands,id',
 
@@ -1622,13 +1622,13 @@ class ProductController extends Controller
             'products.*',
             'vendor.name as vendor_name',
             'categories.name as category_name',
-            'sub_categories.name as subcategory_name',
+            'subcategories.name as subcategory_name',
             'child_categories.name as child_category_name',
             'brands.name as brand_name'
         )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->whereIn('products.vendor_id', $showroles)
@@ -2014,12 +2014,12 @@ class ProductController extends Controller
                     'products.child_category_id',
                     'products.brand_id',
                     'categories.name as category_name',
-                    'sub_categories.name as subcategory_name',
+                    'subcategories.name as subcategory_name',
                     'child_categories.name as child_category_name',
                     'brands.name as brand_name'
                 )
                 ->leftJoin('categories', 'categories.id', 'products.category_id')
-                ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+                ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
                 ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
                 ->leftJoin('brands', 'brands.id', 'products.brand_id')
                 ->where('products.status', 1); // Only show active/approved products
@@ -2093,12 +2093,12 @@ class ProductController extends Controller
                 'products.short_description',
                 'products.description',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
                 ->leftJoin('categories', 'categories.id', 'products.category_id')
-                ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+                ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
                 ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
                 ->leftJoin('brands', 'brands.id', 'products.brand_id')
                 ->where('products.id', $id)
@@ -2178,12 +2178,12 @@ class ProductController extends Controller
                 'products.short_description',
                 'products.description',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
                 ->leftJoin('categories', 'categories.id', 'products.category_id')
-                ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+                ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
                 ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
                 ->leftJoin('brands', 'brands.id', 'products.brand_id')
                 ->where('products.id', $id)
@@ -2314,13 +2314,13 @@ class ProductController extends Controller
             'products.*',
             'vendor.name as vendor_name',
             'categories.name as category_name',
-            'sub_categories.name as subcategory_name',
+            'subcategories.name as subcategory_name',
             'child_categories.name as child_category_name',
             'brands.name as brand_name'
         )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->where('products.is_upload', 1)

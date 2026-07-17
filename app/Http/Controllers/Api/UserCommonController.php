@@ -50,13 +50,13 @@ class UserCommonController extends Controller
 
     public function get_subcategories(Request $request)
     {
-        $subcategories = SubCategory::where('sub_categories.is_active', 1)
-            ->leftJoin('categories', 'sub_categories.category_id', '=', 'categories.id')
+        $subcategories = SubCategory::where('subcategories.is_active', 1)
+            ->leftJoin('categories', 'subcategories.category_id', '=', 'categories.id')
             ->select(
-                'sub_categories.*',
+                'subcategories.*',
                 'categories.name as category_name'
             )
-            ->orderBy('sub_categories.id', 'DESC')
+            ->orderBy('subcategories.id', 'DESC')
             ->get();
 
         foreach ($subcategories as $subcategory) {

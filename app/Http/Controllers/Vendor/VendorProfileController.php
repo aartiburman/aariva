@@ -45,13 +45,13 @@ class VendorProfileController extends Controller
                 'products.*',
                 'vendor.name as vendor_name',
                 'categories.name as category_name',
-                'sub_categories.name as subcategory_name',
+                'subcategories.name as subcategory_name',
                 'child_categories.name as child_category_name',
                 'brands.name as brand_name'
             )
             ->leftJoin('users as vendor', 'vendor.id', 'products.vendor_id')
             ->leftJoin('categories', 'categories.id', 'products.category_id')
-            ->leftJoin('sub_categories', 'sub_categories.id', 'products.subcategory_id')
+            ->leftJoin('subcategories', 'subcategories.id', 'products.subcategory_id')
             ->leftJoin('child_categories', 'child_categories.id', 'products.child_category_id')
             ->leftJoin('brands', 'brands.id', 'products.brand_id')
             ->where('products.vendor_id', $id)

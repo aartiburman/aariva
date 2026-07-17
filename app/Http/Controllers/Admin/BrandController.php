@@ -318,7 +318,7 @@ public function createBrand(Request $request)
     $request->validate([
         'name' => 'required|string|max:255',
         'category_id' => 'nullable|exists:categories,id',
-        'subcategory_id' => 'nullable|exists:sub_categories,id',
+        'subcategory_id' => 'nullable|exists:subcategories,id',
         'child_category_id' => 'nullable|exists:child_categories,id',
     ]);
 
