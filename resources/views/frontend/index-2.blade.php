@@ -863,7 +863,7 @@
 									$imgCount = count($promoImages);
 									$promoTitle = $promo->title ?? __('Sale');
 									$promoDesc = $promo->slug ?? __('Explore the collection');
-									$promoDiscount = $promo->title_ar ?? '-10%';
+									$promoDiscount = $promo->title ?? '-10%';
 								@endphp
 								@if($imgCount >= 5)
 								<div class="col-12 col-md-6 col-lg-3 d-flex">

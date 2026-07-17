@@ -81,6 +81,7 @@ Route::post('update-notification-status', [UserController::class, 'updateNotific
 Route::get('get-notification-status', [UserController::class, 'getNotificationStatus']);
 
 Route::post('place-order', [UserCheckout::class, 'place_order']);
+Route::post('sync-ekart-status', [UserCheckout::class, 'sync_ekart_status']);
 Route::post('checkout', [UserCheckout::class, 'checkout']);
 Route::post('checkout-amount', [UserCheckout::class, 'checkout_amount']);
 Route::post('buy-now', [UserCheckout::class, 'buy_now']);

@@ -189,14 +189,8 @@ public function add_to_wishlist(Request $request)
         ->select(
             'wishlists.*',
             'products.name as product_name',
-            'products.name_ar as product_name_ar',
-            'products.name_ne as product_name_ne',
             'products.slug as product_slug',
-            'products.slug_ar as product_slug_ar',
-            'products.slug_ne as product_slug_ne',
             'products.short_description',
-            'products.short_description_ar',
-            'products.short_description_ne',
             'countries.currency',
             'countries.currency_code',
             'product_variants.discount_type',
@@ -237,19 +231,7 @@ public function add_to_wishlist(Request $request)
             ? round($reviews->avg(), 1)
             : 0;
 
-        // Language fields
-        $item->product_name  = $item->{"product_name_$lang"} ?? $item->product_name;
-        $item->product_slug  = $item->{"product_slug_$lang"} ?? $item->product_slug;
-        $item->short_description = $item->{"short_description_$lang"} ?? $item->short_description;
 
-        unset(
-            $item->product_name_ar,
-            $item->product_name_ne,
-            $item->product_slug_ar,
-            $item->product_slug_ne,
-            $item->short_description_ar,
-            $item->short_description_ne
-        );
 
         return $item;
     });

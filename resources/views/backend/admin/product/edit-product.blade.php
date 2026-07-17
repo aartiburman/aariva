@@ -84,7 +84,7 @@
                         <div class="input-group">
                           <input type="text" name="name" class="form-control product-name" placeholder="Enter Product Name" value="{{ old('name', $product_data->name) }}" maxlength="255" required>
                           <button type="button" class="btn btn-outline-secondary" id="generateTitleBtn" title="Auto-generate title from Brand + Category + Main Feature + Size">
-                            <iconify-icon icon="solar:magic-stick-3-linear" class="fs-16"></iconify-icon>
+                            <iconify-icon icon="solar:magic-stick-3-linear" class="fs-16"></iconify-icon> Generate
                           </button>
                         </div>
                         <small class="text-muted">Format: Brand + Product Type + Main Feature + Size/Variant</small>

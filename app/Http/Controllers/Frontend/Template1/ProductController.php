@@ -344,9 +344,7 @@ class ProductController extends Controller
                 $q->where('status', 1);
             })
             ->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+                $q->where('name', 'LIKE', "%{$searchTerm}%");
             })
             ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value'])
             ->limit(5)
@@ -381,9 +379,7 @@ class ProductController extends Controller
         // Search categories
         $categories = \App\Models\Category::where('is_active', 1)
             ->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+                $q->where('name', 'LIKE', "%{$searchTerm}%");
             })
             ->limit(3)
             ->get();
@@ -402,9 +398,7 @@ class ProductController extends Controller
         // Search subcategories
         $subcategories = \App\Models\SubCategory::where('is_active', 1)
             ->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+                $q->where('name', 'LIKE', "%{$searchTerm}%");
             })
             ->limit(3)
             ->get();
@@ -423,9 +417,7 @@ class ProductController extends Controller
         // Search child categories
         $childCategories = \App\Models\ChildCategory::where('is_active', 1)
             ->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ar', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('name_ne', 'LIKE', "%{$searchTerm}%");
+                $q->where('name', 'LIKE', "%{$searchTerm}%");
             })
             ->limit(3)
             ->get();

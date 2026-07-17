@@ -17,7 +17,6 @@ use App\Models\ProductSizeCategory;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\ImageHelper;
 use App\Helpers\SlugHelper;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -74,14 +73,8 @@ class ProductController extends Controller
                 'vendor.name as vendor_name',
                 'vendor.store_name',
                 'categories.name as category_name',
-                'categories.name_ar as category_name_ar',
-                'categories.name_ne as category_name_ne',
                 'sub_categories.name as subcategory_name',
-                'sub_categories.name_ar as subcategory_name_ar',
-                'sub_categories.name_ne as subcategory_name_ne',
                 'child_categories.name as child_category_name',
-                'child_categories.name_ar as child_category_name_ar',
-                'child_categories.name_ne as child_category_name_ne',
                 'brands.name as brand_name'
             )
             // MANDATORY ROLE FILTER:
@@ -104,8 +97,6 @@ class ProductController extends Controller
             $searchTerm = trim($request->search);
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('products.name', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('products.name_ar', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('products.name_ne', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('categories.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('sub_categories.name', 'LIKE', "%{$searchTerm}%")
                     ->orWhere('child_categories.name', 'LIKE', "%{$searchTerm}%")
@@ -521,38 +512,18 @@ class ProductController extends Controller
 
     
         try {
-            $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('hi');
-
             /* ================= MAIN PRODUCT ================= */
             $slug = $request->slug ? SlugHelper::uniqueProductSlug($request->slug) : SlugHelper::uniqueProductSlug($request->name);
 
-            // Translation Helper (closure to prevent crash if API is down)
-            $translate = function ($text, $lang) use ($trAr, $trNe) {
-                try {
-                    return ($lang == 'ar') ? $trAr->translate($text) : $trNe->translate($text);
-                } catch (\Exception $e) {
-                    return $text; // Fallback to English if API fails
-                }
-            };
-
             $product = Product::create([
                 'name'                 => $request->name,
-                'name_ar'              => $translate($request->name, 'ar'),
-                'name_ne'              => $translate($request->name, 'ne'),
                 'slug'                 => $slug,
-                'slug_ar'              => Str::slug($slug),
-                'slug_ne'              => Str::slug($slug),
                 'category_id'          => $request->category_id,
                 'subcategory_id'       => $request->subcategory_id,
                 'child_category_id'    => $request->child_category_id,
                 'brand_id'             => $request->brand_id,
                 'short_description'    => $request->short_description,
-                'short_description_ar' => $request->short_description ? $translate($request->short_description, 'ar') : null,
-                'short_description_ne' => $request->short_description ? $translate($request->short_description, 'ne') : null,
                 'description'          => $request->description,
-                'description_ar'       => $request->description ? $translate($request->description, 'ar') : null,
-                'description_ne'       => $request->description ? $translate($request->description, 'ne') : null,
                 'meta_title'           => $request->meta_title,
                 'meta_description'     => $request->meta_description,
                 'vendor_id'            => Auth::id(),
@@ -587,7 +558,7 @@ class ProductController extends Controller
                 $variantImages = [];
                 if ($request->hasFile("product_image.$index")) {
                     foreach ($request->file("product_image.$index") as $file) {
-                        $variantImages[] = ImageHelper::compressImage($file, 'uploads/products');
+                        $variantImages[] = ImageHelper::compressImage($file, 'uploads/products', 60, 1200, true);
                     }
                 }
 
@@ -595,8 +566,6 @@ class ProductController extends Controller
                     'product_id'       => $product->id,
                     'sku'              => $request->sku[$index],
                     'color'            => $request->color[$index],
-                    'color_ar'         => $translate($request->color[$index], 'ar'),
-                    'color_ne'         => $translate($request->color[$index], 'ne'),
                     'product_variant'  => $request->product_variant[$index] ?? null,
                     'material'         => $request->material[$index] ?? null,
                     'package_weight'   => $request->package_weight[$index] ?? null,
@@ -606,17 +575,11 @@ class ProductController extends Controller
                     'package_type'     => $request->package_type[$index] ?? null,
                     'size_cat_id'      => $request->size_category_id[$index] ?? null,
                     'size'             => json_encode($sizes),
-                    'size_ar'          => json_encode($sizes),
-                    'size_ne'          => json_encode($sizes),
                     'stock'            => $request->stock[$index],
                     'price'            => $price,
-                    'price_ar'         => $translate($price, 'ar'),
-                    'price_ne'         => $translate($price, 'ne'),
                     'discount_type'    => $discountType,
                     'discount_value'   => $discountValue,
                     'final_price'      => $finalPrice,
-                    'final_price_ar'   => $translate($finalPrice, 'ar'),
-                    'final_price_ne'   => $translate($finalPrice, 'ne'),
                     'image'            => json_encode($variantImages),
                     'vendor_id'        => $product->vendor_id,
                 ]);
@@ -745,18 +708,11 @@ class ProductController extends Controller
         ? SlugHelper::uniqueProductSlug($request->slug)
         : SlugHelper::uniqueProductSlug($request->name);
 
-    $trAr = new GoogleTranslate('ar');
-    $trNe = new GoogleTranslate('hi');
-
     /* ================= CREATE PRODUCT ================= */
     $product = Product::create([
         'name'              => $request->name,
-        'name_ar'           => $trAr->translate($request->name),
-        'name_ne'           => $trNe->translate($request->name),
 
         'slug'              => $slug,
-        'slug_ar'           => Str::slug($slug),
-        'slug_ne'           => Str::slug($slug),
 
         'category_id'       => $request->category_id,
         'subcategory_id'    => $request->subcategory_id,
@@ -764,12 +720,8 @@ class ProductController extends Controller
         'brand_id'          => $request->brand_id,
 
         'short_description' => $request->short_description,
-        'short_description_ar' => $request->short_description ? $trAr->translate($request->short_description) : null,
-        'short_description_ne' => $request->short_description ? $trNe->translate($request->short_description) : null,
 
         'description'       => $request->description,
-        'description_ar'    => $request->description ? $trAr->translate($request->description) : null,
-        'description_ne'    => $request->description ? $trNe->translate($request->description) : null,
 
         'vendor_id'         => Auth::id(),
         'coupon_id'         => $request->coupons ? json_encode($request->coupons) : null,
@@ -820,7 +772,7 @@ class ProductController extends Controller
 
         if ($request->hasFile("product_image.$index")) {
             foreach ($request->file("product_image.$index") as $file) {
-                $filename = ImageHelper::compressImage($file, 'uploads/products');
+                $filename = ImageHelper::compressImage($file, 'uploads/products', 60, 1200, true);
                 $variantImages[] = $filename;
             }
         } elseif (!empty($request->variant_id[$index])) {
@@ -847,27 +799,18 @@ class ProductController extends Controller
             'product_id'      => $product->id,
             'sku'             => $request->sku[$index],
             'color'           => $request->color[$index],
-            'color_ar'        => $trAr->translate($request->color[$index]),
-            'color_ne'        => $trNe->translate($request->color[$index]),
-
             'product_variant' => $request->product_variant[$index] ?? null,
             'size_cat_id'     => $request->size_cat_id[$index] ?? null,
 
             'size'            => json_encode($sizes),
-            'size_ar'         => json_encode($sizes),
-            'size_ne'         => json_encode($sizes),
 
             'stock'           => (int) $request->stock[$index],
             'price'           => $price,
-            'price_ar'        => $trAr->translate($price),
-            'price_ne'        => $trNe->translate($price),
 
             'discount_type'   => $discountType,
             'discount_value'  => $discountValue,
 
             'final_price'     => $finalPrice,
-            'final_price_ar'  => $trAr->translate($finalPrice),
-            'final_price_ne'  => $trNe->translate($finalPrice),
 
             'vendor_id'       => $product->vendor_id,
             'image'           => json_encode($variantImages),
@@ -1090,9 +1033,6 @@ class ProductController extends Controller
             'price.*'          => 'required|integer',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         foreach ($request->sku as $index => $sku) {
             if (empty($sku)) continue;
 
@@ -1122,20 +1062,7 @@ class ProductController extends Controller
             $variant->package_height = $request->package_height[$index] ?? null;
             $variant->package_type   = $request->package_type[$index] ?? null;
 
-            /* ================= TRANSLATIONS ================= */
-            try {
-                $variant->material_ar = $material ? $trAr->translate($material) : null;
-                $variant->material_ne = $material ? $trNe->translate($material) : null;
-                $variant->color_ar    = $color ? $trAr->translate($color) : null;
-                $variant->color_ne    = $color ? $trNe->translate($color) : null;
-            } catch (\Exception $e) {
-                $variant->material_ar = $material;
-                $variant->material_ne = $material;
-                $variant->color_ar    = $color;
-                $variant->color_ne    = $color;
-                $variant->price_ar    = $price ? $trAr->translate($price) : null;
-                $variant->price_ne    = $price ? $trNe->translate($price) : null;
-            }
+
 
             /* ================= PRICE & DISCOUNT ================= */
             $price         = (float) ($request->price[$index] ?? 0);
@@ -1191,7 +1118,7 @@ class ProductController extends Controller
             // 2. Add newly uploaded images
             if ($request->hasFile("product_image.$index")) {
                 foreach ($request->file("product_image.$index") as $file) {
-                    $filename = ImageHelper::compressImage($file, 'uploads/products');
+                    $filename = ImageHelper::compressImage($file, 'uploads/products', 60, 1200, true);
                     $images[] = $filename;
                 }
             }
@@ -1256,9 +1183,6 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => 'Product ID is missing.']);
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $variantIds = [];
         foreach ($request->sku as $index => $sku) {
             if (empty($sku)) continue;
@@ -1286,20 +1210,6 @@ class ProductController extends Controller
             $variant->package_height = $request->package_height[$index] ?? null;
             $variant->package_type   = $request->package_type[$index] ?? null;
 
-            try {
-                $variant->material_ar = $material ? $trAr->translate($material) : null;
-                $variant->material_ne = $material ? $trNe->translate($material) : null;
-                $variant->color_ar    = $color ? $trAr->translate($color) : null;
-                $variant->color_ne    = $color ? $trNe->translate($color) : null;
-                $variant->price_ar    = $price ? $trAr->translate($price) : null;
-                $variant->price_ne    = $price ? $trNe->translate($price) : null;
-            } catch (\Exception $e) {
-                $variant->material_ar = $material;
-                $variant->material_ne = $material;
-                $variant->color_ar    = $color ? $trAr->translate($color) : null;
-                $variant->color_ne    = $color ? $trNe->translate($color) : null;
-            }
-
             $price         = (float) ($request->price[$index] ?? 0);
             $discountType  = $request->discount_type[$index] ?? null;
             $discountValue = (float) ($request->discount_value[$index] ?? 0);
@@ -1315,8 +1225,6 @@ class ProductController extends Controller
             $variant->discount_type  = $discountType;
             $variant->discount_value = $discountValue;
             $variant->final_price    = max(0, $finalPrice);
-            $variant->final_price_ar = $trAr->translate(max(0, $finalPrice));
-            $variant->final_price_ne = $trNe->translate(max(0, $finalPrice));
 
             $variant->size_cat_id = $request->size_category_id[$index] ?? null;
             $sizes = $request->size[$index] ?? [];
@@ -1348,8 +1256,7 @@ class ProductController extends Controller
 
             if ($request->hasFile("product_image.$index")) {
                 foreach ($request->file("product_image.$index") as $file) {
-                    $filename = time() . '_' . Str::slug($color ?? 'variant') . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                    $file->move(public_path('uploads/products'), $filename);
+                    $filename = ImageHelper::compressImage($file, 'uploads/products', 60, 1200, true);
                     $images[] = $filename;
                 }
             }
@@ -1475,18 +1382,11 @@ class ProductController extends Controller
         // If discount_price is explicitly provided, use it instead
         $finalDiscountPrice = $request->discount_price ?? $discountedPrice;
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         // Update product details
         $product->update([
             'name' => $request->name,
-            'name_ar' => $trAr->translate($request->name),
-            'name_ne' => $trNe->translate($request->name),
 
             'slug' => $request->slug ?: SlugHelper::uniqueProductSlug($request->name),
-            'slug_ar' => Str::slug($request->slug ?: $request->name),
-            'slug_ne' => Str::slug($request->slug ?: $request->name),
 
             'category_id' => $request->category_id,
             'subcategory_id' => $request->subcategory_id ?? null,
@@ -1496,12 +1396,8 @@ class ProductController extends Controller
             'status' => $status,
 
             'short_description' => $request->short_description ?? null,
-            'short_description_ar' => $request->short_description ? $trAr->translate($request->short_description) : null,
-            'short_description_ne' => $request->short_description ? $trNe->translate($request->short_description) : null,
 
             'description' => $request->description ?? null,
-            'description_ar' => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne' => $request->description ? $trNe->translate($request->description) : null,
             'meta_title'           => $request->meta_title,
             'meta_description'     => $request->meta_description,
 
@@ -1518,8 +1414,7 @@ class ProductController extends Controller
         if ($request->hasFile('product_image')) {
             $images = [];
             foreach ($request->file('product_image') as $file) {
-                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/products/'), $filename);
+                $filename = ImageHelper::compressImage($file, 'uploads/products', 60, 1200, true);
                 $images[] = $filename;
             }
 
@@ -1880,13 +1775,8 @@ class ProductController extends Controller
 
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $data = [
             'name'         => strtoupper($input['name']),
-            'name_ar'      => $trAr->translate($input['name']),
-            'name_ne'      => $trNe->translate($input['name']),
             'status'       => $input['status'] ?? 1,
         ];
 
@@ -1919,14 +1809,9 @@ class ProductController extends Controller
         // ✅ Fetch ID safely
         $size_id = $request->input('size_id');
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         // ✅ Find record
         $data  = [
             'name'   => strtoupper(trim($request->name)),
-            'name_ar' => $trAr->translate($request->name),
-            'name_ne' => $trNe->translate($request->name),
         ];
 
         if ($request->has('status')) {
@@ -2006,13 +1891,8 @@ class ProductController extends Controller
 
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $data = [
             'name'         => strtoupper($input['name']),
-            'name_ar'      => $trAr->translate($input['name']),
-            'name_ne'      => $trNe->translate($input['name']),
             'status'       => $input['status'] ?? 1,
             'size_cat_id'   => $input['size_cat_id'],
         ];
@@ -2042,13 +1922,8 @@ class ProductController extends Controller
             'name' => 'required|string|max:100',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $productSize = ProductSize::findOrFail($size_id);
         $productSize->name = $request->name;
-        $productSize->name_ar = $trAr->translate($request->name);
-        $productSize->name_ne = $trNe->translate($request->name);
         $productSize->status = $request->status;
         $productSize->save();
 
@@ -2600,9 +2475,6 @@ class ProductController extends Controller
         $errors = [];
         $rowNumber = 1;
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         /* ===== PROCESS ROWS ===== */
         while (($row = fgetcsv($handle)) !== false) {
             $rowNumber++;
@@ -2678,9 +2550,7 @@ class ProductController extends Controller
                     $productIn,
                     $isFeatured,
                     &$createdProducts,
-                    &$createdVariants,
-                    $trAr,
-                    $trNe
+                    &$createdVariants
                 ) {
                     /* ===== CREATE / GET PRODUCT ===== */
                     $product = Product::where('slug', $slugBase)
@@ -2690,11 +2560,7 @@ class ProductController extends Controller
                     if (!$product) {
                         $productData = [
                             'name'              => $productName,
-                            'name_ar'           => $trAr->translate($productName),
-                            'name_ne'           => $trNe->translate($productName),
                             'slug'              => SlugHelper::uniqueProductSlug($productName),
-                            'slug_ar'           => Str::slug($productName),
-                            'slug_ne'           => Str::slug($productName),
                             'category_id'       => $categoryId,
                             'subcategory_id'    => $subcategoryId,
                             'child_category_id' => $childCategoryId,
@@ -2703,11 +2569,7 @@ class ProductController extends Controller
                             'product_in'        => $productIn,
                             'is_featured'       => $isFeatured,
                             'short_description' => $shortDesc,
-                            'short_description_ar' => $shortDesc ? $trAr->translate($shortDesc) : null,
-                            'short_description_ne' => $shortDesc ? $trNe->translate($shortDesc) : null,
                             'description'       => $description,
-                            'description_ar'    => $description ? $trAr->translate($description) : null,
-                            'description_ne'    => $description ? $trNe->translate($description) : null,
                             'vendor_id'         => $vendorId,
                             'status'            => 0,
                             'is_upload'            => 1,
@@ -2722,11 +2584,7 @@ class ProductController extends Controller
                         'product_id'     => $product->id,
                         'sku'            => $sku,
                         'color'          => $color,
-                        'color_ar'       => $color ? $trAr->translate($color) : null,
-                        'color_ne'       => $color ? $trNe->translate($color) : null,
                         'material'       => $material,
-                        'material_ar'    => $material ? $trAr->translate($material) : null,
-                        'material_ne'    => $material ? $trNe->translate($material) : null,
                         'stock'          => $stock,
                         'price'          => $price,
                         'discount_type'  => $discountType,

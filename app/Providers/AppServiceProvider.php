@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             // Silently fail if DB is not ready
         }
 
-        View::composer('frontend.*', function ($view) {
+        View::composer(['frontend.*', 'backend.*'], function ($view) {
             try {
                 $categories = Cache::remember('categories.nav', 3600, function () {
                     return Category::where('is_active', 1)

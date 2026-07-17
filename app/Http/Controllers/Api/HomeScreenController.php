@@ -62,10 +62,7 @@ class HomeScreenController extends Controller
             ->pluck('product_id')
             ->toArray();
 
-        $field = function ($base) use ($lang) {
-            return $lang === 'ar' ? "{$base}_ar"
-                : ($lang === 'ne' ? "{$base}_ne" : $base);
-        };
+
 
         /* =========================
      * MENU CATEGORIES
@@ -73,29 +70,29 @@ class HomeScreenController extends Controller
         $categories_menu = Category::where('is_active', 1)
             ->select([
                 'id',
-                $field('name') . ' as name',
-                $field('slug') . ' as slug',
+                'name',
+                'slug',
                 'image',
 
             ])
             ->with([
-                'subCategories' => function ($q) use ($field) {
+                    'subCategories' => function ($q) {
                     $q->where('is_active', 1)
                         ->select([
                             'id',
                             'category_id',
-                            $field('name') . ' as name',
-                            $field('slug') . ' as slug',
+                            'name',
+                            'slug',
                             'image'
                         ])
                         ->with([
-                            'childCategories' => function ($q2) use ($field) {
+                            'childCategories' => function ($q2) {
                                 $q2->where('is_active', 1)
                                     ->select([
                                         'id',
                                         'subcategory_id',
-                                        $field('name') . ' as name',
-                                        $field('slug') . ' as slug',
+                                        'name',
+                                        'slug',
 
                                     ]);
                             }
@@ -122,8 +119,8 @@ class HomeScreenController extends Controller
             }
 
             // Process multilingual fields
-            $banner->title = $banner[$field('title')] ?? '';
-            $banner->description = $banner[$field('description')] ?? '';
+            $banner->title = $banner['title'] ?? '';
+            $banner->description = $banner['description'] ?? '';
         }
 
 
@@ -143,8 +140,8 @@ class HomeScreenController extends Controller
                 $banner->image = $image ? [ImageHelper::getBannerImage($image)] : [];
             }
 
-            $banner->title = $banner[$field('title')] ?? '';
-            $banner->description = $banner[$field('description')] ?? '';
+            $banner->title = $banner['title'] ?? '';
+            $banner->description = $banner['description'] ?? '';
         }
 
         /* =========================
@@ -153,8 +150,8 @@ class HomeScreenController extends Controller
         $categories = Category::where('is_active', 1)
             ->select([
                 'id',
-                $field('name') . ' as name',
-                $field('slug') . ' as slug',
+                'name',
+                'slug',
                 'image'
             ])
             ->get();
@@ -177,14 +174,9 @@ class HomeScreenController extends Controller
             ->get()
             ->map(function ($product) use ($lang, $cartProductIds, $wishlistProductIds) {
                 // Determine language fields
-                $name = $lang === 'ar' ? $product->name_ar
-                    : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-                $short_description = $lang === 'ar' ? $product->short_description_ar
-                    : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-                $description = $lang === 'ar' ? $product->description_ar
-                    : ($lang === 'ne' ? $product->description_ne : $product->description);
+                $name = $product->name;
+                $short_description = $product->short_description;
+                $description = $product->description;
 
                 // Format product using your helper
                 return $this->formatProduct($product, $lang, $cartProductIds, $wishlistProductIds);
@@ -203,14 +195,9 @@ class HomeScreenController extends Controller
             ->get()
             ->map(function ($product) use ($lang, $cartProductIds, $wishlistProductIds) {
                 // Select fields based on requested language
-                $name = $lang === 'ar' ? $product->name_ar
-                    : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-                $short_description = $lang === 'ar' ? $product->short_description_ar
-                    : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-                $description = $lang === 'ar' ? $product->description_ar
-                    : ($lang === 'ne' ? $product->description_ne : $product->description);
+                $name = $product->name;
+                $short_description = $product->short_description;
+                $description = $product->description;
 
                 // Format product using your helper
                 return $this->formatProduct($product, $lang, $cartProductIds, $wishlistProductIds);
@@ -227,14 +214,9 @@ class HomeScreenController extends Controller
             ->get()
             ->map(function ($product) use ($lang, $cartProductIds, $wishlistProductIds) {
                 // Select fields based on requested language
-                $name = $lang === 'ar' ? $product->name_ar
-                    : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-                $short_description = $lang === 'ar' ? $product->short_description_ar
-                    : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-                $description = $lang === 'ar' ? $product->description_ar
-                    : ($lang === 'ne' ? $product->description_ne : $product->description);
+                $name = $product->name;
+                $short_description = $product->short_description;
+                $description = $product->description;
 
                 // Format product using your helper
                 return $this->formatLowestPriceProduct($product, $lang, $cartProductIds, $wishlistProductIds);
@@ -254,14 +236,9 @@ class HomeScreenController extends Controller
             ->get()
             ->map(function ($product) use ($lang, $cartProductIds, $wishlistProductIds) {
                 // Select fields based on requested language
-                $name = $lang === 'ar' ? $product->name_ar
-                    : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-                $short_description = $lang === 'ar' ? $product->short_description_ar
-                    : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-                $description = $lang === 'ar' ? $product->description_ar
-                    : ($lang === 'ne' ? $product->description_ne : $product->description);
+                $name = $product->name;
+                $short_description = $product->short_description;
+                $description = $product->description;
 
                 // Format product using your helper
                 return $this->formatProduct($product, $lang, $cartProductIds, $wishlistProductIds);
@@ -283,8 +260,8 @@ class HomeScreenController extends Controller
                 $banner->image = $image ? [ImageHelper::getBannerImage($image)] : [];
             }
 
-            $banner->title = $banner[$field('title')] ?? '';
-            $banner->description = $banner[$field('description')] ?? '';
+            $banner->title = $banner['title'] ?? '';
+            $banner->description = $banner['description'] ?? '';
         }
 
         /* =========================
@@ -293,8 +270,8 @@ class HomeScreenController extends Controller
         $category_product = Category::where('is_active', 1)
             ->select([
                 'id',
-                $field('name') . ' as name',
-                $field('slug') . ' as slug'
+                'name',
+                'slug'
             ])
             ->with([
                 'products' => function ($q) use ($userId) {
@@ -304,23 +281,23 @@ class HomeScreenController extends Controller
                         ->with(['firstVariant:id,product_id,price,image,discount_type,discount_value', 'approvedReviews'])
                         ->limit(10);
                 },
-                'subCategories' => function ($q) use ($field) {
+                'subCategories' => function ($q) {
                     $q->where('is_active', 1)
                         ->select([
                             'id',
                             'category_id',
-                            $field('name') . ' as name',
-                            $field('slug') . ' as slug',
+                            'name',
+                            'slug',
                             'image'
                         ])
                         ->with([
-                            'childCategories' => function ($q2) use ($field) {
+                            'childCategories' => function ($q2) {
                                 $q2->where('is_active', 1)
                                     ->select([
                                         'id',
                                         'subcategory_id',
-                                        $field('name') . ' as name',
-                                        $field('slug') . ' as slug',
+                                        'name',
+                                        'slug',
                                     ]);
                             }
                         ]);
@@ -397,17 +374,10 @@ class HomeScreenController extends Controller
     $currency = \App\Helpers\GeneralHelper::get_currency_by_lang($lang);
 
     // Language-specific fields
-    $name = $lang === 'ar' ? $product->name_ar
-          : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-    $slug = $lang === 'ar' ? $product->slug_ar
-          : ($lang === 'ne' ? $product->slug_ne : $product->slug);
-
-    $short_description = $lang === 'ar' ? $product->short_description_ar
-                       : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-    $description = $lang === 'ar' ? $product->description_ar
-                     : ($lang === 'ne' ? $product->description_ne : $product->description);
+    $name = $product->name;
+    $slug = $product->slug;
+    $short_description = $product->short_description;
+    $description = $product->description;
 
     // Calculate dynamic ratings
     $reviewCount = $product->approvedReviews->count();
@@ -466,17 +436,10 @@ private function formatLowestPriceProduct($product, $lang, $cartProductIds = [],
     $currency = \App\Helpers\GeneralHelper::get_currency_by_lang($lang);
 
     // Language-specific fields
-    $name = $lang === 'ar' ? $product->name_ar
-          : ($lang === 'ne' ? $product->name_ne : $product->name);
-
-    $slug = $lang === 'ar' ? $product->slug_ar
-          : ($lang === 'ne' ? $product->slug_ne : $product->slug);
-
-    $short_description = $lang === 'ar' ? $product->short_description_ar
-                       : ($lang === 'ne' ? $product->short_description_ne : $product->short_description);
-
-    $description = $lang === 'ar' ? $product->description_ar
-                     : ($lang === 'ne' ? $product->description_ne : $product->description);
+    $name = $product->name;
+    $slug = $product->slug;
+    $short_description = $product->short_description;
+    $description = $product->description;
 
     // Calculate dynamic ratings
     $reviewCount = $product->approvedReviews->count();

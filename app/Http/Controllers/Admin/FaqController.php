@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Faq;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class FaqController extends Controller
 {
@@ -39,16 +38,9 @@ class FaqController extends Controller
             'answer' => 'required',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $data = [
             'question' => $request->question,
-            'question_ar' => $trAr->translate($request->question),
-            'question_ne' => $trNe->translate($request->question),
             'answer' => $request->answer,
-            'answer_ar' => $trAr->translate($request->answer),
-            'answer_ne' => $trNe->translate($request->answer),
             'status' => $request->status ?? 1,
         ];
 

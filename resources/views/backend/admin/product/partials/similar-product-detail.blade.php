@@ -72,6 +72,11 @@
 
         <div class="mt-3">
             <label class="form-label">Description</label>
+            <div class="d-flex justify-content-end mb-1">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="generateDescBtn">
+                    <iconify-icon icon="solar:magic-stick-3-linear" class="fs-14"></iconify-icon> Generate Description Template
+                </button>
+            </div>
             <textarea name="description" class="form-control" rows="4">{{ old('description', $product->description) }}</textarea>
         </div>
 
@@ -316,4 +321,30 @@
                 </div>
         </div>
     </div>
+<script>
+    function generateDescription() {
+        let color = $('input[name="color[]"]').val() || '';
+        let material = $('input[name="material[]"]').val() || '';
+        let sizeText = '';
+        let sizeSelect = $('.js-size-select').first();
+        if (sizeSelect.length) {
+            let selectedOptions = sizeSelect.find('option:selected');
+            if (selectedOptions.length > 0) {
+                sizeText = selectedOptions.map(function() { return $(this).text(); }).get().join(', ');
+            }
+        }
+
+        let desc = 'Description\n\nInclude:\n';
+        desc += '☐ Material' + (material ? ': ' + material : '') + '\n';
+        desc += '☐ Color' + (color ? ': ' + color : '') + '\n';
+        desc += '☐ Size' + (sizeText ? ': ' + sizeText : '') + '\n';
+        desc += '☐ Features\n';
+        desc += '☐ Package details\n';
+        desc += '☐ Care instructions';
+
+        $('textarea[name="description"]').val(desc);
+    }
+
+    $(document).on('click', '#generateDescBtn', generateDescription);
+</script>
 </form>

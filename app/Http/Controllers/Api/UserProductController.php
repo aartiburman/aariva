@@ -1582,36 +1582,26 @@ class UserProductController extends Controller
             $query->where(function ($q) use ($search) {
 
                 // PRODUCT NAME
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('name_ar', 'LIKE', "%{$search}%")
-                    ->orWhere('name_ne', 'LIKE', "%{$search}%");
+                $q->where('name', 'LIKE', "%{$search}%");
 
                 // CATEGORY
                 $q->orWhereHas('category', function ($cat) use ($search) {
-                    $cat->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ar', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ne', 'LIKE', "%{$search}%");
+                    $cat->where('name', 'LIKE', "%{$search}%");
                 });
 
                 // SUBCATEGORY
                 $q->orWhereHas('subCategory', function ($sub) use ($search) {
-                    $sub->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ar', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ne', 'LIKE', "%{$search}%");
+                    $sub->where('name', 'LIKE', "%{$search}%");
                 });
 
                 // BRAND
                 $q->orWhereHas('brand', function ($brand) use ($search) {
-                    $brand->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ar', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ne', 'LIKE', "%{$search}%");
+                    $brand->where('name', 'LIKE', "%{$search}%");
                 });
 
                 // CHILDCATEGORY
                 $q->orWhereHas('childCategory', function ($child) use ($search) {
-                    $child->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ar', 'LIKE', "%{$search}%")
-                        ->orWhere('name_ne', 'LIKE', "%{$search}%");
+                    $child->where('name', 'LIKE', "%{$search}%");
                 });
             });
         }
@@ -1643,54 +1633,34 @@ class UserProductController extends Controller
 
             if ($search) {
                 // Check Product Name
-                if (
-                    stripos($product->name, $search) !== false ||
-                    stripos($product->name_ar, $search) !== false ||
-                    stripos($product->name_ne, $search) !== false
-                ) {
+                if (stripos($product->name, $search) !== false) {
                     $search_product_id = $product->id;
                 }
 
                 // Check Category
                 if ($product->category) {
-                    if (
-                        stripos($product->category->name, $search) !== false ||
-                        stripos($product->category->name_ar, $search) !== false ||
-                        stripos($product->category->name_ne, $search) !== false
-                    ) {
+                    if (stripos($product->category->name, $search) !== false) {
                         $search_category_id = $product->category->id;
                     }
                 }
 
                 // Check SubCategory
                 if ($product->subCategory) {
-                    if (
-                        stripos($product->subCategory->name, $search) !== false ||
-                        stripos($product->subCategory->name_ar, $search) !== false ||
-                        stripos($product->subCategory->name_ne, $search) !== false
-                    ) {
+                    if (stripos($product->subCategory->name, $search) !== false) {
                         $search_subcategory_id = $product->subCategory->id;
                     }
                 }
 
                 // Check ChildCategory
                 if ($product->childCategory) {
-                    if (
-                        stripos($product->childCategory->name, $search) !== false ||
-                        stripos($product->childCategory->name_ar, $search) !== false ||
-                        stripos($product->childCategory->name_ne, $search) !== false
-                    ) {
+                    if (stripos($product->childCategory->name, $search) !== false) {
                         $search_child_id = $product->childCategory->id;
                     }
                 }
 
                 // Check Brand
                 if ($product->brand) {
-                    if (
-                        stripos($product->brand->name, $search) !== false ||
-                        stripos($product->brand->name_ar, $search) !== false ||
-                        stripos($product->brand->name_ne, $search) !== false
-                    ) {
+                    if (stripos($product->brand->name, $search) !== false) {
                         $search_brand_id = $product->brand->id;
                     }
                 }
@@ -2046,15 +2016,13 @@ class UserProductController extends Controller
     {
         $categoryIds = $products->pluck('category_id')->unique()->filter();
         $categories = Category::whereIn('id', $categoryIds)
-            ->select('id', 'name', 'name_ar', 'name_ne')
+            ->select('id', 'name')
             ->get();
 
         return $categories->map(function ($cat) use ($products) {
             return [
                 'id' => $cat->id,
                 'label' => $cat->name,
-                'label_ar' => $cat->name_ar,
-                'label_ne' => $cat->name_ne,
                 'count' => $products->where('category_id', $cat->id)->count(),
             ];
         })->values()->toArray();

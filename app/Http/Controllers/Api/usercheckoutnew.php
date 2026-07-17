@@ -32,11 +32,39 @@ use App\Services\Payment\PaytmService;
 class UserCheckout extends Controller
 {
 
-    public function sync_ncm_status(Request $request, $reference_id = null)
+    public function sync_ekart_status(Request $request, $reference_id = null)
     {
-        // TODO: NCMService has been removed. This method needs to be refactored.
-        Log::warning('sync_ncm_status called but NCMService is no longer available.');
-        return response()->json(['status' => false, 'message' => 'NCM service not available'], 503);
+        // eKart status sync (scaffold). See UserCheckout.php for the active implementation.
+        $reference_id = $reference_id ?? $request->input('reference_id') ?? $request->input('order_reference');
+
+        if (!$reference_id) {
+            return response()->json(['status' => false, 'message' => 'Reference id required'], 422);
+        }
+
+        $order = \App\Models\Order::where('reference_id', $reference_id)->first();
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found'], 404);
+        }
+
+        $trackingId = $request->input('tracking_id');
+        $status     = $request->input('status') ?? 'In Transit';
+
+        foreach ($order->items as $item) {
+            $item->logistics_provider = 'eKart';
+            if ($trackingId) {
+                $item->tracking_id = $trackingId;
+            }
+            $item->logistics_status = $status;
+            $item->save();
+        }
+
+        return response()->json([
+            'status'           => true,
+            'message'          => 'eKart status synced',
+            'provider'         => 'eKart',
+            'tracking_id'      => $trackingId,
+            'logistics_status' => $status,
+        ]);
     }
 
  public function checkout_amount(Request $request)

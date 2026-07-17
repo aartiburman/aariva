@@ -7,6 +7,8 @@ use App;
 use Carbon\Carbon;
 //use Image;
 use url;
+use App\Models\GeneralSetting;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -36,14 +38,80 @@ class ImageHelper
   public static $NoImage = 'public/backend/no_image.jpg';
 
   /**
+   * Apply watermark (website logo) to an image at a random position
+   * @param resource $image GD image resource
+   * @return resource Watermarked GD image resource
+   */
+  private static function applyWatermark($image)
+  {
+    $logoName = GeneralSetting::where('key', 'website_logo_dark')->value('value');
+    if (!$logoName) {
+      $logoName = GeneralSetting::where('key', 'website_logo_light')->value('value');
+      if (!$logoName) return $image;
+    }
+
+    $logoPath = public_path('uploads/settings/' . $logoName);
+    if (!file_exists($logoPath)) return $image;
+
+    $logoExt = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+    switch ($logoExt) {
+      case 'jpeg':
+      case 'jpg':
+        $logoImg = @\imagecreatefromjpeg($logoPath);
+        break;
+      case 'png':
+        $logoImg = @\imagecreatefrompng($logoPath);
+        \imagealphablending($logoImg, false);
+        \imagesavealpha($logoImg, true);
+        break;
+      case 'webp':
+        $logoImg = @\imagecreatefromwebp($logoPath);
+        break;
+      default:
+        return $image;
+    }
+
+    if (!$logoImg) return $image;
+
+    $imgWidth = \imagesx($image);
+    $imgHeight = \imagesy($image);
+    $logoWidth = \imagesx($logoImg);
+    $logoHeight = \imagesy($logoImg);
+
+    $watermarkWidth = intval($imgWidth * 0.10);
+    $watermarkHeight = intval($logoHeight * ($watermarkWidth / $logoWidth));
+    if ($watermarkHeight < 1) $watermarkHeight = 1;
+
+    $watermarkImg = \imagecreatetruecolor($watermarkWidth, $watermarkHeight);
+    \imagealphablending($watermarkImg, false);
+    \imagesavealpha($watermarkImg, true);
+    \imagecopyresampled($watermarkImg, $logoImg, 0, 0, 0, 0, $watermarkWidth, $watermarkHeight, $logoWidth, $logoHeight);
+
+    $padding = 15;
+    $maxX = $imgWidth - $watermarkWidth - $padding;
+    $maxY = $imgHeight - $watermarkHeight - $padding;
+    $x = \rand($padding, max($padding, $maxX));
+    $y = \rand($padding, max($padding, $maxY));
+
+    \imagealphablending($image, true);
+    \imagecopymerge($image, $watermarkImg, $x, $y, 0, 0, $watermarkWidth, $watermarkHeight, 50);
+
+    \imagedestroy($logoImg);
+    \imagedestroy($watermarkImg);
+
+    return $image;
+  }
+
+  /**
    * Compress and save an image using GD library
    * @param \Illuminate\Http\UploadedFile $file
    * @param string $path Target directory path
    * @param int $quality Compression quality (0-100)
    * @param int|null $maxWidth Optional max width to resize
+   * @param bool $addWatermark Whether to apply watermark
    * @return string Filename of the saved image
    */
-  public static function compressImage($file, $path, $quality = 60, $maxWidth = 1200)
+  public static function compressImage($file, $path, $quality = 60, $maxWidth = 1200, $addWatermark = false)
   {
     $extension = $file->getClientOriginalExtension();
     $filename = time() . '_' . uniqid() . '.' . $extension;
@@ -100,6 +168,11 @@ class ImageHelper
         \imagecopyresampled($tmpImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         \imagedestroy($image);
         $image = $tmpImage;
+      }
+
+      // Apply watermark if requested
+      if ($addWatermark) {
+        $image = static::applyWatermark($image);
       }
 
       // Save compressed image

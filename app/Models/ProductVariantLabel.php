@@ -10,8 +10,6 @@ class ProductVariantLabel extends Model
 
     protected $fillable = [
         'name',
-        'name_ar',
-        'name_ne',
         'status',
     ];
 }

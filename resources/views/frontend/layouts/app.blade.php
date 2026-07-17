@@ -139,7 +139,7 @@
             <div class="top-menu">
                 <div class="container">
                     <nav class="navbar navbar-expand">
-                        <div class="shiping-title d-none d-sm-flex">{{ __t('Welcome to our ' . config('app.name') . ' store!') }}</div>
+                        <div class="shiping-title d-none d-md-flex">{{ __t('Welcome to our ' . config('app.name') . ' store!') }}</div>
                         <ul class="navbar-nav ms-auto d-none d-lg-flex">
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.order-tracking') }}">{{ __t('Track Order') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.about-us') }}">{{ __t('About') }}</a></li>
@@ -148,7 +148,7 @@
                             <li class="nav-item"><a class="nav-link" href="{{ route('frontend.contact-us') }}">{{ __t('Contact') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="javascript:;">{{ __t('Help & FAQs') }}</a></li>
                         </ul>
-                        <ul class="navbar-nav">
+                        <ul class="navbar-nav ms-auto ms-lg-0">
                             @auth
                             <li class="nav-item">
                                     <a class="nav-link" href="{{ route('frontend.logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __t('Logout') }}</a>
@@ -207,9 +207,9 @@
             </div>
             <div class="header-content bg-warning">
                 <div class="container">
-                    <div class="row align-items-center gx-4">
+                    <div class="row align-items-center gx-2 gx-sm-4">
                         <div class="col-auto">
-                            <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2 gap-sm-3">
                                 <div class="mobile-toggle-menu d-inline d-xl-none" data-bs-toggle="offcanvas"
                                     data-bs-target="#offcanvasNavbar">
                                     <i class="bx bx-menu"></i>
@@ -221,19 +221,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-xl order-4 order-xl-0 position-relative">
-                            <form action="{{ route('frontend.products.index') }}" method="GET" class="input-group flex-nowrap pb-3 pb-xl-0" autocomplete="off">
-                                <input type="text" name="search" id="headerSearchInput" class="form-control w-100 border-dark border border-3" placeholder="Search for Products" value="{{ request('search') }}">
-                                <button class="btn btn-dark btn-ecomm border-3" type="submit" id="headerSearchBtn">{{ __t('Search') }}</button>
+                        <div class="col-12 col-xl order-3 order-xl-0 mt-2 mt-xl-0 position-relative">
+                            <form action="{{ route('frontend.products.index') }}" method="GET" class="input-group flex-nowrap" autocomplete="off">
+                                <input type="text" name="search" id="headerSearchInput" class="form-control w-100 border-dark border border-2 border-sm-3" placeholder="Search for Products" value="{{ request('search') }}">
+                                <button class="btn btn-dark btn-ecomm" type="submit" id="headerSearchBtn">{{ __t('Search') }}</button>
                             </form>
                             <div id="searchResults" class="search-results-dropdown d-none"></div>
                         </div>
                         <div class="col-auto d-none d-xl-flex">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="fs-1 text-content"><i class='bx bx-headphone'></i></div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fs-5 text-content"><i class='bx bx-headphone'></i></div>
                                     <div class="">
-                                        <p class="mb-0 text-content">{{ __t('CALL US NOW') }}</p>
-                                        <h5 class="mb-0">{{ $contactPhone ?? '+011 5827918' }}</h5>
+                                        <p class="mb-0 text-content" style="font-size:12px;">{{ __t('CALL US NOW') }}</p>
+                                        <h6 class="mb-0">{{ $contactPhone ?? '+011 5827918' }}</h6>
                                     </div>
                                 </div>
                         </div>
@@ -436,7 +436,7 @@
                                     <li class="mb-2"><a href="{{ route('frontend.about-us') }}"><i class='bx bx-chevron-right'></i> {{ __t('About Us') }}</a></li>
                                     <li class="mb-2"><a href="{{ route('frontend.contact-us') }}"><i class='bx bx-chevron-right'></i> {{ __t('Contact Us') }}</a></li>
                                 </ul>
-                                <h5 class="mb-4 text-uppercase fw-bold mt-4">{{ __t('Stay informed') }}</h5>
+                                <h5 class="mb-4 text-uppercase fw-bold mt-5 pt-3">{{ __t('Stay informed') }}</h5>
                                 <div class="subscribe">
                                     <input type="text" class="form-control" placeholder="Enter Your Email" />
                                     <div class="mt-3 d-grid">

@@ -8,7 +8,6 @@ use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\City;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class ContactDetailController extends Controller
 {
@@ -45,24 +44,7 @@ class ContactDetailController extends Controller
             'order_by' => 'nullable|integer|min:0',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
-        $data = $request->all();
-        $data['title_ar'] = $request->title ? $trAr->translate($request->title) : null;
-        $data['title_ne'] = $request->title ? $trNe->translate($request->title) : null;
-        $data['address_ar'] = $request->address ? $trAr->translate($request->address) : null;
-        $data['address_ne'] = $request->address ? $trNe->translate($request->address) : null;
-        $data['city_ar'] = $request->city ? $trAr->translate($request->city) : null;
-        $data['city_ne'] = $request->city ? $trNe->translate($request->city) : null;
-        $data['state_ar'] = $request->state ? $trAr->translate($request->state) : null;
-        $data['state_ne'] = $request->state ? $trNe->translate($request->state) : null;
-        $data['country_ar'] = $request->country ? $trAr->translate($request->country) : null;
-        $data['country_ne'] = $request->country ? $trNe->translate($request->country) : null;
-        $data['opening_hours_ar'] = $request->opening_hours ? $trAr->translate($request->opening_hours) : null;
-        $data['opening_hours_ne'] = $request->opening_hours ? $trNe->translate($request->opening_hours) : null;
-
-        ContactDetail::create($data);
+        ContactDetail::create($request->all());
 
         return redirect()->route('contact.detail.list')->with('success', 'Contact details added successfully');
     }
@@ -99,24 +81,7 @@ class ContactDetailController extends Controller
             'order_by' => 'nullable|integer|min:0',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
-        $data = $request->all();
-        $data['title_ar'] = $request->title ? $trAr->translate($request->title) : null;
-        $data['title_ne'] = $request->title ? $trNe->translate($request->title) : null;
-        $data['address_ar'] = $request->address ? $trAr->translate($request->address) : null;
-        $data['address_ne'] = $request->address ? $trNe->translate($request->address) : null;
-        $data['city_ar'] = $request->city ? $trAr->translate($request->city) : null;
-        $data['city_ne'] = $request->city ? $trNe->translate($request->city) : null;
-        $data['state_ar'] = $request->state ? $trAr->translate($request->state) : null;
-        $data['state_ne'] = $request->state ? $trNe->translate($request->state) : null;
-        $data['country_ar'] = $request->country ? $trAr->translate($request->country) : null;
-        $data['country_ne'] = $request->country ? $trNe->translate($request->country) : null;
-        $data['opening_hours_ar'] = $request->opening_hours ? $trAr->translate($request->opening_hours) : null;
-        $data['opening_hours_ne'] = $request->opening_hours ? $trNe->translate($request->opening_hours) : null;
-
-        $contact->update($data);
+        $contact->update($request->all());
 
         return redirect()->route('contact.detail.list')->with('success', 'Contact details updated successfully');
     }

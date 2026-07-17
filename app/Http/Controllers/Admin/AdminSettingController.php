@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\PrivacyPolicy;
 use App\Models\TermsAndCondition;
 use App\Models\VendorPolicy;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\PaymentGateway;
 use App\Models\EmailSetting;
 use App\Models\SmsSetting;
@@ -47,9 +46,6 @@ class AdminSettingController extends Controller
             'content' => 'required',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         if ($request->id) {
             $policy = PrivacyPolicy::findOrFail($request->id);
             $totalPolicies = PrivacyPolicy::count();
@@ -70,11 +66,7 @@ class AdminSettingController extends Controller
 
             $policy->update([
                 'title' => $request->title,
-                'title_ar' => $trAr->translate($request->title),
-                'title_ne' => $trNe->translate($request->title),
                 'content' => $request->content,
-                'content_ar' => $trAr->translate($request->content),
-                'content_ne' => $trNe->translate($request->content),
                 'status' => $status,
             ]);
             return redirect()->route('privacy.policy.list')->with('success', 'Privacy Policy updated successfully');
@@ -92,11 +84,7 @@ class AdminSettingController extends Controller
 
         PrivacyPolicy::create([
             'title' => $request->title,
-            'title_ar' => $trAr->translate($request->title),
-            'title_ne' => $trNe->translate($request->title),
             'content' => $request->content,
-            'content_ar' => $trAr->translate($request->content),
-            'content_ne' => $trNe->translate($request->content),
             'status' => $status,
             'version' => 'v1',
         ]);
@@ -135,9 +123,6 @@ class AdminSettingController extends Controller
             'content' => 'required',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         if ($request->id) {
             $term = TermsAndCondition::findOrFail($request->id);
             $totalTerms = TermsAndCondition::count();
@@ -158,11 +143,7 @@ class AdminSettingController extends Controller
 
             $term->update([
                 'title' => $request->title,
-                'title_ar' => $trAr->translate($request->title),
-                'title_ne' => $trNe->translate($request->title),
                 'content' => $request->content,
-                'content_ar' => $trAr->translate($request->content),
-                'content_ne' => $trNe->translate($request->content),
                 'status' => $status,
             ]);
             return redirect()->route('term.and.conditions.list')->with('success', 'Terms and Condition updated successfully');
@@ -180,11 +161,7 @@ class AdminSettingController extends Controller
 
         TermsAndCondition::create([
             'title' => $request->title,
-            'title_ar' => $trAr->translate($request->title),
-            'title_ne' => $trNe->translate($request->title),
             'content' => $request->content,
-            'content_ar' => $trAr->translate($request->content),
-            'content_ne' => $trNe->translate($request->content),
             'status' => $status,
         ]);
 
@@ -222,9 +199,6 @@ class AdminSettingController extends Controller
             'content' => 'required',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         if ($request->id) {
             $policy = VendorPolicy::findOrFail($request->id);
             $totalPolicies = VendorPolicy::count();
@@ -252,11 +226,7 @@ class AdminSettingController extends Controller
             $newVersion = 'v' . $major . '.' . ($minor + 1);
             $policy->update([
                 'title' => $request->title,
-                'title_ar' => $trAr->translate($request->title),
-                'title_ne' => $trNe->translate($request->title),
                 'content' => $request->content,
-                'content_ar' => $trAr->translate($request->content),
-                'content_ne' => $trNe->translate($request->content),
                 'status' => $status,
                 'version' => $newVersion,
             ]);
@@ -292,11 +262,7 @@ class AdminSettingController extends Controller
 
         $policy = VendorPolicy::create([
             'title' => $request->title,
-            'title_ar' => $trAr->translate($request->title),
-            'title_ne' => $trNe->translate($request->title),
             'content' => $request->content,
-            'content_ar' => $trAr->translate($request->content),
-            'content_ne' => $trNe->translate($request->content),
             'status' => $status,
             'version' => $newVersion,
         ]);

@@ -8,7 +8,6 @@ use App\Models\Banner;
 use Illuminate\Support\Str;
 use Nette\Utils\Image;
 use App\Helpers\ImageHelper;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class BannerController extends Controller
 {
@@ -106,9 +105,6 @@ class BannerController extends Controller
         /* =========================
      * STORE BANNER
      * ========================= */
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $baseSlug = Str::slug($request->title);
         $slug = $baseSlug;
         $count = 1;
@@ -118,9 +114,6 @@ class BannerController extends Controller
         }
 
         $data = [
-            'title'      => $request->title,
-            'title_ar'   => $request->title ? $trAr->translate($request->title) : null,
-            'title_ne'   => $request->title ? $trNe->translate($request->title) : null,
             'slug'       => $slug,
             'image'      => $imageValue,
             'link_type'  => $request->link_type,
@@ -220,9 +213,6 @@ class BannerController extends Controller
         /* =========================
  * UPDATE BANNER
  * ========================= */
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $baseSlug = Str::slug($request->title);
         $slug = $baseSlug;
         $count = 1;
@@ -233,8 +223,6 @@ class BannerController extends Controller
 
         $banner->update([
             'title'      => $request->title,
-            'title_ar'   => $request->title ? $trAr->translate($request->title) : null,
-            'title_ne'   => $request->title ? $trNe->translate($request->title) : null,
             'slug'       => $slug,
             'image'      => $imageValue,
             'link_type'  => $request->link_type,

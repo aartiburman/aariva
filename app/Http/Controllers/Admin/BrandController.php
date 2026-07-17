@@ -10,7 +10,6 @@ use App\Helpers\ImageHelper;
 use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\ChildCategory;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class BrandController extends Controller
 {
@@ -57,22 +56,14 @@ class BrandController extends Controller
             $logoName = ImageHelper::compressImage($request->logo, 'uploads/brands');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
-        
         Brand::create([
             'name'           => $request->name,
-            'name_ar'        => $trAr->translate($request->name),
-            'name_ne'        => $trNe->translate($request->name),
             'category_id'    => $request->category_id,
             'subcategory_id' => $request->subcategory_id,
             'childcategory_id' => $request->child_category_id,
             'slug'           => Str::slug($request->name),
             'logo'           => $logoName,
             'description'    => $request->description,
-            'description_ar' => $trAr->translate($request->description??''),
-            'description_ne' => $trNe->translate($request->description??''),
             'meta_title'     => $request->meta_title,
             'meta_description' => $request->meta_description,
             'status'         => $request->status,
@@ -229,23 +220,14 @@ class BrandController extends Controller
             $logoName = ImageHelper::compressImage($request->logo, 'uploads/brands');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-        // echo '<pre>';print_r($trAr->translate($request->name));die;
-
-      
       $data =   [
             'name'           => $request->name,
-            'name_ar'        => $trAr->translate($request->name),
-            'name_ne'        => $trNe->translate($request->name),
             'category_id'    => $request->category_id,
             'subcategory_id' => $request->subcategory_id,
             'childcategory_id' => $request->child_category_id,
             'slug'           => Str::slug($request->name),
             'logo'           => $logoName,
             'description'    => $request->description,
-            'description_ar' => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne' => $request->description ? $trNe->translate($request->description) : null,
             'meta_title'     => $request->meta_title,
             'meta_description' => $request->meta_description,
             'status'         => $request->status,
@@ -361,13 +343,8 @@ public function createBrand(Request $request)
             ]);
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $brand = Brand::create([
             'name' => $name,
-            'name_ar' => $trAr->translate($name),
-            'name_ne' => $trNe->translate($name),
             'category_id' => $request->category_id,
             'subcategory_id' => $request->subcategory_id,
             'childcategory_id' => $request->child_category_id,

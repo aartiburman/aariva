@@ -9,7 +9,6 @@ use App\Models\SubCategory;
 use App\Models\ChildCategory;
 use Illuminate\Support\Str;
 use App\Helpers\ImageHelper;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class SubcategoryController extends Controller
 {
@@ -75,17 +74,10 @@ class SubcategoryController extends Controller
                 return response()->json(['success' => true, 'subcategory' => $subcategory, 'message' => 'Subcategory already exists.']);
             }
 
-            $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('hi');
-
             $subcategory = SubCategory::create([
                 'category_id' => $request->category_id,
                 'name' => $name,
-                'name_ar' => $trAr->translate($name),
-                'name_ne' => $trNe->translate($name),
                 'slug' => Str::slug($name),
-                'slug_ar' => Str::slug($name),
-                'slug_ne' => Str::slug($name),
                 'is_active' => 1,
             ]);
 
@@ -228,22 +220,13 @@ class SubcategoryController extends Controller
             $fileName = ImageHelper::compressImage($request->file('image'), 'uploads/subcategory/');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $subcategory = SubCategory::create([
             'name'        => $request->name,
-            'name_ar'     => $trAr->translate($request->name),
-            'name_ne'     => $trNe->translate($request->name),
 
             'slug'        => Str::slug($request->slug),
-            'slug_ar'     => Str::slug($request->slug),
-            'slug_ne'     => Str::slug($request->slug),
 
             'category_id' => $request->category_id,
             'description' => $request->description,
-            'description_ar' => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne' => $request->description ? $trNe->translate($request->description) : null,
             'meta_title'           => $request->meta_title,
             'meta_description'     => $request->meta_description,
 
@@ -304,19 +287,12 @@ class SubcategoryController extends Controller
             $fileName = ImageHelper::compressImage($request->image, 'uploads/subcategory/');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $subcategory->update([
             'name'           => $request->name,
-            'name_ar'        => $trAr->translate($request->name),
-            'name_ne'        => $trNe->translate($request->name),
 
             'category_id'    => $request->category_id,
             'is_active'      => $request->is_active,
             'description'    => $request->description,
-            'description_ar' => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne' => $request->description ? $trNe->translate($request->description) : null,
             'meta_title'     => $request->meta_title,
             'meta_description' => $request->meta_description,
             'image'          => $fileName,

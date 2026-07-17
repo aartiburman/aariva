@@ -26,8 +26,9 @@ class LoginController extends Controller
         
         $darkLogo = isset($generalSettings['website_logo_dark']) ? ImageHelper::getWebsiteLogo($generalSettings['website_logo_dark']) : '';
         $lightLogo = isset($generalSettings['website_logo_light']) ? ImageHelper::getWebsiteLogo($generalSettings['website_logo_light']) : '';
-        // echo '<pre>';print_r($generalSettings);die;
-        return view('backend.login', compact('notificationSetting', 'darkLogo', 'lightLogo'));
+        $siteName = $generalSettings['website_name'] ?? config('app.name');
+        $siteFavicon = $generalSettings['favicon'] ?? null;
+        return view('backend.login', compact('notificationSetting', 'darkLogo', 'lightLogo', 'siteName', 'siteFavicon'));
     }
 
     public function showRegistrationForm()

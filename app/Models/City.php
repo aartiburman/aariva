@@ -10,8 +10,6 @@ class City extends Model
         'country_id',
         'state_id',
         'name',
-        'name_ar',
-        'name_ne',
         'is_active',
     ];
 

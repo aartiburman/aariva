@@ -7,37 +7,49 @@ $(function() {
 		margin:0,
 		responsiveClass:true,
 		nav:true,
+		autoplay:true,
+		autoplayTimeout:4000,
+		autoplayHoverPause:true,
+		smartSpeed:800,
 		navText: [
 			"<i class='bx bx-chevron-left'></i>",
 		    "<i class='bx bx-chevron-right' ></i>"
 		 ],
-		dots: false,
+		dots: true,
 		responsive:{
 			0:{
 				nav:false,
+				dots:true,
 				margin:0,
 				items:1
 			},
 			576:{
 				nav:false,
+				dots:true,
 				items:1
 			},
 			768:{
 				nav:false,
+				dots:false,
 				items:1
 			},
 			1024:{
-				nav:false,
+				nav:true,
+				dots:false,
 				items:1
 			},
 			1366:{
+				nav:true,
+				dots:false,
 				items:1
 			},
 			1400:{
+				nav:true,
+				dots:false,
 				items:1
 			}
 	     },
-    	})
+     	})
 
 
 	

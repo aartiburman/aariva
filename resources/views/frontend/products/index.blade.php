@@ -209,38 +209,40 @@
                             @forelse ($products as $product)
                             @php $slug = $product->slug ?? $product->id; $inWishlist = in_array($product->id, $wishlistProductIds ?? []); @endphp
                             <div class="col">
-                                <div class="card">
-                                    <div class="position-relative overflow-hidden">
-                                      <div class="icon-wishlist position-absolute top-0 end-0 mt-3 me-3">
+                                <div class="card product-card h-100 border-0 shadow-sm">
+                                    <div class="product-img-wrapper position-relative overflow-hidden">
+                                      <a href="{{ route('frontend.products.show', $slug) }}" class="d-block">
+                                        <img src="{{ $product->image }}" class="product-img" alt="{{ $product->name }}" loading="lazy">
+                                      </a>
+                                      <div class="icon-wishlist position-absolute top-0 end-0 mt-2 me-2">
                                           <a href="javascript:;" class="add-to-wishlist {{ $inWishlist ? 'active' : '' }}" data-product-id="{{ $product->id }}"><i class="bx {{ $inWishlist ? 'bxs-heart' : 'bx-heart' }}"></i></a>
                                       </div>
-                                      <a href="{{ route('frontend.products.show', $slug) }}">
-                                        <img src="{{ $product->image }}" class="img-fluid" alt="{{ $product->name }}" loading="lazy">
-                                      </a>
                                       @if ($product->discount_percent > 0)
-                                      <span class="discount-badge">{{ $product->discount_percent }}% {{ __t('OFF') }}</span>
+                                      <span class="badge bg-danger position-absolute top-0 start-0 mt-2 ms-2">{{ $product->discount_percent }}% {{ __t('OFF') }}</span>
                                       @endif
                                     </div>
-                                    <div class="card-body px-0">
-                                      <div class="d-flex align-items-center justify-content-between">
-                                          <div class="">
-                                              <p class="mb-1 product-short-name">{{ $product->category->name ?? '' }}</p>
-                                              <h6 class="mb-0 fw-bold product-short-title"><a href="{{ route('frontend.products.show', $slug) }}" class="text-dark text-decoration-none">{{ $product->name }}</a></h6>
-                                          </div>
-                                      </div>
-                                      <div class="cursor-pointer rating mt-2">
+                                    <div class="card-body px-3 pb-3 pt-2">
+                                      <p class="product-category mb-1 small text-muted text-truncate">{{ $product->category->name ?? '' }}</p>
+                                      <h6 class="product-title fw-bold mb-0"><a href="{{ route('frontend.products.show', $slug) }}" class="text-dark text-decoration-none">{{ $product->name }}</a></h6>
+                                      <div class="rating mt-1">
                                           @for ($i = 1; $i <= 5; $i++)
                                           <i class="bx {{ $i <= round($product->avg_rating) ? 'bxs-star text-warning' : 'bx-star text-muted' }}"></i>
                                           @endfor
                                           @if ($product->approvedReviews->count() > 0)
-                                          <span class="rating-count">({{ $product->approvedReviews->count() }})</span>
+                                          <span class="rating-count small">({{ $product->approvedReviews->count() }})</span>
                                           @endif
                                       </div>
-                                      <div class="product-price d-flex align-items-center justify-content-start gap-2 mt-2">
+                                      <div class="product-price d-flex align-items-center gap-2 mt-2">
                                           @if ($product->formatted_original_price)
-                                          <div class="h6 fw-light fw-bold text-secondary text-decoration-line-through">{{ $product->formatted_original_price }}</div>
+                                          <span class="old-price text-decoration-line-through text-muted small">{{ $product->formatted_original_price }}</span>
                                           @endif
-                                          <div class="h6 fw-bold">{{ $product->formatted_price }}</div>
+                                          <span class="current-price fw-bold fs-6">{{ $product->formatted_price }}</span>
+                                      </div>
+                                      <div class="mt-2">
+                                          <a href="javascript:;" class="btn btn-sm btn-dark btn-ecomm w-100 add-to-cart {{ in_array($product->id, $cartProductIds ?? []) ? 'remove-from-cart' : '' }}" data-product-id="{{ $product->id }}">
+                                              <i class="bx {{ in_array($product->id, $cartProductIds ?? []) ? 'bx-cart-x' : 'bx-cart-add' }} me-1"></i>
+                                              {{ in_array($product->id, $cartProductIds ?? []) ? __t('Remove') : __t('Add to Cart') }}
+                                          </a>
                                       </div>
                                     </div>
                                   </div>

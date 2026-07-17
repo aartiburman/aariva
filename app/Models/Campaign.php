@@ -9,8 +9,6 @@ class Campaign extends Model
 {
     protected $fillable = [
         'name',
-        'name_ar',
-        'name_ne',
         'discount_percent',
         'start_date',
         'end_date',
@@ -20,15 +18,6 @@ class Campaign extends Model
         'budget_per_vendor',
         'max_vendors',
     ];
-
-    public function getNameAttribute($value)
-    {
-        $locale = app()->getLocale();
-        if ($locale !== 'en') {
-            return $this->{"name_{$locale}"} ?: $value;
-        }
-        return ucfirst($value);
-    }
 
     protected $casts = [
         'start_date' => 'datetime',

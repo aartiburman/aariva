@@ -10,7 +10,6 @@ use App\Models\ChildCategory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use App\Helpers\ImageHelper;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\Product;
 
 
@@ -63,31 +62,12 @@ class CategoryController extends Controller
             $fileName = ImageHelper::compressImage($request->file('image'), 'uploads/category/');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $category = Category::create([
             'name' => $request->name,
-            'name_ar' => $trAr->translate($request->name),
-            'name_ne' => $trNe->translate($request->name),
-
             'slug' => Str::slug($request->slug),
-            'slug_ar' => Str::slug($request->slug),
-            'slug_ne' => Str::slug($request->slug),
-
             'description' => $request->description,
-            'description_ar' => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne' => $request->description ? $trNe->translate($request->description) : null,
-
             'meta_title' => $request->meta_title,
-            'meta_title_ar' => $request->meta_title ? $trAr->translate($request->meta_title) : null,
-            'meta_title_ne' => $request->meta_title ? $trNe->translate($request->meta_title) : null,
-
             'meta_description' => $request->meta_description,
-            'meta_description_ar' => $request->meta_description ? $trAr->translate($request->meta_description) : null,
-            'meta_description_ne' => $request->meta_description ? $trNe->translate($request->meta_description) : null,
-
-            // COMMON FIELDS
             'is_active' => $request->has('is_active') ? 1 : 0,
             'image'     => $fileName,
         ]);
@@ -131,30 +111,12 @@ class CategoryController extends Controller
             $fileName = ImageHelper::compressImage($request->image, 'uploads/category/');
         }
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $category->update([
             'name'             => $request->name,
-            'name_ar'          => $trAr->translate($request->name),
-            'name_ne'          => $trNe->translate($request->name),
-
             'slug'             => Str::slug($request->slug),
-            'slug_ar'          => Str::slug($request->slug),
-            'slug_ne'          => Str::slug($request->slug),
-
             'description'      => $request->description,
-            'description_ar'   => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne'   => $request->description ? $trNe->translate($request->description) : null,
-
             'meta_title'       => $request->meta_title,
-            'meta_title_ar'    => $request->meta_title ? $trAr->translate($request->meta_title) : null,
-            'meta_title_ne'    => $request->meta_title ? $trNe->translate($request->meta_title) : null,
-
             'meta_description' => $request->meta_description,
-            'meta_description_ar' => $request->meta_description ? $trAr->translate($request->meta_description) : null,
-            'meta_description_ne' => $request->meta_description ? $trNe->translate($request->meta_description) : null,
-
             'is_active'        => $request->has('is_active') ? 1 : 0,
             'image'            => $fileName, // 👈 old image stays if empty
         ]);
@@ -211,16 +173,9 @@ class CategoryController extends Controller
                 return response()->json(['success' => true, 'category' => $category, 'message' => 'Category already exists.']);
             }
 
-            $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('hi');
-
             $category = Category::create([
                 'name' => $name,
-                'name_ar' => $trAr->translate($name),
-                'name_ne' => $trNe->translate($name),
                 'slug' => Str::slug($name),
-                'slug_ar' => Str::slug($name),
-                'slug_ne' => Str::slug($name),
                 'is_active' => 1,
             ]);
 

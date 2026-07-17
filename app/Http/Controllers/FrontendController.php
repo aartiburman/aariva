@@ -3,12 +3,41 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ComingSoonSubscriber;
 
 class FrontendController extends Controller
 {
     public function home()
     {
-        return view('frontend.index');
+        return app(\App\Http\Controllers\Frontend\Template1\HomeController::class)->index(request());
+    }
+
+    public function comingSoon()
+    {
+        return view('frontend.coming-soon');
+    }
+
+    /**
+     * Launch gate for the website index.
+     * Before the launch date it shows the coming soon page,
+     * after the launch date it always shows the real home (index) page.
+     */
+    public function index()
+    {
+        $launch = \Carbon\Carbon::parse('2026-08-01 09:00:00');
+
+        if (now()->lt($launch)) {
+            return $this->comingSoon();
+        }
+
+        return $this->home();
+    }
+
+    public function comingSoonNotify(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        ComingSoonSubscriber::firstOrCreate(['email' => $request->email]);
+        return response()->json(['status' => true]);
     }
 
     public function aboutUs()

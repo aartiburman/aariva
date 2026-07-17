@@ -404,13 +404,16 @@
       let mainFeature = $('#main_feature').val() || '';
 
       let sizeVariant = '';
-      let selectedSizes = $('.js-size-select').first().select2('data');
-      if (selectedSizes && selectedSizes.length > 0) {
-        sizeVariant = selectedSizes.map(s => s.text).join(', ');
+      let sizeSelect = $('.js-size-select').first();
+      if (sizeSelect.length) {
+        let selectedOptions = sizeSelect.find('option:selected');
+        if (selectedOptions.length > 0) {
+          sizeVariant = selectedOptions.map(function() { return $(this).text(); }).get().join(', ');
+        }
       }
       if (!sizeVariant) {
         sizeVariant = $('select[name="product_variant"] option:selected').text();
-        if (sizeVariant === 'Select product Variant' || sizeVariant === 'Select product Variant' || !sizeVariant) sizeVariant = '';
+        if (sizeVariant === 'Select product Variant' || !sizeVariant) sizeVariant = '';
       }
 
       let productType = childcategory || subcategory || category;
@@ -429,9 +432,12 @@
       let color = $('input[name="color[]"]').val() || '';
       let material = $('input[name="material[]"]').val() || '';
       let sizeText = '';
-      let selectedSizes = $('.js-size-select').first().select2('data');
-      if (selectedSizes && selectedSizes.length > 0) {
-        sizeText = selectedSizes.map(s => s.text).join(', ');
+      let sizeSelect = $('.js-size-select').first();
+      if (sizeSelect.length) {
+        let selectedOptions = sizeSelect.find('option:selected');
+        if (selectedOptions.length > 0) {
+          sizeText = selectedOptions.map(function() { return $(this).text(); }).get().join(', ');
+        }
       }
 
       let desc = 'Description\n\nInclude:\n';

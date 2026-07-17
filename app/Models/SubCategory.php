@@ -13,15 +13,9 @@ class SubCategory extends Model
     protected $fillable = [
         'category_id',
         'name',
-        'name_ar',
-        'name_ne',
         'slug',
-        'slug_ar',
-        'slug_ne',
         'image',
         'description',
-        'description_ar',
-        'description_ne',
         'meta_title',
         'meta_description',
         'is_active',
@@ -31,15 +25,6 @@ class SubCategory extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function getNameAttribute($value)
-    {
-        $locale = app()->getLocale();
-        if ($locale !== 'en') {
-            return $this->{"name_{$locale}"} ?: $value;
-        }
-        return ucfirst($value);
     }
 
     public function setNameAttribute($value)

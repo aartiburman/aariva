@@ -6,6 +6,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Session\TokenMismatchException;
 
+// Stale putenv values from other projects persist across Apache child processes.
+// Disable PutenvAdapter so Dotenv reads from $_ENV/$_SERVER (always clean per-request).
+\Illuminate\Support\Env::disablePutenv();
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -15,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
-            'admin', // Exclude NCM webhook callback
+            'admin/ekart-webhook', // Sirf specific webhook path ko CSRF se exempt karo
         ]);
 
         // ✅ Register route middleware aliases here

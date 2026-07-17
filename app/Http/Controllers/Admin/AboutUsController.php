@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AboutUs;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AboutUsController extends Controller
 {
@@ -41,18 +40,11 @@ class AboutUsController extends Controller
             'content' => 'required',
         ]);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         if ($request->id) {
             $about = AboutUs::findOrFail($request->id);
             $about->update([
                 'title' => $request->title,
-                'title_ar' => $trAr->translate($request->title),
-                'title_ne' => $trNe->translate($request->title),
                 'content' => $request->content,
-                'content_ar' => $trAr->translate($request->content),
-                'content_ne' => $trNe->translate($request->content),
                 'status' => $request->status ?? 1,
             ]);
             return redirect()->route('about.us.list')->with('success', 'About Us updated successfully');
@@ -60,11 +52,7 @@ class AboutUsController extends Controller
 
         AboutUs::create([
             'title' => $request->title,
-            'title_ar' => $trAr->translate($request->title),
-            'title_ne' => $trNe->translate($request->title),
             'content' => $request->content,
-            'content_ar' => $trAr->translate($request->content),
-            'content_ne' => $trNe->translate($request->content),
             'status' => $request->status ?? 1,
         ]);
 

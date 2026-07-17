@@ -3,7 +3,9 @@
 use App\Http\Controllers\FrontendController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [FrontendController::class, 'home'])->name('frontend.home');
+Route::get('/', [FrontendController::class, 'index'])->name('frontend.home');
+Route::get('/home', [FrontendController::class, 'home'])->name('frontend.home');
+Route::post('/coming-soon/notify', [FrontendController::class, 'comingSoonNotify'])->name('coming.soon.notify');
 Route::get('/about-us', [FrontendController::class, 'aboutUs'])->name('frontend.about-us');
 Route::get('/contact-us', [FrontendController::class, 'contactUs'])->name('frontend.contact-us');
 Route::get('/blog-post', [FrontendController::class, 'blogPost'])->name('frontend.blog-post');

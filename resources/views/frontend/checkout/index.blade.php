@@ -126,7 +126,7 @@
                                 @endphp
                                 <div class="d-flex align-items-center mb-2">
                                     <a class="d-block flex-shrink-0" href="javascript:;">
-                                        <img src="{{ $img }}" width="60" alt="">
+                                        <img src="{{ $img }}" class="checkout-product-img" alt="">
                                     </a>
                                     <div class="ps-2">
                                         <h6 class="mb-0 small">{{ $product->name ?? 'Product' }}</h6>

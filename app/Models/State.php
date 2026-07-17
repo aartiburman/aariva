@@ -9,8 +9,6 @@ class State extends Model
     protected $fillable = [
         'country_id',
         'name',
-        'name_ar',
-        'name_ne',
         'code',
         'is_active',
     ];

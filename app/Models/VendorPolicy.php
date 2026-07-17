@@ -9,32 +9,10 @@ class VendorPolicy extends Model
 {
     protected $fillable = [
         'title',
-        'title_ar',
-        'title_ne',
         'content',
-        'content_ar',
-        'content_ne',
         'status',
         'version'
     ];
-
-    public function getTitleAttribute($value)
-    {
-        $locale = app()->getLocale();
-        if ($locale !== 'en') {
-            return $this->{"title_{$locale}"} ?? $value;
-        }
-        return $value;
-    }
-
-    public function getContentAttribute($value)
-    {
-        $locale = app()->getLocale();
-        if ($locale !== 'en') {
-            return $this->{"content_{$locale}"} ?? $value;
-        }
-        return $value;
-    }
 
     protected $casts = [
         'status' => 'boolean',

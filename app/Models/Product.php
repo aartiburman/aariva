@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-         'vendor_id', 'category_id', 'subcategory_id', 'child_category_id', 'brand_id', 'name', 'name_ar', 'name_ne', 'slug', 'slug_ar', 'slug_ne', 'short_description', 'short_description_ar', 'short_description_ne', 'description', 'description_ar', 'description_ne', 'meta_title', 'meta_description', 'thumbnail', 'status', 'rejection_reason', 'is_featured', 'offer_id', 'product_in', 'is_upload', 're_added',
+         'vendor_id', 'category_id', 'subcategory_id', 'child_category_id', 'brand_id', 'name', 'slug', 'short_description', 'description', 'meta_title', 'meta_description', 'thumbnail', 'status', 'rejection_reason', 'is_featured', 'offer_id', 'product_in', 'is_upload', 're_added',
          'vendor_warranty', 'vendor_payment', 'vendor_return', 'vendor_delivery'
     ];
 
@@ -55,15 +55,6 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class, 'brand_id');
-    }
-
-    public function getNameAttribute($value)
-    {
-        $locale = app()->getLocale();
-        if ($locale !== 'en') {
-            return $this->{"name_{$locale}"} ?: $value;
-        }
-        return ucfirst($value);
     }
 
     public function setNameAttribute($value)

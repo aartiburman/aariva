@@ -12,8 +12,6 @@ class ProductSize extends Model
    protected $fillable = [
         'size_cat_id',
         'name',
-        'name_ar',
-        'name_ne',
         'status',
     ];
 }

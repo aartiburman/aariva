@@ -10,29 +10,24 @@
 @section('og_description', 'Welcome to ' . config('app.name') . ' - Explore endless collection of fashion, electronics, beauty, home essentials & more. Shop now for exclusive deals with fast delivery.')
 
 @section('before-page-wrapper')
-<!--start slider section-->
-		<section class="slider-section mb-4">
+<!-- Launch blast effect (plays once for 2 seconds after going live) -->
+<canvas id="homeBlast" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9998; pointer-events:none;"></canvas>
+<div id="homeBlastFlash" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; opacity:0; z-index:9999; pointer-events:none; transition:opacity 0.2s;"></div>
+
+	<!--start slider section-->
+		<section class="slider-section mb-2 mb-md-4">
 			<div class="first-slider p-0">
 
 				<div class="banner-slider owl-carousel owl-theme">
 					@forelse ($heroBanners as $banner)
-					<div class="item">
-						<div class="position-relative">
-							<div class="position-absolute top-50 slider-content translate-middle">
-								<h3 class="h3 fw-bold d-none d-md-block">{{ $banner->title }}</h3>
-								<div class=""><a class="btn btn-dark btn-ecomm px-4" href="{{ $banner->link_url ?? route('frontend.products.index') }}">{{ __t('Shop Now') }}</a>
-								</div>
-							  </div>
-							<a href="{{ $banner->link_url ?? route('frontend.products.index') }}">
-								<img src="{{ is_array($banner->image) ? ($banner->image[0] ?? '') : $banner->image }}" class="img-fluid" alt="{{ $banner->title }}">
-							</a>
-						</div>
+					<div class="item position-relative">
+						<a href="{{ $banner->link_url ?? route('frontend.products.index') }}" class="d-block">
+							<img src="{{ is_array($banner->image) ? ($banner->image[0] ?? '') : $banner->image }}" class="img-fluid w-100" alt="{{ $banner->title }}" style="min-height:120px;object-fit:cover;">
+						</a>
 					</div>
 					@empty
 					<div class="item">
-						<div class="position-relative">
-							<img src="{{ asset('frontend/assets/images/banners/01.png') }}" class="img-fluid" alt="...">
-						</div>
+						<img src="{{ asset('frontend/assets/images/banners/01.png') }}" class="img-fluid w-100" alt="...">
 					</div>
 					@endforelse
 				</div>
@@ -44,12 +39,12 @@
 
 @section('content')
 <!--start information-->
-				<section class="py-4">
+				<section class="py-4 info-section">
 					<div class="container">
 
-						<div class="row row-cols-1 row-cols-lg-3 g-4">
+						<div class="row row-cols-1 row-cols-md-3 g-3">
 							<div class="col">
-								<div class="d-flex align-items-center justify-content-center p-3 border">
+								<div class="d-flex align-items-center justify-content-center p-3 border h-100">
 									<div class="fs-1 text-content"><i class='bx bx-taxi'></i>
 									</div>
 									<div class="info-box-content ps-3">
@@ -60,7 +55,7 @@
 							</div>
 	
 							<div class="col">
-								<div class="d-flex align-items-center justify-content-center p-3 border">
+								<div class="d-flex align-items-center justify-content-center p-3 border h-100">
 									<div class="fs-1 text-content"><i class='bx bx-dollar-circle'></i>
 									</div>
 									<div class="info-box-content ps-3">
@@ -70,7 +65,7 @@
 								</div>
 							</div>
 							<div class="col">
-								<div class="d-flex align-items-center justify-content-center p-3 border">
+								<div class="d-flex align-items-center justify-content-center p-3 border h-100">
 									<div class="fs-1 text-content"><i class='bx bx-support'></i>
 									</div>
 									<div class="info-box-content ps-3">
@@ -274,7 +269,7 @@
 									$imgCount = count($promoImages);
 									$promoTitle = $promo->title ?? __t('Sale');
 									$promoDesc = $promo->slug ?? __t('Explore the collection');
-									$promoDiscount = $promo->title_ar ?? '-10%';
+									$promoDiscount = $promo->title ?? '-10%';
 								@endphp
 								@if($imgCount >= 5)
 								<div class="col-12 col-md-6 col-lg-3 d-flex">
@@ -973,6 +968,81 @@ $(document).on('click', '.product-card-modern', function(e) {
     var url = $(this).data('url');
     if (url) window.location.href = url;
 });
+
+// Launch blast on the home page: 2 seconds, then stops
+(function() {
+    var flag = false;
+    try { flag = sessionStorage.getItem('aariva_launch_blast') === '1'; } catch (e) {}
+    if (!flag) return;
+    try { sessionStorage.removeItem('aariva_launch_blast'); } catch (e) {}
+
+    var canvas = document.getElementById('homeBlast');
+    var ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = 'block';
+    var cx = canvas.width / 2;
+    var cy = canvas.height / 2;
+    var particles = [];
+    var colors = ['#ff5722', '#ff9800', '#ffeb3b', '#f44336', '#ffc107', '#ffffff'];
+    var endTime = Date.now() + 5000;
+
+    function boom(x, y, count, power) {
+        for (var i = 0; i < count; i++) {
+            var angle = Math.random() * Math.PI * 2;
+            var speed = (Math.random() * power) + power * 0.3;
+            particles.push({
+                x: x, y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1,
+                decay: Math.random() * 0.009 + 0.004,
+                size: Math.random() * 3 + 1.5,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+    }
+
+    function flashScreen() {
+        var flash = document.getElementById('homeBlastFlash');
+        flash.style.opacity = '1';
+        setTimeout(function() { flash.style.opacity = '0'; }, 180);
+    }
+
+    var burst = 0;
+    var timer = setInterval(function() {
+        burst++;
+        var x = (burst % 3 === 0) ? cx : cx + (Math.random() - 0.5) * canvas.width * 0.7;
+        var y = (burst % 3 === 0) ? cy : cy + (Math.random() - 0.5) * canvas.height * 0.7;
+        boom(x, y, 160, 9);
+    }, 550);
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = particles.length - 1; i >= 0; i--) {
+            var p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.vy += 0.05; p.vx *= 0.985; p.vy *= 0.985;
+            p.life -= p.decay;
+            if (p.life <= 0) { particles.splice(i, 1); continue; }
+            ctx.globalAlpha = Math.max(p.life, 0);
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        if (Date.now() < endTime || particles.length > 0) {
+            requestAnimationFrame(render);
+        } else {
+            clearInterval(timer);
+            canvas.style.display = 'none';
+            document.getElementById('homeBlastFlash').style.display = 'none';
+        }
+    }
+    render();
+})();
 </script>
 <script src="{{ asset('frontend/assets/js/index.js') }}"></script>
 @endpush

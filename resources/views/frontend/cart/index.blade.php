@@ -72,14 +72,14 @@
                             <div class="col-6 col-sm-2">
                                 <div class="cart-item-price text-center d-none d-sm-block">{{ App\Helpers\PriceHelper::formatPrice($unitPrice) }}</div>
                             </div>
-                            <div class="col-6 col-sm-2">
+                            <div class="col-4 col-sm-2">
                                 <div class="qty-control">
                                     <button type="button" class="qty-btn qty-minus" data-cart-id="{{ $item->id }}">−</button>
                                     <input type="number" class="qty-input cart-qty-input" value="{{ $item->qty }}" min="1" data-cart-id="{{ $item->id }}">
                                     <button type="button" class="qty-btn qty-plus" data-cart-id="{{ $item->id }}">+</button>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-1 text-center">
+                            <div class="col-2 col-sm-1 text-center">
                                 <button type="button" class="cart-remove-btn" data-cart-id="{{ $item->id }}" title="Remove item">
                                     <i class="bx bx-trash"></i>
                                 </button>
@@ -253,8 +253,14 @@
 }
 @media (max-width: 575.98px) {
     .cart-item-card { padding: 16px; }
-    .qty-control { margin: 0 auto; }
-    .cart-remove-btn { margin: 0 auto; }
+    .cart-item-price.text-center.d-none.d-sm-block {
+        display: block !important;
+        text-align: left !important;
+        font-size: 14px;
+    }
+    .cart-item-detail .cart-item-price.d-sm-none {
+        display: none !important;
+    }
 }
 </style>
 @endpush

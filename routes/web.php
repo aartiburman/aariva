@@ -54,6 +54,9 @@ Route::get('/pay/{order_reference_id}', [POSController::class, 'showPaymentPage'
 Route::get('/payment-success', [WebPagesController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment-failure', [WebPagesController::class, 'paymentFailure'])->name('payment.failure');
 
+// eKart webhook (CSRF exempted in bootstrap/app.php)
+Route::post('admin/ekart-webhook', [App\Http\Controllers\Api\UserCheckout::class, 'ekart_webhook'])->name('admin.ekart.webhook');
+
 
 //    Route::get('/', function () {
 //        return response('OK', 200);
@@ -141,7 +144,6 @@ Route::middleware(['auth', 'role:1'])->group(function () {
 
     Route::post('delete-coupon', [CouponController::class, 'delete'])->name('delete.coupon');
     Route::post('coupons-delete-multiple', [CouponController::class, 'delete_multiple'])->name('coupons.delete.multiple');
-    Route::post('export-coupons', [CouponController::class, 'export_multiple'])->name('coupons.export');
     Route::post('change-coupons-status', [CouponController::class, 'status'])->name('change.coupons.status');
     Route::post('export-coupons', [CouponController::class, 'export'])->name('coupons.export');
     Route::post('export-coupons-multiple', [CouponController::class, 'export_multiple'])->name('coupons.export.multiple');
@@ -280,7 +282,6 @@ Route::middleware(['auth', 'role:1'])->group(function () {
 
     // shipping Address
     Route::get('shipping-address', [HomeController::class, 'shipping_address'])->name('shipping.address');
-    Route::get('shipping-zone', [HomeController::class, 'shipping_zone'])->name('shipping.zone');
     Route::get('add-shipping-zone', [HomeController::class, 'add_shipping_zone'])->name('add.shipping.zone');
     Route::get('store-shipping-zone', [HomeController::class, 'store_shipping_zone'])->name('store.shipping.zone');
 
@@ -585,8 +586,6 @@ Route::middleware(['auth', 'role:2'])->group(function () {
 
 // ======================== CUSTOMER FRONTEND ROUTES ========================
 Route::group(['namespace' => 'App\Http\Controllers\Frontend\Template1', 'as' => 'frontend.'], function () {
-    Route::get('/', 'HomeController@index')->name('home');
-
     // Auth
     Route::get('login', 'AuthController@showLoginForm')->name('login');
     Route::post('login', 'AuthController@login');

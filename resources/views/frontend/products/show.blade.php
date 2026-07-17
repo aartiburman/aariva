@@ -326,52 +326,39 @@
         <div class="product-grid">
             <div class="similar-products owl-carousel owl-theme position-relative">
                 @foreach($relatedProducts as $similarProduct)
+                    @php
+                        $similarVariant = $similarProduct->firstVariant ?? $similarProduct->variants->first();
+                        $similarImg = $similarVariant && $similarVariant->image ? App\Helpers\ImageHelper::getProductImage($similarVariant->image) : asset('frontend/assets/images/similar-products/01.png');
+                        $sOriginalPrice = $similarVariant ? $similarVariant->price : 0;
+                        $sFinalPrice = $similarVariant ? App\Helpers\PriceHelper::applyDiscount($similarVariant->price, $similarVariant->discount_type, $similarVariant->discount_value) : 0;
+                        $discountPct = ($sOriginalPrice > 0 && $sFinalPrice < $sOriginalPrice) ? round((1 - $sFinalPrice / $sOriginalPrice) * 100) : 0;
+                    @endphp
                     <div class="item">
-                        <div class="card">
-                            <div class="position-relative overflow-hidden">
-                                <div class="add-cart position-absolute top-0 end-0 mt-3 me-3">
-                                    <button type="button" class="{{ $similarProduct->is_in_cart ? 'remove-from-cart' : 'add-to-cart' }}" 
+                        <div class="card product-card h-100 border-0 shadow-sm">
+                            <div class="product-img-wrapper position-relative overflow-hidden">
+                                <a href="{{ route('frontend.products.show', $similarProduct->slug) }}" class="d-block">
+                                    <img src="{{ $similarImg }}" class="product-img" alt="{{ $similarProduct->name }}">
+                                </a>
+                                <div class="add-cart position-absolute top-0 end-0 mt-2 me-2" style="z-index:3;">
+                                    <button type="button" class="btn btn-light btn-sm rounded-circle p-1 {{ $similarProduct->is_in_cart ? 'remove-from-cart' : 'add-to-cart' }}" 
                                         data-product-id="{{ $similarProduct->id }}" 
                                         data-variant-id="{{ $similarProduct->firstVariant ? $similarProduct->firstVariant->id : '' }}" 
-                                        data-qty="1">
-                                        <i class="bx {{ $similarProduct->is_in_cart ? 'bx-cart-x' : 'bx-cart-add' }}"></i>
+                                        data-qty="1" style="width:32px;height:32px;">
+                                        <i class="bx {{ $similarProduct->is_in_cart ? 'bx-cart-x' : 'bx-cart-add' }}" style="font-size:16px;"></i>
                                     </button>
                                 </div>
-                                <div class="quick-view position-absolute start-0 bottom-0 end-0">
-                                    <a href="{{ route('frontend.products.show', $similarProduct->slug) }}" class="btn btn-light btn-sm">{{ __('View Product') }}</a>
-                                </div>
-                                <a href="{{ route('frontend.products.show', $similarProduct->slug) }}">
-                                    @php
-                                        $similarVariant = $similarProduct->firstVariant ?? $similarProduct->variants->first();
-                                        $similarImg = $similarVariant && $similarVariant->image ? App\Helpers\ImageHelper::getProductImage($similarVariant->image) : asset('frontend/assets/images/similar-products/01.png');
-                                    @endphp
-                                    <img src="{{ $similarImg }}" class="img-fluid" alt="{{ $similarProduct->name }}">
-                                </a>
+                                @if($discountPct > 0)
+                                <span class="badge bg-danger position-absolute top-0 start-0 mt-2 ms-2">{{ $discountPct }}% OFF</span>
+                                @endif
                             </div>
-                            <div class="card-body px-0">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="">
-                                        <p class="mb-1 product-short-name">{{ $similarProduct->category->name ?? 'Category' }}</p>
-                                        <h6 class="mb-0 fw-bold product-short-title">{{ $similarProduct->name }}</h6>
-                                    </div>
-                                    <div class="icon-wishlist">
-                                        <button type="button" class="add-to-wishlist {{ $similarProduct->is_in_wishlist ? 'active text-danger' : '' }}" 
-                                            data-product-id="{{ $similarProduct->id }}">
-                                            <i class="bx {{ $similarProduct->is_in_wishlist ? 'bxs-heart' : 'bx-heart' }}"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="product-price d-flex align-items-center justify-content-start gap-2 mt-2">
-                                    @php
-                                        $sOriginalPrice = $similarVariant ? $similarVariant->price : 0;
-                                        $sFinalPrice = $similarVariant ? App\Helpers\PriceHelper::applyDiscount($similarVariant->price, $similarVariant->discount_type, $similarVariant->discount_value) : 0;
-                                    @endphp
-                                    @if($sFinalPrice < $sOriginalPrice)
-                                        <div class="h6 fw-light fw-bold text-secondary text-decoration-line-through">
-                                            {{ App\Helpers\PriceHelper::formatPrice($sOriginalPrice) }}
-                                        </div>
+                            <div class="card-body px-3 pb-3 pt-2">
+                                <p class="product-category mb-1 small text-muted text-truncate">{{ $similarProduct->category->name ?? 'Category' }}</p>
+                                <h6 class="product-title fw-bold mb-0"><a href="{{ route('frontend.products.show', $similarProduct->slug) }}" class="text-dark text-decoration-none">{{ $similarProduct->name }}</a></h6>
+                                <div class="product-price d-flex align-items-center gap-2 mt-2">
+                                    @if($discountPct > 0)
+                                        <span class="old-price text-decoration-line-through text-muted small">{{ App\Helpers\PriceHelper::formatPrice($sOriginalPrice) }}</span>
                                     @endif
-                                    <div class="h6 fw-bold">{{ App\Helpers\PriceHelper::formatPrice($sFinalPrice) }}</div>
+                                    <span class="current-price fw-bold fs-6">{{ App\Helpers\PriceHelper::formatPrice($sFinalPrice) }}</span>
                                 </div>
                             </div>
                         </div>

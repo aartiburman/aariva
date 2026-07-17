@@ -9,7 +9,6 @@ use App\Models\SubCategory;
 use App\Models\ChildCategory;
 use Illuminate\Support\Str;
 use App\Helpers\ImageHelper;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 
 class ChildCategoryController extends Controller
@@ -73,32 +72,19 @@ class ChildCategoryController extends Controller
             ? Str::slug($request->slug)
             : Str::slug($request->name);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         // ✅ Create Child Category
         $data = [
             'category_id'      => $request->category_id,
             'subcategory_id'   => $request->subcategory_id,
             'name'             => $request->name,
-            'name_ar'          => $trAr->translate($request->name),
-            'name_ne'          => $trNe->translate($request->name),
 
             'slug'             => $slug,
-            'slug_ar'          => Str::slug($request->slug ?? $request->name),
-            'slug_ne'          => Str::slug($request->slug ?? $request->name),
 
             'description'      => $request->description,
-            'description_ar'   => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne'   => $request->description ? $trNe->translate($request->description) : null,
 
             'meta_title'       => $request->meta_title,
-            'meta_title_ar'    => $request->meta_title ? $trAr->translate($request->meta_title) : null,
-            'meta_title_ne'    => $request->meta_title ? $trNe->translate($request->meta_title) : null,
 
             'meta_description' => $request->meta_description,
-            'meta_description_ar' => $request->meta_description ? $trAr->translate($request->meta_description) : null,
-            'meta_description_ne' => $request->meta_description ? $trNe->translate($request->meta_description) : null,
 
             'is_active'           => $request->is_active,
         ];
@@ -134,18 +120,11 @@ class ChildCategoryController extends Controller
                 return response()->json(['success' => true, 'child' => $child, 'message' => 'Child category already exists.']);
             }
 
-            $trAr = new GoogleTranslate('ar');
-            $trNe = new GoogleTranslate('hi');
-
             $child = ChildCategory::create([
                 'category_id' => $request->category_id,
                 'subcategory_id' => $request->subcategory_id,
                 'name' => $name,
-                'name_ar' => $trAr->translate($name),
-                'name_ne' => $trNe->translate($name),
                 'slug' => Str::slug($name),
-                'slug_ar' => Str::slug($name),
-                'slug_ne' => Str::slug($name),
                 'is_active' => 1,
             ]);
 
@@ -302,34 +281,21 @@ class ChildCategoryController extends Controller
 
         $childCategory = ChildCategory::findOrFail($request->child_category_id);
 
-        $trAr = new GoogleTranslate('ar');
-        $trNe = new GoogleTranslate('hi');
-
         $childCategory->update([
             'category_id'       => $request->category_id,
             'subcategory_id'    => $request->subcategory_id,
             'name'              => $request->name,
-            'name_ar'           => $trAr->translate($request->name),
-            'name_ne'           => $trNe->translate($request->name),
 
             'slug'              => $request->slug
                 ? Str::slug($request->slug)
                 : Str::slug($request->name),
-            'slug_ar'           => Str::slug($request->slug ?? $request->name),
-            'slug_ne'           => Str::slug($request->slug ?? $request->name),
 
             'is_active'         => $request->is_active,
             'description'       => $request->description,
-            'description_ar'    => $request->description ? $trAr->translate($request->description) : null,
-            'description_ne'    => $request->description ? $trNe->translate($request->description) : null,
 
             'meta_title'        => $request->meta_title,
-            'meta_title_ar'     => $request->meta_title ? $trAr->translate($request->meta_title) : null,
-            'meta_title_ne'     => $request->meta_title ? $trNe->translate($request->meta_title) : null,
 
             'meta_description'  => $request->meta_description,
-            'meta_description_ar' => $request->meta_description ? $trAr->translate($request->meta_description) : null,
-            'meta_description_ne' => $request->meta_description ? $trNe->translate($request->meta_description) : null,
         ]);
 
         return redirect()

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Helpers\NotificationHelper;
 use Carbon\Carbon;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class CampaignController extends Controller
 {
@@ -144,13 +143,8 @@ class CampaignController extends Controller
             ]);
 
             return DB::transaction(function () use ($request, $validated) {
-                $trAr = new GoogleTranslate('ar');
-                $trNe = new GoogleTranslate('hi');
-
                 $campaign = Campaign::create([
                     'name' => $validated['name'],
-                    'name_ar' => $trAr->translate($validated['name']),
-                    'name_ne' => $trNe->translate($validated['name']),
                     'discount_percent' => $validated['discount_percent'],
                     'start_date' => $validated['start_date'],
                     'end_date' => $validated['end_date'],
@@ -353,12 +347,6 @@ class CampaignController extends Controller
             ]);
 
             return DB::transaction(function () use ($request, $campaign, $validated) {
-                if ($request->has('name')) {
-                    $trAr = new GoogleTranslate('ar');
-                    $trNe = new GoogleTranslate('hi');
-                    $campaign->name_ar = $trAr->translate($request->name);
-                    $campaign->name_ne = $trNe->translate($request->name);
-                }
                 $campaign->fill($validated);
                 if ($request->has('offer_id')) {
                     $campaign->offer_id = $request->input('offer_id');

@@ -33,6 +33,7 @@ use App\Helpers\PriceCalculationHelper;
 use App\Helpers\CampaignBudgetHelper;
 use App\Services\Payment\PhonePeService;
 use App\Services\Payment\PaytmService;
+use App\Services\Logistics\EkartService;
 
 class UserCheckout extends Controller
 {
@@ -45,11 +46,53 @@ class UserCheckout extends Controller
             ?? $request->input('couponCode');
     }
 
-    public function sync_ncm_status(Request $request, $reference_id = null)
+    public function sync_ekart_status(Request $request, $reference_id = null)
     {
-        // TODO: NCMService has been removed. This method needs to be refactored.
-        Log::warning('sync_ncm_status called but NCMService is no longer available.');
-        return response()->json(['status' => false, 'message' => 'NCM service not available'], 503);
+        $reference_id = $reference_id ?? $request->input('reference_id') ?? $request->input('order_reference');
+
+        if (!$reference_id) {
+            return response()->json(['status' => false, 'message' => 'Reference id required'], 422);
+        }
+
+        $order = \App\Models\Order::where('reference_id', $reference_id)->first();
+        if (!$order) {
+            return response()->json(['status' => false, 'message' => 'Order not found'], 404);
+        }
+
+        $ekart = new EkartService();
+        $service = $ekart->trackShipment($request->input('tracking_id'));
+
+        $trackingId = $request->input('tracking_id') ?? ($service['tracking_id'] ?? null);
+        $status     = $request->input('status') ?? ($service['status'] ?? 'In Transit');
+
+        foreach ($order->items as $item) {
+            $item->logistics_provider = 'eKart';
+            if ($trackingId) {
+                $item->tracking_id = $trackingId;
+            }
+            $item->logistics_status = $status;
+            $item->save();
+        }
+
+        return response()->json([
+            'status'      => true,
+            'message'     => 'eKart status synced',
+            'provider'    => 'eKart',
+            'tracking_id' => $trackingId,
+            'logistics_status' => $status,
+        ]);
+    }
+
+    /**
+     * eKart webhook receiver (CSRF exempted in bootstrap/app.php).
+     */
+    public function ekart_webhook(Request $request)
+    {
+        $payload = $request->all();
+        $ekart = new EkartService();
+        $result = $ekart->handleWebhook($payload);
+
+        return response()->json($result, $result['success'] ? 200 : 422);
     }
 
     public function place_order(Request $request)
