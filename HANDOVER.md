@@ -1,9 +1,9 @@
-# Project Handover Documentation: Nepoora Vendor Admin & API
+# Project Handover Documentation: Aariva Vendor Admin & API
 
-This document provides a comprehensive overview of the Nepoora Vendor Admin backend project, its architecture, setup instructions, and API documentation for handover to the client.
+This document provides a comprehensive overview of the Aariva Vendor Admin backend project, its architecture, setup instructions, and API documentation for handover to the client.
 
 ## 1. Project Overview
-Nepoora is a multi-vendor marketplace platform. This backend system manages vendor administration, user interactions, product management, orders, and payment processing.
+Aariva is a multi-vendor marketplace platform. This backend system manages vendor administration, user interactions, product management, orders, and payment processing.
 
 - **Framework**: Laravel 12.x
 - **Language**: PHP 8.2+

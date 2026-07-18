@@ -1,9 +1,8 @@
 @extends('backend.layouts.app')
 @section('content')
 
-<!-- [ Main Content ] start -->
-<section class="pc-container">
-  <div class="pc-content">
+<div class="page-content">
+    <div class="container-fluid">
 
     <div class="card">
       <div class="card-header">
@@ -12,14 +11,14 @@
             <div class="row align-items-center">
               <div class="col-md-12">
                 <div class="page-header-title">
-                  <h5 class="mb-0">Add Shipping Zone</h5>
+                  <h5 class="mb-0">Add Tax Rate</h5>
                 </div>
               </div>
               <div class="col-md-12">
                 <ul class="breadcrumb mb-0">
                   <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Home</a></li>
-                  <li class="breadcrumb-item"><a href="javascript: void(0)">Shipping Zone</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Add Shipping Zone</li>
+                  <li class="breadcrumb-item"><a href="{{route('tax.rates')}}">Tax Rates</a></li>
+                  <li class="breadcrumb-item" aria-current="page">Add Tax Rate</li>
                 </ul>
               </div>
             </div>
@@ -29,15 +28,13 @@
     </div>
     <!-- [ breadcrumb ] end -->
 
-
     <!-- [ Main Content ] start -->
     <div class="row">
       <div class="col-md-12">
 
-
         <div class="card">
           <div class="card-header">
-            <h5>Add Shipping Zone</h5>
+            <h5>Add Tax Rate</h5>
           </div>
           <div class="card-body">
         <form action="{{ route('store.tax.rate') }}" method="POST">
@@ -52,6 +49,7 @@
                         name="name"
                         class="form-control"
                         placeholder="GST / VAT / Sales Tax"
+                        id="taxName"
                         required>
                 </div>
 
@@ -61,8 +59,9 @@
                     <input type="text"
                         name="slug"
                         class="form-control"
-                        readonly
-                        placeholder="auto-generated">
+                        id="taxSlug"
+                        placeholder="auto-generated"
+                        required>
                 </div>
 
             </div>
@@ -130,6 +129,16 @@
     </div>
   </div>
   <!-- [ Main Content ] end -->
-</section>
 <!-- [ Main Content ] end -->
+
+@push('scripts')
+<script>
+document.getElementById('taxName').addEventListener('input', function() {
+    document.getElementById('taxSlug').value = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+});
+</script>
+@endpush
 @endsection

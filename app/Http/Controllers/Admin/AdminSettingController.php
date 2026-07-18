@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Helpers\EmailHelper;
 use App\Models\KYC_Document;
 use App\Models\Country;
+use App\Models\TaxRate;
 
 class AdminSettingController extends Controller
 {
@@ -848,5 +849,76 @@ class AdminSettingController extends Controller
         }
 
         return redirect()->route('company.info')->with('success', 'Company information updated successfully.');
+    }
+
+    public function tax_rates()
+    {
+        $taxRates = TaxRate::latest()->get();
+        return view('backend/admin/tax/tax-rates', compact('taxRates'));
+    }
+
+    public function add_tax_rate()
+    {
+        return view('backend/admin/tax/add-tax-rate');
+    }
+
+    public function store_tax_rate(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tax_rates,slug',
+            'tax_percentage' => 'required|numeric|min:0|max:100',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        TaxRate::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'tax_percentage' => $request->tax_percentage,
+            'country' => $request->country,
+            'state' => $request->state,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return redirect()->route('tax.rates')->with('success', 'Tax rate added successfully.');
+    }
+
+    public function edit_tax_rate($id)
+    {
+        $taxRate = TaxRate::findOrFail($id);
+        return view('backend/admin/tax/edit-tax-rate', compact('taxRate'));
+    }
+
+    public function update_tax_rate(Request $request)
+    {
+        $taxRate = TaxRate::findOrFail($request->id);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tax_rates,slug,' . $taxRate->id,
+            'tax_percentage' => 'required|numeric|min:0|max:100',
+            'country' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $taxRate->update([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'tax_percentage' => $request->tax_percentage,
+            'country' => $request->country,
+            'state' => $request->state,
+            'is_active' => $request->boolean('is_active', $taxRate->is_active),
+        ]);
+
+        return redirect()->route('tax.rates')->with('success', 'Tax rate updated successfully.');
+    }
+
+    public function delete_tax_rate(Request $request)
+    {
+        $taxRate = TaxRate::findOrFail($request->id);
+        $taxRate->delete();
+        return redirect()->route('tax.rates')->with('success', 'Tax rate deleted successfully.');
     }
 }

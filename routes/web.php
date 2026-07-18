@@ -290,9 +290,12 @@ Route::middleware(['auth', 'role:1'])->group(function () {
     Route::get('create-email-template', [EmailController::class, 'create_email_template'])->name('create.email.template');
     Route::get('add-email-template', [EmailController::class, 'add_email_template'])->name('add.email.template');
     Route::post('store-email-template', [EmailController::class, 'store_email_template'])->name('store.email.template');
-    Route::get('add-tax-rates', [HomeController::class, 'add_tax_rates'])->name('add.tax.rate');
-    Route::get('tax-rates', [HomeController::class, 'tax_rates'])->name('tax.rates');
-    Route::get('store-tax-rate', [HomeController::class, 'store_tax_rate'])->name('store.tax.rate');
+    Route::get('tax-rates', [AdminSettingController::class, 'tax_rates'])->name('tax.rates');
+    Route::get('add-tax-rate', [AdminSettingController::class, 'add_tax_rate'])->name('add.tax.rate');
+    Route::post('store-tax-rate', [AdminSettingController::class, 'store_tax_rate'])->name('store.tax.rate');
+    Route::get('edit-tax-rate/{id}', [AdminSettingController::class, 'edit_tax_rate'])->name('edit.tax.rate');
+    Route::post('update-tax-rate', [AdminSettingController::class, 'update_tax_rate'])->name('update.tax.rate');
+    Route::post('delete-tax-rate', [AdminSettingController::class, 'delete_tax_rate'])->name('delete.tax.rate');
 
     // report   
     Route::match(['get', 'post'], 'sales-report', [ReportController::class, 'sales_report'])->name('sales.report');
@@ -510,6 +513,13 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('orders-details/{reference_id}', [OrderController::class, 'orders_details'])->name('orders.details');
     Route::get('orders-invoice/{reference_id}', [OrderController::class, 'orders_invoice'])->name('orders.invoice');
     Route::get('restore-order/{id}', [OrderController::class, 'restore_order'])->name('restore.order');
+
+    // bills
+    Route::match(['get', 'post'], 'bills', [\App\Http\Controllers\Admin\BillController::class, 'index'])->name('bills.index');
+    Route::get('bills/{id}', [\App\Http\Controllers\Admin\BillController::class, 'show'])->name('bills.show');
+    Route::get('bills/{id}/download', [\App\Http\Controllers\Admin\BillController::class, 'download'])->name('bills.download');
+    Route::get('bills/generate/{orderId}', [\App\Http\Controllers\Admin\BillController::class, 'generateForOrder'])->name('bills.generate');
+    Route::get('bills/{id}/regenerate', [\App\Http\Controllers\Admin\BillController::class, 'regenerate'])->name('bills.regenerate');
 
     // tickets
     Route::match(['get', 'post'], 'tickets', [TicketController::class, 'index'])->name('tickets.index');

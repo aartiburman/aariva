@@ -19,7 +19,7 @@ class SingleSessionMiddleware
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                return redirect()->route('login')->with('error', 'Detached : Your account was logged in from another device.');
+                return redirect('/login')->with('error', 'Detached : Your account was logged in from another device.');
             }
         }
 

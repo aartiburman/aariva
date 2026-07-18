@@ -114,6 +114,14 @@ Route::get('my-orders', [UserCheckout::class, 'my_orders']);
 Route::get('get-order-detail', [UserCheckout::class, 'get_order_detail']);
 Route::get('track-order', [UserCheckout::class, 'track_order']);
 
+// bill/invoice
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('my-bills', [\App\Http\Controllers\Api\BillController::class, 'myBills']);
+    Route::get('bill/{orderId}', [\App\Http\Controllers\Api\BillController::class, 'getBill']);
+    Route::get('bill/{billId}/download', [\App\Http\Controllers\Api\BillController::class, 'downloadBill']);
+    Route::get('bill/{billId}/stream', [\App\Http\Controllers\Api\BillController::class, 'streamBill']);
+});
+
 Route::get('get-categories', [UserCommonController::class, 'get_categories']);
 Route::get('get-subcategories', [UserCommonController::class, 'get_subcategories']);
 Route::get('get-childcategories', [UserCommonController::class, 'get_childcategories']);
@@ -182,53 +190,7 @@ Route::get('paypal/cancel', [PayPalApiController::class, 'cancel'])->name('api.p
 // Route::get('test-sms', [UserController::class, 'testSms']);
 // Route::get('send-notification', [UserController::class, 'send_notification']);
 
-// Route::match(['get', 'post'], 'update-fcm-settings', function(\Illuminate\Http\Request $request) {
-//     $data = [
-//         'firebase_api_key' => $request->apiKey ?? 'AIzaSyCBozqKSO6IqmmHVlRvTVQYtQV7RIgGpUY',
-//         'firebase_auth_domain' => $request->authDomain ?? 'nepoora-auth.firebaseapp.com',
-//         'firebase_project_id' => $request->projectId ?? 'nepoora-auth',
-//         'firebase_storage_bucket' => $request->storageBucket ?? 'nepoora-auth.firebasestorage.app',
-//         'firebase_messaging_sender_id' => $request->messagingSenderId ?? '288333381789',
-//         'firebase_app_id' => $request->appId ?? '1:288333381789:web:e8d02fd0f0f899cb729474',
-//         'measurementId' => $request->measurementId ?? 'G-W0MZC761Q3',
-//         'status' => 1
-//     ];
 
-//     if ($request->has('serviceAccount')) {
-//         $data['firebase_service_account'] = is_array($request->serviceAccount) 
-//             ? json_encode($request->serviceAccount) 
-//             : $request->serviceAccount;
-//     }
-
-//     $setting = \App\Models\NotificationSetting::updateOrCreate(['id' => 1], $data);
-
-//     return response()->json([
-//         'status' => true, 
-//         'message' => 'FCM settings updated successfully', 
-//         'service_account_saved' => $request->has('serviceAccount') ? 'Yes' : 'No',
-//         'current_service_account_status' => empty($setting->firebase_service_account) ? 'Empty' : 'Present',
-//         'data' => $setting
-//     ]);
-// });
-
-// Route::get('check-fcm-config', function() {
-//     $setting = \App\Models\NotificationSetting::first();
-//     if (!$setting) return response()->json(['status' => false, 'message' => 'No settings found']);
-    
-//     try {
-//         $dummyToken = 'dummy_token_at_least_140_characters_long_to_pass_sdk_validation_check_' . str_repeat('a', 100);
-//         $serviceAccount = \App\Helpers\NotificationHelper::sendPushByToken($dummyToken, ['title' => 'test', 'message' => 'test']);
-//     } catch (\Exception $e) {
-//         $message = $e->getMessage();
-//         if (
-//             strpos($message, 'Requested entity was not found') !== false || 
-//             strpos($message, 'Invalid registration token') !== false ||
-//             strpos($message, 'not a valid FCM registration token') !== false
-//         ) {
-//             return response()->json(['status' => true, 'message' => 'Credentials are VALID (Token was dummy but auth succeeded)']);
-//         }
-//         return response()->json(['status' => false, 'message' => 'FCM Auth Failed: ' . $message]);
-//     }
 // });
 
 

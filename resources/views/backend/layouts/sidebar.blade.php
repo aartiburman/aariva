@@ -456,10 +456,13 @@
                               <li class="sub-nav-item">
                                    <a class="sub-nav-link {{ request()->routeIs('kyc.documents.list') ? 'active' : '' }}" href="{{route('kyc.documents.list')}}">KYC Documents</a>
                               </li>
-                              <li class="sub-nav-item">
-                                   <a class="sub-nav-link {{ request()->routeIs('global.fees') ? 'active' : '' }}" href="{{route('global.fees')}}">{{ __('messages.global_fees') }}</a>
-                              </li>
                                <li class="sub-nav-item">
+                                    <a class="sub-nav-link {{ request()->routeIs('global.fees') ? 'active' : '' }}" href="{{route('global.fees')}}">{{ __('messages.global_fees') }}</a>
+                               </li>
+                               <li class="sub-nav-item">
+                                    <a class="sub-nav-link {{ request()->routeIs('tax.rates') ? 'active' : '' }}" href="{{route('tax.rates')}}">Tax Rates</a>
+                               </li>
+                                <li class="sub-nav-item">
                                     <a class="sub-nav-link {{ request()->routeIs('payment.getway.setting') ? 'active' : '' }}" href="{{route('payment.getway.setting')}}">{{ __('messages.payment_gateway_setting') }}</a>
                               </li>
                               <li class="sub-nav-item">

@@ -23,6 +23,13 @@
                                     <i class="bx bx-arrow-back fs-16"></i> Back to Order List
                                 </a>
                                 <a href="{{ route('orders.invoice', $order->order_reference_id) }}" target="_blank" class="btn btn-soft-primary btn-sm"><i class="bx bx-printer fs-16"></i> Print Invoice</a>
+                                @php $orderBill = \App\Models\Bill::where('order_id', $order->id)->first(); @endphp
+                                @if($orderBill)
+                                <a href="{{ route('bills.show', $orderBill->id) }}" target="_blank" class="btn btn-soft-dark btn-sm"><i class="bx bx-receipt fs-16"></i> View Bill</a>
+                                <a href="{{ route('bills.download', $orderBill->id) }}" class="btn btn-soft-success btn-sm"><i class="bx bx-download fs-16"></i> Bill PDF</a>
+                                @else
+                                <a href="{{ route('bills.generate', $order->id) }}" class="btn btn-soft-warning btn-sm"><i class="bx bx-plus fs-16"></i> Generate Bill</a>
+                                @endif
                             </div>
                         </div>
                     </div>

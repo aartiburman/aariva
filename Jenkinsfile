@@ -3,59 +3,45 @@ pipeline {
 
     stages {
 
-        stage('Composer Install') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
             steps {
                 bat 'composer install --no-interaction --prefer-dist'
             }
         }
 
-        stage('Create .env') {
+        stage('Deploy') {
             steps {
-                bat '''
-                if not exist .env (
-                    copy .env.example .env
-                )
+                sshCommand remote: [
+                    host: '82.112.239.97',
+                    user: 'u434256881',
+                    password: 'YOUR_SSH_PASSWORD',
+                    port: 65002,
+                    allowAnyHosts: true
+                ], command: '''
+                    cd /home/u434256881/domains/goaariva.com/public_html
+                    git pull origin main
+                    composer install --no-dev --optimize-autoloader
+                    php artisan migrate --force
+                    php artisan optimize:clear
+                    php artisan optimize
                 '''
-            }
-        }
-
-        stage('Generate App Key') {
-            steps {
-                bat 'php artisan key:generate --force'
-            }
-        }
-
-        stage('Storage Link') {
-            steps {
-                bat 'php artisan storage:link'
-            }
-        }
-
-        stage('Optimize') {
-            steps {
-                bat 'php artisan optimize:clear'
-                bat 'php artisan optimize'
-            }
-        }
-
-        stage('Build Completed') {
-            steps {
-                echo '✅ AARIVA Build Successful'
             }
         }
     }
 
     post {
-        always {
-            cleanWs()
-        }
-
         success {
-            echo '✅ Deployment Successful'
+            echo '✅ AARIVA deployed successfully!'
         }
 
         failure {
-            echo '❌ Build Failed'
+            echo '❌ Deployment failed!'
         }
     }
 }

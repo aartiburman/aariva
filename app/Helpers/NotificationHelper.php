@@ -6,8 +6,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\WebPushNotification;
 use App\Models\NotificationSetting;
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
 use Illuminate\Support\Facades\Log;
 
 class NotificationHelper
@@ -70,7 +68,7 @@ class NotificationHelper
                 Notification::send($users, new WebPushNotification($notificationData));
             }
             Log::info('NotificationHelper: Database notification sent successfully');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('NotificationHelper: Database notification failed: ' . $e->getMessage());
         }
 
@@ -169,6 +167,11 @@ class NotificationHelper
      */
     protected static function sendFirebasePush($users, $data, $setting = null)
     {
+        if (!class_exists('Kreait\\Firebase\\Factory')) {
+            Log::warning('Firebase SDK not installed. Skipping Firebase push.');
+            return;
+        }
+
         $serviceAccount = self::getServiceAccount($setting);
 
         if (!$serviceAccount) {
@@ -177,7 +180,7 @@ class NotificationHelper
         }
 
         try {
-            $factory = (new Factory)
+            $factory = (new \Kreait\Firebase\Factory)
                 ->withServiceAccount($serviceAccount);
 
             $messaging = $factory->createMessaging();
@@ -196,7 +199,7 @@ class NotificationHelper
                         continue;
                     }
 
-                    $message = CloudMessage::fromArray([
+                    $message = \Kreait\Firebase\Messaging\CloudMessage::fromArray([
                         'token' => $token,
                         'notification' => [
                             'title' => (string) ($data['title'] ?? 'Notification'),
@@ -212,13 +215,15 @@ class NotificationHelper
                     $messaging->send($message);
 
                     Log::info("FCM sent successfully to User ID {$user->id} using token: " . substr($token, 0, 10) . '...');
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     Log::error(
                         "FCM Send Error for User {$user->id}: " . $e->getMessage()
                     );
                 }
             }
-        } catch (\Exception $e) {
+
+            Log::info('Firebase push sent to ' . count($users) . ' users');
+        } catch (\Throwable $e) {
             Log::error(
                 'Firebase Initialization Error: ' . $e->getMessage()
             );
@@ -243,12 +248,12 @@ class NotificationHelper
         }
 
         try {
-            $factory = (new Factory)
+            $factory = (new \Kreait\Firebase\Factory)
                 ->withServiceAccount($serviceAccount);
 
             $messaging = $factory->createMessaging();
 
-            $message = CloudMessage::fromArray([
+            $message = \Kreait\Firebase\Messaging\CloudMessage::fromArray([
                 'token' => $token,
                 'notification' => [
                     'title' => (string) ($data['title'] ?? 'Notification'),
@@ -266,7 +271,7 @@ class NotificationHelper
             Log::info('Direct FCM push sent successfully');
 
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error(
                 'Direct Firebase Error: ' . $e->getMessage()
             );
@@ -338,7 +343,7 @@ class NotificationHelper
                 'message' => 'Your device token has been registered via NotificationHelper.',
                 'type' => 'system'
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::warning('FCM Verification notification failed via helper: ' . $e->getMessage());
         }
 

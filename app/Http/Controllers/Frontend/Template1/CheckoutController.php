@@ -14,6 +14,7 @@ use App\Models\PaymentGateway;
 use App\Models\GeneralSetting;
 use App\Helpers\ImageHelper;
 use App\Helpers\PriceHelper;
+use App\Services\BillService;
 use App\Helpers\PriceCalculationHelper;
 use App\Helpers\GeneralHelper;
 use Illuminate\Http\Request;
@@ -414,6 +415,15 @@ class CheckoutController extends Controller
         }
 
         $order = $order->firstOrFail();
+
+        if (!\App\Models\Bill::where('order_id', $order->id)->exists()) {
+            try {
+                $billService = app(BillService::class);
+                $billService->generate($order);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Bill generation failed: ' . $e->getMessage());
+            }
+        }
 
         // Get recommended/cross-sell products
         $crossSellProducts = Product::where('status', 1)

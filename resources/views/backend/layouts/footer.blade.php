@@ -19,7 +19,6 @@
 <!-- END Wrapper -->
 
 <style>
-/* Stylish Circular Loader */
 #page-loader {
     position: fixed;
     top: 0;
@@ -28,31 +27,53 @@
     height: 100%;
     background: #fff;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 999999;
 }
 
-.loader-circle {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(111, 66, 193, 0.1);
-    border-radius: 50%;
-    border-top-color: #6f42c1;
-    animation: spin 1s ease-in-out infinite;
-    -webkit-animation: spin 1s ease-in-out infinite;
+#page-loader svg {
+    width: 80px;
+    height: 80px;
+    animation: bounce-cart 1.2s ease-in-out infinite;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+#page-loader .loader-text {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #b8860b;
+    font-weight: 500;
+    letter-spacing: 1px;
+    animation: pulse-text 1.5s ease-in-out infinite;
 }
-@-webkit-keyframes spin {
-    to { -webkit-transform: rotate(360deg); }
+
+@keyframes bounce-cart {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-text {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
 }
 </style>
 
 <div id="page-loader">
-    <div class="loader-circle"></div>
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="15" y="38" width="70" height="45" rx="4" fill="#b8860b" opacity="0.15"/>
+        <rect x="15" y="38" width="70" height="45" rx="4" stroke="#b8860b" stroke-width="2.5" fill="none"/>
+        <path d="M28 38V28C28 18 32 12 42 12H58C68 12 72 18 72 28V38" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <circle cx="38" cy="56" r="5" fill="#b8860b"/>
+        <circle cx="62" cy="56" r="5" fill="#b8860b"/>
+        <line x1="38" y1="56" x2="38" y2="66" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+        <line x1="62" y1="56" x2="62" y2="66" stroke="#b8860b" stroke-width="2" stroke-linecap="round"/>
+        <path d="M38 66C38 70 42 72 50 72C58 72 62 70 62 66" stroke="#b8860b" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M48 46L52 46" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M36 46L38 46" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M62 46L64 46" stroke="#b8860b" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="loader-text">Loading...</div>
 </div>
 
 <!-- ================= Vendor & Core Scripts ================= -->

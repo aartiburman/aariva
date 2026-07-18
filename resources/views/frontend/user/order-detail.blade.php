@@ -38,6 +38,10 @@
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <h5 class="mb-0">Order #{{ $order->order_reference_id }}</h5>
                             <a href="{{ route('frontend.user.orders') }}" class="btn btn-light btn-ecomm"><i class="bx bx-arrow-back"></i> Back</a>
+                            @php $hasBill = \App\Models\Bill::where('order_id', $order->id)->first(); @endphp
+                            @if($hasBill)
+                            <a href="{{ url('/api/bill/' . $hasBill->id . '/stream') }}" class="btn btn-dark btn-ecomm" target="_blank"><i class="bx bx-receipt"></i> Download Bill</a>
+                            @endif
                         </div>
 
                         <div class="row g-3 mb-4">

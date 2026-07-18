@@ -34,6 +34,7 @@ use App\Helpers\CampaignBudgetHelper;
 use App\Services\Payment\PhonePeService;
 use App\Services\Payment\PaytmService;
 use App\Services\Logistics\EkartService;
+use App\Services\BillService;
 
 class UserCheckout extends Controller
 {
@@ -376,6 +377,12 @@ class UserCheckout extends Controller
                 }
 
                 Cart::where('user_id', $request->user_id)->delete();
+
+                try {
+                    app(BillService::class)->generate($order);
+                } catch (\Exception $e) {
+                    Log::error('Bill generation failed for order #' . $order->id . ': ' . $e->getMessage());
+                }
 
                 $finalOrder = Order::with('items')->find($order->id);
                 return response()->json([
@@ -766,6 +773,13 @@ class UserCheckout extends Controller
             
             $order = $result;
             $this->saveCardIfPresent($request);
+
+            try {
+                app(BillService::class)->generate($order);
+            } catch (\Exception $e) {
+                Log::error('Bill generation failed for order #' . $order->id . ': ' . $e->getMessage());
+            }
+
             $finalOrder = Order::with('items')->find($order->id);
 
             return response()->json(['status' => true, 'message' => 'Order placed successfully', 'order_id' => $finalOrder->id, 'order' => $finalOrder, 'order_items' => $finalOrder->items], 201);

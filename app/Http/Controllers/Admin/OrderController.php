@@ -47,9 +47,12 @@ class OrderController extends Controller
     private function getVendorIds($user)
     {
         if ((string)$user->role === '1') {
-            return User::where('role', '2')->pluck('id')->values()->toArray();
+            $vendorIds = User::where('role', '2')->pluck('id')->values()->toArray();
+            $vendorIds[] = $user->id;
+            return $vendorIds;
         }
         return [$user->id];
+
     }
 
     private function applyFilters(Request $request, $query, $user)
@@ -120,10 +123,10 @@ class OrderController extends Controller
         $user = Auth::user();
         $vendorIds = $this->getVendorIds($user);
         $statusCounts = $this->getStatusCounts($vendorIds);
-
         /* ===============================
        BASE QUERY (ORDER ITEMS)
     =============================== */
+
         $query = OrderItem::with([
             'product',
             'order.user',
@@ -143,9 +146,11 @@ class OrderController extends Controller
             ->paginate(15)->withQueryString();
 
         $vendors = [];
-        if ((string)$user->role === '1') {
-            $vendors = User::where('role', '2')->get();
-        }
+        // if ((string)$user->role === '1') {
+        //     $vendors = User::where('role', '2')->get();
+        // }
+
+
 
         if ($request->ajax()) {
              return view('backend.orders.partials.orders-table', compact('orders'))->render();

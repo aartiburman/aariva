@@ -1,9 +1,7 @@
  @extends('backend.layouts.app')
  @section('content')
-
-<!-- [ Main Content ] start -->
- <section class="pc-container">
-     <div class="pc-content">
+<div class="page-content">
+    <div class="container-fluid">
          <!-- [ breadcrumb ] start -->
          <div class="card">
              <div class="card-header">
@@ -30,67 +28,21 @@
          </div>
          <!-- [ breadcrumb ] end -->
 
-
-
          <div class="row">
              <!-- [ basic-table ] start -->
              <div class="col-xl-12">
-                 <!-- <div class="card">
-                     <div class="card-header">
-                         <h5>Inline Form</h5>
-                     </div>
-                     <div class="card-body">
-                         <form class="row row-cols-md-auto g-3 align-items-center">
-                             <div class="col-12">
-                                 <label class="visually-hidden" for="inlineFormInputName">Name</label>
-                                 <input type="text" class="form-control" id="inlineFormInputName" placeholder="Jane Doe">
-                             </div>
-                             <div class="col-12">
-                                 <label class="visually-hidden" for="inlineFormInputGroupUsername">Username</label>
-                                 <div class="input-group">
-                                     <div class="input-group-text">@</div>
-                                     <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Username">
-                                 </div>
-                             </div>
-                             <div class="col-12">
-                                 <label class="visually-hidden" for="inlineFormSelectPref">Preference</label>
-                                 <select class="form-select" id="inlineFormSelectPref">
-                                     <option selected="">Choose...</option>
-                                     <option value="1">One</option>
-                                     <option value="2">Two</option>
-                                     <option value="3">Three</option>
-                                 </select>
-                             </div>
-                             <div class="col-12">
-                                 <div class="form-check">
-                                     <input class="form-check-input" type="checkbox" id="inlineFormCheck">
-                                     <label class="form-check-label" for="inlineFormCheck"> Remember me </label>
-                                 </div>
-                             </div>
-                             <div class="col-12">
-                                 <button type="submit" class="btn btn-primary">Submit</button>
-                             </div>
-                         </form>
-                     </div>
-                 </div> -->
                  <div class="card">
                      <div class="card-header">
                         <h5 style="display:inline-block;">Tax Rate List</h5>
                         <a href="{{route('add.tax.rate')}}" class="btn btn-success d-inline-flex" style="float:right;color: white;">
                             <iconify-icon icon="solar:plus-linear" class="me-1"></iconify-icon>Add Tax Rate</a>
-                    </div>
+                     </div>
                      <div class="card-body table-border-style">
                          <div class="table-responsive">
                              <table class="table datatables" id="pc-dt-filter">
                                  <thead>
                                      <tr>
-                                         <th>
-                                             <label class="custom-checkbox">
-                                                 <input type="checkbox">
-                                                 <span class="checkmark"></span>
-                                             </label>
-                                         </th>
-
+                                         <th>#</th>
                                          <th>Tax Name</th>
                                          <th>Slug</th>
                                          <th>Tax %</th>
@@ -103,43 +55,42 @@
                                  </thead>
 
                                  <tbody>
-                                     {{-- Example Row --}}
+                                     @forelse($taxRates as $tax)
                                      <tr>
+                                         <td>{{ $loop->iteration }}</td>
+                                         <td>{{ $tax->name }}</td>
+                                         <td>{{ $tax->slug }}</td>
+                                         <td>{{ $tax->tax_percentage }}%</td>
+                                         <td>{{ $tax->country ?? '—' }}</td>
+                                         <td>{{ $tax->state ?? '—' }}</td>
                                          <td>
-                                             <label class="custom-checkbox">
-                                                 <input type="checkbox">
-                                                 <span class="checkmark"></span>
-                                             </label>
+                                             <span class="badge bg-{{ $tax->is_active ? 'success' : 'danger' }}">
+                                                 {{ $tax->is_active ? 'Active' : 'Inactive' }}
+                                             </span>
                                          </td>
-
-                                         <td>GST</td>
-                                         <td>gst</td>
-                                         <td>18%</td>
-                                         <td>India</td>
-                                         <td>Maharashtra</td>
-
+                                         <td>{{ $tax->created_at->format('d M Y') }}</td>
                                          <td>
-                                             <span class="badge bg-success">Active</span>
+                                             <div class="d-flex align-items-center gap-3">
+                                                 <a href="{{ route('edit.tax.rate', $tax->id) }}" class="text-purple hover-opacity-100" data-bs-toggle="tooltip" title="Edit Tax Rate">
+                                                     <iconify-icon icon="solar:pen-linear" class="fs-20"></iconify-icon>
+                                                 </a>
+                                                 <form action="{{ route('delete.tax.rate') }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this tax rate?')">
+                                                     @csrf
+                                                     <input type="hidden" name="id" value="{{ $tax->id }}">
+                                                     <button type="submit" class="btn btn-link text-purple p-0 hover-opacity-100" data-bs-toggle="tooltip" title="Delete Tax Rate" style="background: none; border: none;">
+                                                         <iconify-icon icon="solar:trash-bin-trash-linear" class="fs-20"></iconify-icon>
+                                                     </button>
+                                                 </form>
+                                             </div>
                                          </td>
-
-                                         <td>2025-05-05</td>
-
-                                         <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <a href="#" class="text-purple hover-opacity-100" data-bs-toggle="tooltip" title="Edit Tax Rate">
-                                                    <iconify-icon icon="solar:pen-linear" class="fs-20"></iconify-icon>
-                                                </a>
-                                                <a href="#" class="text-purple hover-opacity-100" data-bs-toggle="tooltip" title="Delete Tax Rate">
-                                                    <iconify-icon icon="solar:trash-bin-trash-linear" class="fs-20"></iconify-icon>
-                                                </a>
-                                            </div>
-                                        </td>
                                      </tr>
-
-                                     {{-- @foreach($taxRates as $tax) --}}
+                                     @empty
+                                     <tr>
+                                         <td colspan="9" class="text-center">No tax rates found.</td>
+                                     </tr>
+                                     @endforelse
                                  </tbody>
                              </table>
-
                          </div>
                      </div>
                  </div>
@@ -148,8 +99,6 @@
          </div>
          <!-- [ Main Content ] end -->
      </div>
- </section>
  <!-- [ Main Content ] end -->
-
+</div>
  @endsection
-

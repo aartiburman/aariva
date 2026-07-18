@@ -191,7 +191,8 @@ class NotificationController extends Controller
     public function updatePlayerId(Request $request)
     {
         $request->validate([
-            'token' => 'required|string',
+            'token' => 'nullable|string',
+            'player_id' => 'nullable|string',
             'type' => 'nullable|string',
         ]);
 
@@ -203,7 +204,13 @@ class NotificationController extends Controller
             ], 401);
         }
 
-        $token = $request->token;
+        $token = $request->token ?? $request->player_id;
+        if (empty($token)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Token or player_id is required'
+            ], 422);
+        }
         $type = $request->type ?? 'web';
 
         $updated = NotificationHelper::updateDeviceToken($user, $token, $type);
