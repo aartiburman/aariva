@@ -15625,6 +15625,7 @@ html[data-menu-size=hidden] .topbar {
   margin-left: -45px;
   height: var(--bs-logo-lg-height);
 }
+
 .logo-box .logo-light {
   display: none;
 }

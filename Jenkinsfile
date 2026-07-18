@@ -31,12 +31,6 @@ pipeline {
             }
         }
 
-        stage('Run Migration') {
-            steps {
-                bat 'php artisan migrate --force'
-            }
-        }
-
         stage('Optimize') {
             steps {
                 bat 'php artisan optimize:clear'
