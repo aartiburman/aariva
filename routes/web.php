@@ -615,24 +615,29 @@ Route::group(['namespace' => 'App\Http\Controllers\Frontend\Template1', 'as' => 
         Route::get('count', 'WishlistController@count')->name('count');
     });
 
-    // Checkout (Requires Auth)
-    Route::middleware('auth')->group(function () {
-        Route::prefix('checkout')->as('checkout.')->group(function () {
-            Route::get('/', 'CheckoutController@index')->name('index');
-            Route::post('place-order', 'CheckoutController@placeOrder')->name('place-order');
-            Route::get('success/{reference_id}', 'CheckoutController@success')->name('success');
+    // Checkout (Accessible to all — guest checkout supported)
+    Route::prefix('checkout')->as('checkout.')->group(function () {
+        Route::get('/', 'CheckoutController@index')->name('index');
+        Route::post('place-order', 'CheckoutController@placeOrder')->name('place-order');
+        Route::get('success/{reference_id}', 'CheckoutController@success')->name('success');
+        Route::post('check-pincode', 'CheckoutController@checkPincode')->name('check-pincode');
+        Route::post('apply-coupon', 'CheckoutController@applyCoupon')->name('apply-coupon');
+        Route::post('remove-coupon', 'CheckoutController@removeCoupon')->name('remove-coupon');
+        Route::post('set-delivery', 'CheckoutController@setDelivery')->name('set-delivery');
+        Route::middleware('auth')->group(function () {
             Route::post('address/add', 'CheckoutController@addAddress')->name('address.add');
             Route::delete('address/{id}', 'CheckoutController@deleteAddress')->name('address.delete');
+            Route::get('addresses', 'CheckoutController@getAddresses')->name('addresses');
         });
+    });
 
-        // User Account
-        Route::prefix('my-account')->as('user.')->group(function () {
-            Route::get('profile', 'UserController@profile')->name('profile');
-            Route::post('profile/update', 'UserController@updateProfile')->name('profile.update');
-            Route::get('orders', 'UserController@orders')->name('orders');
-            Route::get('orders/{id}', 'UserController@orderDetail')->name('order-detail');
-            Route::get('addresses', 'UserController@addresses')->name('addresses');
-        });
+    // User Account (requires auth)
+    Route::middleware('auth')->prefix('my-account')->as('user.')->group(function () {
+        Route::get('profile', 'UserController@profile')->name('profile');
+        Route::post('profile/update', 'UserController@updateProfile')->name('profile.update');
+        Route::get('orders', 'UserController@orders')->name('orders');
+        Route::get('orders/{id}', 'UserController@orderDetail')->name('order-detail');
+        Route::get('addresses', 'UserController@addresses')->name('addresses');
     });
 
     // Vendor Registration

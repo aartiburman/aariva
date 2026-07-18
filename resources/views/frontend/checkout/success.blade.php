@@ -1,98 +1,193 @@
-@extends('frontend.layouts.app')
+@php
+  $paymentStatus = $order->payment_status ?? 0;
+  $orderStatus = $order->status ?? 0;
+  $isSuccess = $paymentStatus || $orderStatus >= 0;
+  $deliveryDate = $order->delivery_date ? \Carbon\Carbon::parse($order->delivery_date)->format('d M Y') : $deliveryEnd ?? 'N/A';
+@endphp
 
-@section('content')
-<section class="py-3 border-bottom border-top d-none d-md-flex bg-light">
-    <div class="container">
-        <div class="page-breadcrumb d-flex align-items-center">
-            <h3 class="breadcrumb-title pe-3">Order Complete</h3>
-            <div class="ms-auto">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0 p-0">
-                        <li class="breadcrumb-item"><a href="{{ route('frontend.home') }}"><i class="bx bx-home-alt"></i> Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Order Complete</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order Confirmed - {{ config('app.name') }}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="{{ asset('frontend/assets/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+  <link href="{{ asset('frontend/assets/css/checkout.css') }}" rel="stylesheet">
+</head>
+<body style="background:#FFFDF8;font-family:'Albert Sans',sans-serif;">
+  <div class="checkout-logo">
+    <a href="{{ route('frontend.home') }}">
+      <img src="{{ asset('frontend/assets/images/logo-icon.png') }}" alt="{{ config('app.name') }}">
+    </a>
+  </div>
+
+  <div class="confirmation-page">
+    {{-- Confirmation Header --}}
+    <div class="confirmation-header">
+      <div class="check-icon"><i class="bx bx-check"></i></div>
+      <h2>{{ __('Thank You!') }}</h2>
+      <p>
+        @auth
+          {{ __('Hi') }} {{ Auth::user()->name }},
+        @endauth
+        {{ __('Your order has been confirmed.') }}
+      </p>
     </div>
-</section>
-<section class="py-4">
-    <div class="container">
-        <div class="card py-3 mt-sm-3">
-            <div class="card-body text-center">
-                <h2 class="h4 pb-3">Thank you for your order!</h2>
-                <p class="fs-sm mb-2">Your order has been placed and will be processed as soon as possible.</p>
-                <p class="fs-sm mb-2">
-                    Your order number is <strong>{{ $order->order_reference_id }}</strong>.
-                </p>
-                <p class="fs-sm">You will be receiving an email shortly with confirmation of your order.</p>
-                <a class="btn btn-light rounded-0 mt-3 me-3" href="{{ route('frontend.home') }}"><i class="bx bx-home"></i> Go back shopping</a>
-                <a class="btn btn-dark rounded-0 mt-3" href="{{ route('frontend.user.orders') }}"><i class="bx bx-receipt"></i> View Orders</a>
-            </div>
-        </div>
 
-        <div class="card mt-4 rounded-0">
-            <div class="card-body">
-                <h5 class="mb-3">Order Details</h5>
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Order Reference</th>
-                        <td>{{ $order->order_reference_id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Transaction ID</th>
-                        <td>{{ $order->transaction_id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Payment Mode</th>
-                        <td>{{ $order->payment_mode }}</td>
-                    </tr>
-                    <tr>
-                        <th>Order Date</th>
-                        <td>{{ $order->order_date ? date('d M Y, h:i A', strtotime($order->order_date)) : 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Total Cost</th>
-                        <td>{{ App\Helpers\PriceHelper::formatPrice($order->total_cost) }}</td>
-                    </tr>
-                    <tr>
-                        <th>Shipping Address</th>
-                        <td>
-                            @if ($order->shippingAddress)
-                                {{ $order->shippingAddress->name }},
-                                {{ $order->shippingAddress->address }},
-                                {{ $order->shippingAddress->city }},
-                                {{ $order->shippingAddress->state }} {{ $order->shippingAddress->zip }}
-                            @else
-                                N/A
-                            @endif
-                        </td>
-                    </tr>
-                </table>
-
-                <h5 class="mt-4 mb-3">Items</h5>
-                <table class="table table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($order->items as $item)
-                        <tr>
-                            <td>{{ $item->product->name ?? 'N/A' }}</td>
-                            <td>{{ App\Helpers\PriceHelper::formatPrice($item->price) }}</td>
-                            <td>{{ $item->quantity }}</td>
-                            <td>{{ App\Helpers\PriceHelper::formatPrice($item->total_actual_price) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    {{-- Order Details --}}
+    <div class="confirmation-details">
+      <div class="detail-row">
+        <span class="lbl">{{ __('Order Number') }}</span>
+        <span class="val" style="color:#C89B3C;">{{ $order->order_reference_id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Transaction ID') }}</span>
+        <span class="val">{{ $order->transaction_id ?? 'N/A' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Payment Mode') }}</span>
+        <span class="val">{{ $order->payment_mode }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Order Date') }}</span>
+        <span class="val">{{ $order->order_date ? date('d M Y, h:i A', strtotime($order->order_date)) : 'N/A' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Total Amount') }}</span>
+        <span class="val" style="font-size:18px;">{{ App\Helpers\PriceHelper::formatPrice($order->total_cost) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Expected Delivery') }}</span>
+        <span class="val" style="color:#28A745;">{{ $deliveryDate }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Delivery Address') }}</span>
+        <span class="val" style="text-align:right;max-width:300px;">
+          @if ($order->shippingAddress)
+            {{ $order->shippingAddress->name }},<br>
+            {{ $order->shippingAddress->address }},<br>
+            {{ $order->shippingAddress->city }}@if($order->shippingAddress->state), {{ $order->shippingAddress->state }}@endif @if($order->shippingAddress->zip) - {{ $order->shippingAddress->zip }}@endif
+          @else
+            N/A
+          @endif
+        </span>
+      </div>
     </div>
-</section>
-@endsection
+
+    {{-- Items Review --}}
+    <div class="confirmation-details">
+      <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">{{ __('Items Ordered') }}</h5>
+      <div class="order-review">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ __('Product') }}</th>
+              <th>{{ __('Qty') }}</th>
+              <th>{{ __('Price') }}</th>
+              <th>{{ __('Delivery') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($order->items as $item)
+            <tr>
+              <td>
+                <div class="or-product">
+                  <img src="{{ App\Helpers\ImageHelper::getProductImage($item->product->thumbnail ?? '') }}" alt="">
+                  <div>
+                    <div class="or-name">{{ $item->product->name ?? 'Product' }}</div>
+                    <div class="or-meta">
+                      @if ($item->variant) 
+                        @if ($item->variant->color) Color: {{ $item->variant->color }} @endif
+                        @if ($item->variant->size) Size: {{ $item->variant->size }} @endif
+                      @endif
+                      Seller: {{ $item->vendor->store_name ?? 'AARIVA' }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>{{ $item->quantity }}</td>
+              <td class="or-price">{{ App\Helpers\PriceHelper::formatPrice($item->price) }}</td>
+              <td class="or-delivery">{{ $deliveryDate }}</td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {{-- Price Breakdown --}}
+    <div class="confirmation-details">
+      <h5 style="font-size:15px;font-weight:600;margin-bottom:12px;">{{ __('Price Breakdown') }}</h5>
+      <div class="detail-row">
+        <span class="lbl">{{ __('Items Total') }}</span>
+        <span class="val">{{ App\Helpers\PriceHelper::formatPrice($order->sub_total) }}</span>
+      </div>
+      @if ($order->product_discounts > 0)
+      <div class="detail-row">
+        <span class="lbl">{{ __('Product Discount') }}</span>
+        <span class="val" style="color:#DC3545;">-{{ App\Helpers\PriceHelper::formatPrice($order->product_discounts) }}</span>
+      </div>
+      @endif
+      @if ($order->coupon_discounts > 0)
+      <div class="detail-row">
+        <span class="lbl">{{ __('Coupon Discount') }}</span>
+        <span class="val" style="color:#28A745;">-{{ App\Helpers\PriceHelper::formatPrice($order->coupon_discounts) }}</span>
+      </div>
+      @endif
+      <div class="detail-row">
+        <span class="lbl">{{ __('Shipping') }}</span>
+        <span class="val" style="color:#28A745;">{{ $order->delivery_charges > 0 ? App\Helpers\PriceHelper::formatPrice($order->delivery_charges) : 'FREE' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">{{ __('GST') }}</span>
+        <span class="val">{{ App\Helpers\PriceHelper::formatPrice($order->taxes) }}</span>
+      </div>
+      <div class="detail-row" style="border-top:2px solid #222;padding-top:12px;margin-top:8px;">
+        <span class="lbl" style="font-weight:700;font-size:16px;">{{ __('Total') }}</span>
+        <span class="val" style="font-weight:700;font-size:18px;">{{ App\Helpers\PriceHelper::formatPrice($order->total_cost) }}</span>
+      </div>
+    </div>
+
+    {{-- Action Buttons --}}
+    <div class="confirmation-actions">
+      <a href="{{ route('frontend.user.orders') }}" class="btn-track">
+        <i class="bx bx-package"></i> {{ __('Track Order') }}
+      </a>
+      <a href="javascript:;" class="btn-continue" onclick="alert('Invoice download coming soon')">
+        <i class="bx bx-download"></i> {{ __('Download Invoice') }}
+      </a>
+      <a href="{{ route('frontend.home') }}" class="btn-continue">
+        <i class="bx bx-shopping-bag"></i> {{ __('Continue Shopping') }}
+      </a>
+    </div>
+
+    {{-- Cross Selling --}}
+    @if (isset($crossSellProducts) && $crossSellProducts->count() > 0)
+    <div class="cross-sell">
+      <h5><i class="bx bx-star" style="color:#C89B3C;"></i> {{ __('Customers also bought') }}</h5>
+      <div class="cross-sell-grid">
+        @foreach ($crossSellProducts as $csProduct)
+        @php
+          $firstVar = $csProduct->lowestPriceVariant;
+          $csPrice = $firstVar ? $firstVar->price : $csProduct->price;
+          $csImg = $csProduct->thumbnail ? App\Helpers\ImageHelper::getProductImage($csProduct->thumbnail) : asset('frontend/assets/images/products/01.png');
+          $csSlug = $csProduct->slug;
+        @endphp
+        <a href="{{ route('frontend.products.show', $csSlug) }}" class="cross-sell-item" style="text-decoration:none;color:inherit;">
+          <img src="{{ $csImg }}" alt="">
+          <div class="cs-name">{{ $csProduct->name }}</div>
+          <div class="cs-price">{{ App\Helpers\PriceHelper::formatPrice($csPrice) }}</div>
+          <span class="cs-add">{{ __('View') }} <i class="bx bx-chevron-right"></i></span>
+        </a>
+        @endforeach
+      </div>
+    </div>
+    @endif
+  </div>
+
+  <script src="{{ asset('frontend/assets/js/jquery.min.js') }}"></script>
+</body>
+</html>
