@@ -1,26 +1,15 @@
 pipeline {
     agent any
 
-    environment {
-        PHP = "php"
-        COMPOSER = "composer"
-    }
-
     stages {
-
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Composer Install') {
             steps {
-                bat '%COMPOSER% install --no-interaction --prefer-dist'
+                bat 'composer install --no-interaction --prefer-dist'
             }
         }
 
-        stage('Environment') {
+        stage('Create .env') {
             steps {
                 bat '''
                 if not exist .env (
@@ -30,45 +19,49 @@ pipeline {
             }
         }
 
-        stage('Generate Key') {
+        stage('Generate App Key') {
             steps {
-                bat '%PHP% artisan key:generate'
+                bat 'php artisan key:generate --force'
             }
         }
 
         stage('Storage Link') {
             steps {
-                bat '%PHP% artisan storage:link'
+                bat 'php artisan storage:link'
             }
         }
 
-        stage('Migration') {
+        stage('Run Migration') {
             steps {
-                bat '%PHP% artisan migrate --force'
+                bat 'php artisan migrate --force'
             }
         }
 
         stage('Optimize') {
             steps {
-                bat '%PHP% artisan optimize:clear'
-                bat '%PHP% artisan optimize'
+                bat 'php artisan optimize:clear'
+                bat 'php artisan optimize'
             }
         }
 
-        stage('Finished') {
+        stage('Build Completed') {
             steps {
-                echo 'AARIVA Build Successful'
+                echo '✅ AARIVA Build Successful'
             }
         }
     }
 
     post {
+        always {
+            cleanWs()
+        }
+
         success {
-            echo 'Deployment Successful'
+            echo '✅ Deployment Successful'
         }
 
         failure {
-            echo 'Build Failed'
+            echo '❌ Build Failed'
         }
     }
 }
